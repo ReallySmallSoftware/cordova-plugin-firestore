@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="0.0.1">
+  <name>Cordova Firestore Plugin</name>
+  <description>Google Firebase Firestorm</description>
+  <license>MIT</license>
+  <keywords>database, nosql, realtime, cloud</keywords>
+  <repo></repo>
+  <issue></issue>
+
+  <platform name="browser">
+    <js-module src="www/browser/firestore.js" name="Firestore">
+      <runs/>
+      <clobbers target="Firestore"/>
+    </js-module>
+  </platform>
+
+  <platform name="android">
+    <js-module src="www/firestore.js" name="Firestore">
+      <runs/>
+      <clobbers target="Firestore"/>
+    </js-module>
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="Firestore">
+        <param name="android-package" value="uk.co.reallysmall.cordova.plugin.firestore.FirestorePlugin"/>
+        <param name="onload" value="true"/>
+      </feature>
+    </config-file>
+
+    <framework src="com.google.firebase:firebase-firestore:11.4.2" />
+
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestorePlugin.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+  </platform>
+
+  <platform name="ios">
+    <js-module src="www/firestore.js" name="Firestore">
+      <runs/>
+      <clobbers target="Firestore"/>
+    </js-module>
+    <config-file target="config.xml" parent="/*">
+      <feature name="Firestore">
+        <param name="ios-package" value="FirestorePlugin" onload="true"/>
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/FirestorePlugin.h"/>
+    <source-file src="src/ios/FirestorePlugin.m"/>
+  </platform>
+
+</plugin>
