@@ -10,14 +10,16 @@
 
   <platform name="browser">
     <js-module src="www/browser/firestore.js" name="Firestore">
-      <runs/>
       <clobbers target="Firestore"/>
+    </js-module>
+    <js-module src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js" name="FirebaseCore">
+    </js-module>
+    <js-module src="https://www.gstatic.com/firebasejs/4.5.0/firebase-firestore.js" name="FirebaseFirestore">
     </js-module>
   </platform>
 
   <platform name="android">
     <js-module src="www/firestore.js" name="Firestore">
-      <runs/>
       <clobbers target="Firestore"/>
     </js-module>
     <config-file target="res/xml/config.xml" parent="/*">
@@ -27,14 +29,14 @@
       </feature>
     </config-file>
 
-    <framework src="com.google.firebase:firebase-firestore:11.4.2" />
+    <framework src="com.google.firebase:firebase-firestore:11.6.0" />
+    <framework src="firestore.gradle" custom="true" type="gradleReference"/>
 
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestorePlugin.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
   </platform>
 
   <platform name="ios">
     <js-module src="www/firestore.js" name="Firestore">
-      <runs/>
       <clobbers target="Firestore"/>
     </js-module>
     <config-file target="config.xml" parent="/*">

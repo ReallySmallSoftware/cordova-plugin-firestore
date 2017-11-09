@@ -1,8 +1,14 @@
 var exec = require('cordova/exec');
 
 var PLUGIN_NAME = 'Firestore';
+var listenerCtr = 1;
 
-function Firestore(persist) {
+function Firestore(persist, datePrefix) {
+  if (datePrefix === undefined) {
+    this.datePrefix = "__DATE(";
+  } else {
+    this.datePrefix = datePrefix;
+  }
   exec(function() {}, null, PLUGIN_NAME, 'initialise', [persist]);
 }
 
@@ -18,25 +24,12 @@ Firestore.prototype = {
 function CollectionReference(path, id) {
   this.path = path;
   this.id = id;
+  this.limit = -1;
+  this.endAt = -1;
+  this.endBefore = -1;
+  this.orderByArray = [];
+  this.whereArray = [];
 }
-
-Object.defineProperties(CollectionReference.prototype, {
-  firestore: {
-    get: function() {
-      throw "CollectionReference.firestore: Not supported";
-    }
-  },
-  id: {
-    get: function() {
-      return this.id;
-    }
-  },
-  parent: {
-    get: function() {
-      throw "CollectionReference.parent: Not supported";
-    }
-  }
-})
 
 CollectionReference.prototype = {
   add: function(data) {
@@ -64,24 +57,39 @@ CollectionReference.prototype = {
       exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
     });
   },
-  limit: function() {
-    throw "CollectionReference.limit: Not supported";
+  limit: function(limit) {
+    this.limit = limit;
     return this;
   },
-  orderBy: function(field) {
-    throw "CollectionReference.orderBy: Not supported";
-    return this;
-  },
-  onSnapshot: function(callback) {
-    var args = [this.path, [],
-      []
-    ];
-    var wrappedCallback = function(data) {
-      alert("create qs");
-
-      callback(new QuerySnapshot(data));
+  orderBy: function(field, direction) {
+    if (direction === undefined) {
+      direction = "ASCENDING";
     }
-    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
+
+    var orderByField = {
+      "field": field,
+      "direction": direction
+    };
+    this.orderByArray[] = orderByField;
+    return this;
+  },
+  onSnapshot: function(callback, options) {
+    var args = [this.path, this.whereArray, this.orderByArray, this.limit, options];
+
+    var resolved = false;
+    var id = callback.$listenerId || ++listenerCtr;
+    callback.$listenerId = id;
+
+    return new Promise(function(resolve, reject) {
+      exec(function(data) {
+        var snapshot = new QuerySnapshot(data);
+        callback(snapshot);
+        if (!resolved) {
+          resolve(callback);
+          resolved = true;
+        }
+      }, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
+    }.bind(this));
   },
   startAfter: function(snapshotOrVarArgs) {
     throw "CollectionReference.startAfter: Not supported";
@@ -91,21 +99,27 @@ CollectionReference.prototype = {
     throw "CollectionReference.startAt: Not supported";
     return this;
   },
-  where: function(fieldPath, opStr, value) {
-    throw "CollectionReference.where: Not supported";
+  where: function(fieldPath, opStr, passedValue) {
+    var value;
+    if (typeof passedValue is Date) {
+      value = "__DATE(" + passedValue.getTime() + ")";
+    } else {
+      value = passedValue;
+    }
+    var whereField = {
+      "fieldPath": fieldPath,
+      "opStr": opStr,
+      "value": value
+    };
+    this.whereArray[] = whereField;
     return this;
   }
 };
 
-function DocumentReference(collectionReference, id) {
-  this.id = id;
-  this.collectionReference = collectionReference;
-}
-
-Object.defineProperties(DocumentReference.prototype, {
+Object.defineProperties(CollectionReference.prototype, {
   firestore: {
     get: function() {
-      throw "DocumentReference.firestore: Not supported";
+      throw "CollectionReference.firestore: Not supported";
     }
   },
   id: {
@@ -115,10 +129,16 @@ Object.defineProperties(DocumentReference.prototype, {
   },
   parent: {
     get: function() {
-      return this.collectionReference;
+      throw "CollectionReference.parent: Not supported";
     }
   }
 });
+
+function DocumentReference(collectionReference, id) {
+  this.id = id;
+  this.collectionReference = collectionReference;
+}
+
 
 DocumentReference.prototype = {
   _isFunction: function(functionToCheck) {
@@ -144,7 +164,6 @@ DocumentReference.prototype = {
 
     if (this._isFunction(optionsOrObserverOrOnNext)) {
       wrappedCallback = function(documentSnapshot) {
-        alert("create ds1");
         optionsOrObserverOrOnNext(new DocumentSnapshot(documentSnapshot));
       }
     } else if (this._isFunction(observerOrOnNextOrOnError)) {
@@ -154,8 +173,9 @@ DocumentReference.prototype = {
     } else {
       wrappedCallback = function(documentSnapshot) {}
     }
-
-    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
+    return new Promise(function(resolve, reject) {
+      exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
+    }.bind(this));
   },
   set: function(data, options) {
 
@@ -165,7 +185,7 @@ DocumentReference.prototype = {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
     });
   },
-  update: function(data ) {
+  update: function(data) {
 
     var args = [this.collectionReference.path, this.id, data];
 
@@ -175,14 +195,11 @@ DocumentReference.prototype = {
   }
 };
 
-function DocumentSnapshot(data) {
-  this._data = data;
-}
 
-Object.defineProperties(DocumentSnapshot.prototype, {
-  exists: {
+Object.defineProperties(DocumentReference.prototype, {
+  firestore: {
     get: function() {
-      return this._data.exists;
+      throw "DocumentReference.firestore: Not supported";
     }
   },
   id: {
@@ -190,17 +207,32 @@ Object.defineProperties(DocumentSnapshot.prototype, {
       return this.id;
     }
   },
-  metadata: {
+  parent: {
     get: function() {
-      throw "DocumentReference.metadata: Not supported";
-    }
-  },
-  ref: {
-    get: function() {
-      throw "DocumentReference.ref: Not supported";
+      return this.collectionReference;
     }
   }
 });
+
+function DocumentSnapshot(data) {
+  this._data = data;
+
+  var keys = Object.keys(this._data._data);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    console.log(key, this._data._data[key]);
+
+    if (typeof this._data._data[key] === 'string' && this._data._data[key].startsWith("__DATE(")) {
+      var length = this._data._data[key].length;
+      var wrapperLength = "__DATE(".length;
+
+      var timestamp = this._data._data[key].substring(wrapperLength, length - wrapperLength - 1);
+
+      this._data._data[key] = new Date(timestamp);
+    }
+  }
+
+}
 
 DocumentSnapshot.prototype = {
   _fieldPath: function(obj, i) {
@@ -214,9 +246,42 @@ DocumentSnapshot.prototype = {
   }
 };
 
+Object.defineProperties(DocumentSnapshot.prototype, {
+  exists: {
+    get: function() {
+      return this._data.exists;
+    }
+  },
+  id: {
+    get: function() {
+      return this._data.id;
+    }
+  },
+  metadata: {
+    get: function() {
+      throw "DocumentReference.metadata: Not supported";
+    }
+  },
+  ref: {
+    get: function() {
+      return this._data.ref;
+    }
+  }
+});
+
+
 function QuerySnapshot(data) {
   this._data = data;
 }
+
+QuerySnapshot.prototype = {
+  forEach: function(callback, thisArg) {
+    var keys = Object.keys(this._data.docs);
+    for (var i = 0; i < keys.length; i++) {
+      callback(new DocumentSnapshot(this._data.docs[i]));
+    }
+  }
+};
 
 Object.defineProperties(QuerySnapshot.prototype, {
   docChanges: {
@@ -250,19 +315,6 @@ Object.defineProperties(QuerySnapshot.prototype, {
     }
   }
 });
-
-QuerySnapshot.prototype = {
-  forEach: function(callback, thisArg) {
-    alert("fe");
-    console.log(JSON.stringify(this._data.docs));
-    $.each(this._data.docs, function(i, v) {
-      alert("fe "+i);
-      console.log(JSON.stringify(v));
-      callback(new DocumentSnapshot(v));
-    });
-  }
-};
-
 module.exports = {
   initialise: function() {
     return new Firestore();
