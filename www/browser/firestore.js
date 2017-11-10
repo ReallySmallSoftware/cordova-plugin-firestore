@@ -1,16 +1,35 @@
 var PLUGIN_NAME = 'Firestore';
 
-function Firestore(persist) {
+var loadJS = function(url, implementationCode, location) {
+  var scriptTag = document.createElement('script');
+  scriptTag.src = url;
+
+  scriptTag.onload = implementationCode;
+  scriptTag.onreadystatechange = implementationCode;
+
+  location.appendChild(scriptTag);
+};
+
+function Firestore(persist, firebaseOptions) {
 
   var self = this;
 
-  if (persist) {
-    firebase.firestore().enablePersistence().then(function() {
+  var initialise = function() {
+
+    firebase.initializeApp(firebaseOptions);
+
+    if (persist) {
+      firebase.firestore().enablePersistence().then(function() {
+        self.database = firebase.firestore();
+      });
+    } else {
       self.database = firebase.firestore();
-    });
-  } else {
-    self.database = firebase.firestore();
+    }
   }
+  loadJS('https://www.gstatic.com/firebasejs/4.5.0/firebase.js', function() {
+    loadJS('https://www.gstatic.com/firebasejs/4.5.0/firebase-firestore.js', initialise, document.body);
+  }, document.body);
+
 }
 
 Firestore.prototype.get = function() {
@@ -18,7 +37,7 @@ Firestore.prototype.get = function() {
 };
 
 module.exports = {
-  initialise: function() {
-    return new Firestore();
+  initialise: function(persist, firebaseOptions) {
+    return new Firestore(persist, firebaseOptions);
   }
 };

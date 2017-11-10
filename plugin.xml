@@ -12,10 +12,6 @@
     <js-module src="www/browser/firestore.js" name="Firestore">
       <clobbers target="Firestore"/>
     </js-module>
-    <js-module src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js" name="FirebaseCore">
-    </js-module>
-    <js-module src="https://www.gstatic.com/firebasejs/4.5.0/firebase-firestore.js" name="FirebaseFirestore">
-    </js-module>
   </platform>
 
   <platform name="android">

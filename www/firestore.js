@@ -1,13 +1,17 @@
 var exec = require('cordova/exec');
+var utils = require("cordova/utils");
 
 var PLUGIN_NAME = 'Firestore';
-var listenerCtr = 1;
 
 function Firestore(persist, datePrefix) {
   if (datePrefix === undefined) {
     this.datePrefix = "__DATE(";
   } else {
     this.datePrefix = datePrefix;
+  }
+
+  if (persist === undefined) {
+    persist = true;
   }
   exec(function() {}, null, PLUGIN_NAME, 'initialise', [persist]);
 }
@@ -21,45 +25,20 @@ Firestore.prototype = {
   }
 };
 
-function CollectionReference(path, id) {
-  this.path = path;
-  this.id = id;
-  this.limit = -1;
-  this.endAt = -1;
-  this.endBefore = -1;
-  this.orderByArray = [];
-  this.whereArray = [];
+function Query(ref, queryType, value) {
+  this.ref = ref;
+  this.ref.queries.push({"queryType" : queryType, "value" : value});
 }
 
-CollectionReference.prototype = {
-  add: function(data) {
-    var args = [this.collectionReference.path, data];
-
-    return new Promise(function(resolve, reject) {
-      exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
-    });
-  },
-  doc: function(id) {
-    return new DocumentReference(this, id);
-  },
+Query.prototype = {
   endAt: function(snapshotOrVarArgs) {
-    throw "CollectionReference.endAt: Not supported";
-    return this;
+    return new Query(this.ref, "endAt", snapshotOrVarArgs);
   },
   endBefore: function(snapshotOrVarArgs) {
-    throw "CollectionReference.endBefore: Not supported";
-    return this;
-  },
-  get: function() {
-    var args = [this.collectionReference.path];
-
-    return new Promise(function(resolve, reject) {
-      exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
-    });
+    return new Query(this.ref, "endBefore", snapshotOrVarArgs);
   },
   limit: function(limit) {
-    this.limit = limit;
-    return this;
+    return new Query(this.ref, "limit", limit);
   },
   orderBy: function(field, direction) {
     if (direction === undefined) {
@@ -70,15 +49,20 @@ CollectionReference.prototype = {
       "field": field,
       "direction": direction
     };
-    this.orderByArray[] = orderByField;
-    return this;
+    return new Query(this.ref, "orderBy", orderByField);
+  },
+  get: function() {
+    var args = [this.ref.path, this.ref.queries];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
+    });
   },
   onSnapshot: function(callback, options) {
-    var args = [this.path, this.whereArray, this.orderByArray, this.limit, options];
+    var args = [this.ref.path, this.ref.queries, options];
 
     var resolved = false;
-    var id = callback.$listenerId || ++listenerCtr;
-    callback.$listenerId = id;
+    callback.$listenerId = utils.createUUID();
 
     return new Promise(function(resolve, reject) {
       exec(function(data) {
@@ -92,16 +76,14 @@ CollectionReference.prototype = {
     }.bind(this));
   },
   startAfter: function(snapshotOrVarArgs) {
-    throw "CollectionReference.startAfter: Not supported";
-    return this;
+    return new Query(this.ref, "startAfter", snapshotOrVarArgs);
   },
   startAt: function(snapshotOrVarArgs) {
-    throw "CollectionReference.startAt: Not supported";
-    return this;
+    return new Query(this.ref, "startAt", snapshotOrVarArgs);
   },
   where: function(fieldPath, opStr, passedValue) {
     var value;
-    if (typeof passedValue is Date) {
+    if (passedValue instanceof Date) {
       value = "__DATE(" + passedValue.getTime() + ")";
     } else {
       value = passedValue;
@@ -111,12 +93,18 @@ CollectionReference.prototype = {
       "opStr": opStr,
       "value": value
     };
-    this.whereArray[] = whereField;
-    return this;
+    return new Query(this.ref, "where", whereField);
   }
 };
 
-Object.defineProperties(CollectionReference.prototype, {
+function CollectionReference(path, id) {
+  this.path = path;
+  this.id = id;
+  this.ref = this;
+  this.queries = [];
+}
+
+CollectionReference.prototype = Object.create(Query.prototype, {
   firestore: {
     get: function() {
       throw "CollectionReference.firestore: Not supported";
@@ -131,6 +119,16 @@ Object.defineProperties(CollectionReference.prototype, {
     get: function() {
       throw "CollectionReference.parent: Not supported";
     }
+  },
+  add: function(data) {
+    var args = [this.collectionReference.path, data];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
+    });
+  },
+  doc: function(id) {
+    return new DocumentReference(this, id);
   }
 });
 
@@ -138,7 +136,6 @@ function DocumentReference(collectionReference, id) {
   this.id = id;
   this.collectionReference = collectionReference;
 }
-
 
 DocumentReference.prototype = {
   _isFunction: function(functionToCheck) {
@@ -165,13 +162,13 @@ DocumentReference.prototype = {
     if (this._isFunction(optionsOrObserverOrOnNext)) {
       wrappedCallback = function(documentSnapshot) {
         optionsOrObserverOrOnNext(new DocumentSnapshot(documentSnapshot));
-      }
+      };
     } else if (this._isFunction(observerOrOnNextOrOnError)) {
       wrappedCallback = function(documentSnapshot) {
         observerOrOnNextOrOnError(new DocumentSnapshot(documentSnapshot));
-      }
+      };
     } else {
-      wrappedCallback = function(documentSnapshot) {}
+      wrappedCallback = function(documentSnapshot) {};
     }
     return new Promise(function(resolve, reject) {
       exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
@@ -220,15 +217,14 @@ function DocumentSnapshot(data) {
   var keys = Object.keys(this._data._data);
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
-    console.log(key, this._data._data[key]);
 
     if (typeof this._data._data[key] === 'string' && this._data._data[key].startsWith("__DATE(")) {
       var length = this._data._data[key].length;
       var wrapperLength = "__DATE(".length;
 
-      var timestamp = this._data._data[key].substring(wrapperLength, length - wrapperLength - 1);
+      var timestamp = this._data._data[key].substr(wrapperLength, length - wrapperLength - 1);
 
-      this._data._data[key] = new Date(timestamp);
+      this._data._data[key] = new Date(parseInt(timestamp));
     }
   }
 

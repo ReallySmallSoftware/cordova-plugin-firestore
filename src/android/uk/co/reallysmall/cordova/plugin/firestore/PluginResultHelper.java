@@ -1,7 +1,5 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.util.Log;
-
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 

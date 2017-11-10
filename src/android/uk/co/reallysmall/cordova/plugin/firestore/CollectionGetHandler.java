@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.cordova.CallbackContext;
@@ -24,6 +26,7 @@ public class CollectionGetHandler implements ActionHandler {
     public boolean handle(JSONArray args, final CallbackContext callbackContext) {
         try {
             final String collectionPath = args.getString(0);
+            final JSONArray queries = args.getJSONArray(1);
 
             firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
                 @Override
@@ -32,7 +35,10 @@ public class CollectionGetHandler implements ActionHandler {
                     Log.d(FirestorePlugin.TAG, "Getting document from collection");
 
                     try {
-                        firestorePlugin.getDatabase().collection(collectionPath).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath);
+                        Query query = QueryHelper.processQueries(queries, collectionRef);
+
+                        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot querySnapshot) {
                                 callbackContext.sendPluginResult(createPluginResult(querySnapshot, false));
