@@ -26,19 +26,22 @@ Firestore.prototype = {
 };
 
 function Query(ref, queryType, value) {
-  this.ref = ref;
-  this.ref.queries.push({"queryType" : queryType, "value" : value});
+  this._ref = ref;
+  this._ref._queries.push({
+    "queryType": queryType,
+    "value": value
+  });
 }
 
 Query.prototype = {
   endAt: function(snapshotOrVarArgs) {
-    return new Query(this.ref, "endAt", snapshotOrVarArgs);
+    return new Query(this._ref, "endAt", snapshotOrVarArgs);
   },
   endBefore: function(snapshotOrVarArgs) {
-    return new Query(this.ref, "endBefore", snapshotOrVarArgs);
+    return new Query(this._ref, "endBefore", snapshotOrVarArgs);
   },
   limit: function(limit) {
-    return new Query(this.ref, "limit", limit);
+    return new Query(this._ref, "limit", limit);
   },
   orderBy: function(field, direction) {
     if (direction === undefined) {
@@ -49,17 +52,19 @@ Query.prototype = {
       "field": field,
       "direction": direction
     };
-    return new Query(this.ref, "orderBy", orderByField);
+    return new Query(this._ref, "orderBy", orderByField);
   },
   get: function() {
-    var args = [this.ref.path, this.ref.queries];
+    var args = [this._ref._path, this._ref._queries];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
+    }).then(function(data) {
+      return new QuerySnapshot(data);
     });
   },
   onSnapshot: function(callback, options) {
-    var args = [this.ref.path, this.ref.queries, options];
+    var args = [this._ref._path, this._ref._queries, options];
 
     var resolved = false;
     callback.$listenerId = utils.createUUID();
@@ -73,13 +78,13 @@ Query.prototype = {
           resolved = true;
         }
       }, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
-    }.bind(this));
+    });
   },
   startAfter: function(snapshotOrVarArgs) {
-    return new Query(this.ref, "startAfter", snapshotOrVarArgs);
+    return new Query(this._ref, "startAfter", snapshotOrVarArgs);
   },
   startAt: function(snapshotOrVarArgs) {
-    return new Query(this.ref, "startAt", snapshotOrVarArgs);
+    return new Query(this._ref, "startAt", snapshotOrVarArgs);
   },
   where: function(fieldPath, opStr, passedValue) {
     var value;
@@ -93,15 +98,15 @@ Query.prototype = {
       "opStr": opStr,
       "value": value
     };
-    return new Query(this.ref, "where", whereField);
+    return new Query(this._ref, "where", whereField);
   }
 };
 
 function CollectionReference(path, id) {
-  this.path = path;
-  this.id = id;
-  this.ref = this;
-  this.queries = [];
+  this._path = path;
+  this._id = id;
+  this._ref = this;
+  this._queries = [];
 }
 
 CollectionReference.prototype = Object.create(Query.prototype, {
@@ -112,29 +117,31 @@ CollectionReference.prototype = Object.create(Query.prototype, {
   },
   id: {
     get: function() {
-      return this.id;
+      return this._id;
     }
   },
   parent: {
     get: function() {
       throw "CollectionReference.parent: Not supported";
     }
-  },
-  add: function(data) {
-    var args = [this.collectionReference.path, data];
-
-    return new Promise(function(resolve, reject) {
-      exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
-    });
-  },
-  doc: function(id) {
-    return new DocumentReference(this, id);
   }
 });
 
+CollectionReference.prototype.add = function(data) {
+  var args = [this._path, data];
+
+  return new Promise(function(resolve, reject) {
+    exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
+  });
+};
+
+CollectionReference.prototype.doc = function(id) {
+  return new DocumentReference(this, id);
+}
+
 function DocumentReference(collectionReference, id) {
-  this.id = id;
-  this.collectionReference = collectionReference;
+  this._id = id;
+  this._collectionReference = collectionReference;
 }
 
 DocumentReference.prototype = {
@@ -149,10 +156,16 @@ DocumentReference.prototype = {
     throw "DocumentReference.delete(): Not supported";
   },
   get: function() {
-    throw "DocumentReference.get(): Not supported";
+    var args = [this._collectionReference._path, this._id];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docGet', args);
+    }).then(function(data) {
+      return new DocumentSnapshot(data);
+    });
   },
   onSnapshot: function(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
-    var args = [this.collectionReference.path, this.id];
+    var args = [this._collectionReference._path, this._id];
 
     if (!this._isFunction(optionsOrObserverOrOnNext)) {
       args.push(optionsOrObserverOrOnNext);
@@ -176,7 +189,7 @@ DocumentReference.prototype = {
   },
   set: function(data, options) {
 
-    var args = [this.collectionReference.path, this.id, data, options];
+    var args = [this._collectionReference._path, this._id, data, options];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
@@ -184,7 +197,7 @@ DocumentReference.prototype = {
   },
   update: function(data) {
 
-    var args = [this.collectionReference.path, this.id, data];
+    var args = [this._collectionReference._path, this._id, data];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docUpdate', args);
@@ -201,12 +214,12 @@ Object.defineProperties(DocumentReference.prototype, {
   },
   id: {
     get: function() {
-      return this.id;
+      return this._id;
     }
   },
   parent: {
     get: function() {
-      return this.collectionReference;
+      return this._collectionReference;
     }
   }
 });
@@ -214,20 +227,21 @@ Object.defineProperties(DocumentReference.prototype, {
 function DocumentSnapshot(data) {
   this._data = data;
 
-  var keys = Object.keys(this._data._data);
-  for (var i = 0; i < keys.length; i++) {
-    var key = keys[i];
+  if (data.exists) {
+    var keys = Object.keys(this._data._data);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
 
-    if (typeof this._data._data[key] === 'string' && this._data._data[key].startsWith("__DATE(")) {
-      var length = this._data._data[key].length;
-      var wrapperLength = "__DATE(".length;
+      if (typeof this._data._data[key] === 'string' && this._data._data[key].startsWith("__DATE(")) {
+        var length = this._data._data[key].length;
+        var wrapperLength = "__DATE(".length;
 
-      var timestamp = this._data._data[key].substr(wrapperLength, length - wrapperLength - 1);
+        var timestamp = this._data._data[key].substr(wrapperLength, length - wrapperLength - 1);
 
-      this._data._data[key] = new Date(parseInt(timestamp));
+        this._data._data[key] = new Date(parseInt(timestamp));
+      }
     }
   }
-
 }
 
 DocumentSnapshot.prototype = {
