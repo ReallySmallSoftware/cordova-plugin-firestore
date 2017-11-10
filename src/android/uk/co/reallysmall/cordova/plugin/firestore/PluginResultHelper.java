@@ -1,5 +1,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
+import android.util.Log;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -18,6 +20,8 @@ public class PluginResultHelper {
     static PluginResult createPluginResult(QuerySnapshot value, boolean reusable) {
         JSONObject querySnapshot = new JSONObject();
         JSONArray array = new JSONArray();
+
+        Log.e(FirestorePlugin.TAG, "Creating query snapshot result");
 
         for (DocumentSnapshot doc : value) {
             JSONObject document = createDocumentSnapshot(doc);
@@ -38,15 +42,19 @@ public class PluginResultHelper {
     private static JSONObject createDocumentSnapshot(DocumentSnapshot doc) {
         JSONObject documentSnapshot = new JSONObject();
 
+        Log.e(FirestorePlugin.TAG, "Creating document snapshot result");
+
         try {
             documentSnapshot.put("id", doc.getId());
             documentSnapshot.put("exists", doc.exists());
             documentSnapshot.put("ref", doc.getReference().getId());
 
-            documentSnapshot.put("_data", JSONHelper.toJSON(doc.getData()));
+            if (doc.exists()) {
+                documentSnapshot.put("_data", JSONHelper.toJSON(doc.getData()));
+            }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(FirestorePlugin.TAG, "Error creating document snapshot result", e);
         }
 
         return documentSnapshot;

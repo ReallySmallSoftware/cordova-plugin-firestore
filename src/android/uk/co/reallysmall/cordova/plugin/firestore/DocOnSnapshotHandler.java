@@ -27,10 +27,12 @@ public class DocOnSnapshotHandler implements ActionHandler {
         try {
             final String collectionPath = args.getString(0);
             final String doc = args.getString(1);
+            final String callbackId = args.getString(2);
+
             final JSONObject options;
 
-            if (args.length() > 2) {
-                options = args.getJSONObject(2);
+            if (args.length() > 3) {
+                options = args.getJSONObject(3);
             } else {
                 options = null;
             }
@@ -39,14 +41,15 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 @Override
                 public void run() {
 
-                    Log.d(FirestorePlugin.TAG, "Listening to document");
+                    Log.d(FirestorePlugin.TAG, "Listening to document " + collectionPath + " " + doc);
 
                     DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
                     DocumentListenOptions documentListenOptions = getDocumentListenOptions(options);
+                    Log.d(FirestorePlugin.TAG, "SS for document "+collectionPath+"/"+doc);
 
                     EventListener eventListener = new EventListener<DocumentSnapshot>() {
                         @Override
-                        public void onEvent(@Nullable DocumentSnapshot value,
+                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
                                             @Nullable FirebaseFirestoreException e) {
                             if (e != null) {
                                 Log.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
@@ -54,14 +57,14 @@ public class DocOnSnapshotHandler implements ActionHandler {
                             }
 
                             Log.d(FirestorePlugin.TAG, "Got document snapshot data");
-                            callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(value, true));
+                            callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentSnapshot, true));
                         }
                     };
 
                     if (documentListenOptions == null) {
-                        documentRef.addSnapshotListener(eventListener);
+                        firestorePlugin.addRegistration(callbackId,documentRef.addSnapshotListener(eventListener));
                     } else {
-                        documentRef.addSnapshotListener(documentListenOptions, eventListener);
+                        firestorePlugin.addRegistration(callbackId,documentRef.addSnapshotListener(documentListenOptions, eventListener));
                     }
                 }
             });

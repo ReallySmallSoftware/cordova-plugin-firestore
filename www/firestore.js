@@ -64,21 +64,18 @@ Query.prototype = {
     });
   },
   onSnapshot: function(callback, options) {
-    var args = [this._ref._path, this._ref._queries, options];
 
-    var resolved = false;
-    callback.$listenerId = utils.createUUID();
+    callbackId = utils.createUUID();
+    var args = [this._ref._path, this._ref._queries, options, callbackId];
 
-    return new Promise(function(resolve, reject) {
-      exec(function(data) {
-        var snapshot = new QuerySnapshot(data);
-        callback(snapshot);
-        if (!resolved) {
-          resolve(callback);
-          resolved = true;
-        }
-      }, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
-    });
+    var callbackWrapper = function(data) {
+      callback(new QuerySnapshot(data));
+    }
+    exec(callbackWrapper, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
+
+    return function() {
+      exec(function() {}, function() {}, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
+    };
   },
   startAfter: function(snapshotOrVarArgs) {
     return new Query(this._ref, "startAfter", snapshotOrVarArgs);
@@ -165,7 +162,10 @@ DocumentReference.prototype = {
     });
   },
   onSnapshot: function(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
-    var args = [this._collectionReference._path, this._id];
+
+    var callbackId = utils.createUUID();
+
+    var args = [this._collectionReference._path, this._id, callbackId];
 
     if (!this._isFunction(optionsOrObserverOrOnNext)) {
       args.push(optionsOrObserverOrOnNext);
@@ -183,9 +183,12 @@ DocumentReference.prototype = {
     } else {
       wrappedCallback = function(documentSnapshot) {};
     }
-    return new Promise(function(resolve, reject) {
-      exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
-    }.bind(this));
+
+    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
+
+    return function() {
+      exec(function() {}, function() {}, PLUGIN_NAME, 'docUnsubscribe', [callbackId]);
+    };
   },
   set: function(data, options) {
 

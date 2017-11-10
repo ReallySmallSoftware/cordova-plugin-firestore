@@ -27,6 +27,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
             final String collection = args.getString(0);
             final JSONArray queries = args.getJSONArray(1);
             final JSONObject options = args.optJSONObject(2);
+            final String callbackId = args.getString(3);
 
             firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
                 @Override
@@ -56,9 +57,9 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                         };
 
                         if (queryListenOptions == null) {
-                            query.addSnapshotListener(eventListener);
+                            firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(eventListener));
                         } else {
-                            query.addSnapshotListener(queryListenOptions, eventListener);
+                            firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(queryListenOptions, eventListener));
                         }
 
                     } catch (Exception e) {
