@@ -60,7 +60,7 @@ public class FirestorePlugin extends CordovaPlugin {
     }
 
     public void addRegistration(String callbackId, ListenerRegistration listenerRegistration) {
-        registrations.put(callbackId,listenerRegistration);
+        registrations.put(callbackId, listenerRegistration);
         Log.d(TAG, "Registered subscriber " + callbackId);
 
     }

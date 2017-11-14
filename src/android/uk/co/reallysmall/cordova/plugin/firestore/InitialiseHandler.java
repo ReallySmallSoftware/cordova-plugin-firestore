@@ -19,7 +19,7 @@ public class InitialiseHandler implements ActionHandler {
     }
 
     @Override
-    synchronized public boolean handle(JSONArray args, CallbackContext callbackContext) {
+    public boolean handle(final JSONArray args, CallbackContext callbackContext) {
 
         try {
             if (firestorePlugin.getDatabase() == null) {
@@ -38,6 +38,7 @@ public class InitialiseHandler implements ActionHandler {
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
         }
+
 
         return true;
     }

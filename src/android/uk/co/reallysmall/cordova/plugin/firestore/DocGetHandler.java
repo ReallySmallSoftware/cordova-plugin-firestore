@@ -2,24 +2,16 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentListenOptions;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import static uk.co.reallysmall.cordova.plugin.firestore.PluginResultHelper.createPluginResult;
 
@@ -37,34 +29,30 @@ public class DocGetHandler implements ActionHandler {
             final String collectionPath = args.getString(0);
             final String doc = args.getString(1);
 
-            firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
 
-                    Log.d(FirestorePlugin.TAG, "Listening to document");
+            Log.d(FirestorePlugin.TAG, "Listening to document");
 
-                    try {
-                        DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-                        Log.d(FirestorePlugin.TAG, "Get for document "+collectionPath+"/"+doc);
+            try {
+                DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
+                Log.d(FirestorePlugin.TAG, "Get for document " + collectionPath + "/" + doc);
 
-                        documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                callbackContext.sendPluginResult(createPluginResult(documentSnapshot, false));
-                                Log.d(FirestorePlugin.TAG, "Successfully got document");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(FirestorePlugin.TAG, "Error getting document", e);
-                                callbackContext.error(e.getMessage());
-                            }
-                        });
-                    } catch (Exception ex) {
-                        Log.e(FirestorePlugin.TAG, "Error processing document get in thread", ex);
+                documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        callbackContext.sendPluginResult(createPluginResult(documentSnapshot, false));
+                        Log.d(FirestorePlugin.TAG, "Successfully got document");
                     }
-                }
-            });
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(FirestorePlugin.TAG, "Error getting document", e);
+                        callbackContext.error(e.getMessage());
+                    }
+                });
+            } catch (Exception ex) {
+                Log.e(FirestorePlugin.TAG, "Error processing document get in thread", ex);
+            }
+
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
         }

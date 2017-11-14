@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.SetOptions;
 
 import org.apache.cordova.CallbackContext;
@@ -28,33 +29,41 @@ public class DocSetHandler implements ActionHandler {
             final JSONObject data = args.getJSONObject(2);
             final JSONObject options = args.getJSONObject(3);
 
-            firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
 
-                        SetOptions setOptions = getSetOptions(options);
+            try {
 
-                        Log.d(FirestorePlugin.TAG, "Setting document");
+                SetOptions setOptions = getSetOptions(options);
 
-                        firestorePlugin.getDatabase().collection(collection).document(docId).set(data, setOptions).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                callbackContext.success();
-                                Log.d(FirestorePlugin.TAG, "Successfully written document");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(FirestorePlugin.TAG, "Error writing document", e);
-                                callbackContext.error(e.getMessage());
-                            }
-                        });
-                    } catch (Exception e) {
-                        Log.e(FirestorePlugin.TAG, "Error processing document set in thread", e);
+                Log.d(FirestorePlugin.TAG, "Setting document");
+
+                DocumentReference documentReference = firestorePlugin.getDatabase().collection(collection).document(docId);
+
+                OnSuccessListener onSuccessListener = new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        callbackContext.success();
+                        Log.d(FirestorePlugin.TAG, "Successfully written document");
                     }
+                };
+
+                OnFailureListener onFailureListener = new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(FirestorePlugin.TAG, "Error writing document", e);
+                        callbackContext.error(e.getMessage());
+                    }
+                };
+
+                if (setOptions == null) {
+                    documentReference.set(JSONHelper.toSettableMap(data)).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+                } else {
+                    documentReference.set(JSONHelper.toSettableMap(data), setOptions).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
                 }
-            });
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing document set in thread", e);
+            }
+
+
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document set", e);
         }
@@ -65,18 +74,15 @@ public class DocSetHandler implements ActionHandler {
     private SetOptions getSetOptions(JSONObject options) {
         SetOptions setOptions = null;
 
-        if (options != null) {
-
-            try {
-                if (options.getBoolean("merge")) {
-                    setOptions.merge();
-                }
-            } catch (JSONException e) {
-                Log.e(FirestorePlugin.TAG, "Error getting document option", e);
+        try {
+            if (options.getBoolean("merge")) {
+                setOptions = SetOptions.merge();
             }
-
-            Log.d(FirestorePlugin.TAG, "Set document options");
+        } catch (JSONException e) {
+            Log.e(FirestorePlugin.TAG, "Error getting document option", e);
         }
+
+        Log.d(FirestorePlugin.TAG, "Set document options");
 
         return setOptions;
     }

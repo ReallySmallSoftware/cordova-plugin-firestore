@@ -37,37 +37,33 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 options = null;
             }
 
-            firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
+
+            Log.d(FirestorePlugin.TAG, "Listening to document " + collectionPath + " " + doc);
+
+            DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
+            DocumentListenOptions documentListenOptions = getDocumentListenOptions(options);
+            Log.d(FirestorePlugin.TAG, "SS for document " + collectionPath + "/" + doc);
+
+            EventListener eventListener = new EventListener<DocumentSnapshot>() {
                 @Override
-                public void run() {
-
-                    Log.d(FirestorePlugin.TAG, "Listening to document " + collectionPath + " " + doc);
-
-                    DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-                    DocumentListenOptions documentListenOptions = getDocumentListenOptions(options);
-                    Log.d(FirestorePlugin.TAG, "SS for document "+collectionPath+"/"+doc);
-
-                    EventListener eventListener = new EventListener<DocumentSnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
-                                            @Nullable FirebaseFirestoreException e) {
-                            if (e != null) {
-                                Log.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
-                                return;
-                            }
-
-                            Log.d(FirestorePlugin.TAG, "Got document snapshot data");
-                            callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentSnapshot, true));
-                        }
-                    };
-
-                    if (documentListenOptions == null) {
-                        firestorePlugin.addRegistration(callbackId,documentRef.addSnapshotListener(eventListener));
-                    } else {
-                        firestorePlugin.addRegistration(callbackId,documentRef.addSnapshotListener(documentListenOptions, eventListener));
+                public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
+                                    @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
+                        return;
                     }
+
+                    Log.d(FirestorePlugin.TAG, "Got document snapshot data");
+                    callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentSnapshot, true));
                 }
-            });
+            };
+
+            if (documentListenOptions == null) {
+                firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(eventListener));
+            } else {
+                firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(documentListenOptions, eventListener));
+            }
+
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
         }

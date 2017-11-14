@@ -29,44 +29,40 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
             final JSONObject options = args.optJSONObject(2);
             final String callbackId = args.getString(3);
 
-            firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
 
-                    Log.d(FirestorePlugin.TAG, "Listening to collection");
+            Log.d(FirestorePlugin.TAG, "Listening to collection");
 
-                    try {
-                        CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
-                        QueryListenOptions queryListenOptions = getQueryListenOptions(options);
+            try {
+                CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
+                QueryListenOptions queryListenOptions = getQueryListenOptions(options);
 
-                        Query query = QueryHelper.processQueries(queries, collectionRef);
+                Query query = QueryHelper.processQueries(queries, collectionRef);
 
-                        EventListener eventListener = new EventListener<QuerySnapshot>() {
-                            @Override
-                            public void onEvent(@Nullable QuerySnapshot value,
-                                                @Nullable FirebaseFirestoreException e) {
+                EventListener eventListener = new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e) {
 
-                                if (e != null) {
-                                    Log.w(FirestorePlugin.TAG, "Collection snapshot listener error", e);
-                                    return;
-                                }
-
-                                Log.d(FirestorePlugin.TAG, "Got collection snapshot data");
-                                callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(value, true));
-                            }
-                        };
-
-                        if (queryListenOptions == null) {
-                            firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(eventListener));
-                        } else {
-                            firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(queryListenOptions, eventListener));
+                        if (e != null) {
+                            Log.w(FirestorePlugin.TAG, "Collection snapshot listener error", e);
+                            return;
                         }
 
-                    } catch (Exception e) {
-                        Log.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
+                        Log.d(FirestorePlugin.TAG, "Got collection snapshot data");
+                        callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(value, true));
                     }
+                };
+
+                if (queryListenOptions == null) {
+                    firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(eventListener));
+                } else {
+                    firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(queryListenOptions, eventListener));
                 }
-            });
+
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
+            }
+
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing collection snapshot", e);
         }

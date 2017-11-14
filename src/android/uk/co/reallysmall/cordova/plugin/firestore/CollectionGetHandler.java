@@ -28,34 +28,30 @@ public class CollectionGetHandler implements ActionHandler {
             final String collectionPath = args.getString(0);
             final JSONArray queries = args.getJSONArray(1);
 
-            firestorePlugin.cordova.getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
 
-                    Log.d(FirestorePlugin.TAG, "Getting document from collection");
+            Log.d(FirestorePlugin.TAG, "Getting document from collection");
 
-                    try {
-                        CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath);
-                        Query query = QueryHelper.processQueries(queries, collectionRef);
+            try {
+                CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath);
+                Query query = QueryHelper.processQueries(queries, collectionRef);
 
-                        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot querySnapshot) {
-                                callbackContext.sendPluginResult(createPluginResult(querySnapshot, false));
-                                Log.d(FirestorePlugin.TAG, "Successfully got collection");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(FirestorePlugin.TAG, "Error getting collection", e);
-                                callbackContext.error(e.getMessage());
-                            }
-                        });
-                    } catch (Exception ex) {
-                        Log.e(FirestorePlugin.TAG, "Error processing collection get in thread", ex);
+                query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        callbackContext.sendPluginResult(createPluginResult(querySnapshot, false));
+                        Log.d(FirestorePlugin.TAG, "Successfully got collection");
                     }
-                }
-            });
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(FirestorePlugin.TAG, "Error getting collection", e);
+                        callbackContext.error(e.getMessage());
+                    }
+                });
+            } catch (Exception ex) {
+                Log.e(FirestorePlugin.TAG, "Error processing collection get in thread", ex);
+            }
+
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing collection get", e);
         }
