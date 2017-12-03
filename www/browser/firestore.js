@@ -1,3 +1,5 @@
+/* global firebase: false, Promise: false */
+
 var PLUGIN_NAME = 'Firestore';
 
 var loadJS = function(url, implementationCode, location) {
@@ -10,24 +12,26 @@ var loadJS = function(url, implementationCode, location) {
   location.appendChild(scriptTag);
 };
 
-function Firestore(persist, firebaseOptions) {
+function Firestore(options, resolve) {
 
   var self = this;
 
   var initialise = function() {
 
-    firebase.initializeApp(firebaseOptions);
+    firebase.initializeApp(options.browser);
 
-    if (persist) {
+    if (options.persist) {
       firebase.firestore().enablePersistence().then(function() {
         self.database = firebase.firestore();
+        resolve(self);
       });
     } else {
       self.database = firebase.firestore();
+      resolve(self);
     }
-  }
-  loadJS('https://www.gstatic.com/firebasejs/4.5.0/firebase.js', function() {
-    loadJS('https://www.gstatic.com/firebasejs/4.5.0/firebase-firestore.js', initialise, document.body);
+  };
+  loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase.js', function() {
+    loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase-firestore.js', initialise, document.body);
   }, document.body);
 
 }
@@ -37,7 +41,9 @@ Firestore.prototype.get = function() {
 };
 
 module.exports = {
-  initialise: function(persist, firebaseOptions) {
-    return new Firestore(persist, firebaseOptions);
+  initialise: function(options) {
+    return new Promise(function(resolve, reject) {
+      var db = new Firestore(options, resolve);
+    });
   }
 };
