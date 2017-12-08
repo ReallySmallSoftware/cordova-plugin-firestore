@@ -18,9 +18,19 @@
 - (void)docGet:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
+- (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryWhere:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryOrderBy:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryStartAfter:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSObject *)value;
+- (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSObject *)value;
 
-- (NSString *)getDatePrefix;
+- (FIRQueryListenOptions *)getQueryListenOptions:(NSDictionary *)options;
 
 @property(strong) FIRFirestore *firestore;
-@property(strong) NSString *datePrefix;
+@property(strong) NSMutableDictionary *listeners;
+
 @end
+
+typedef void (^DocumentSetBlock)(NSError *_Nullable error);

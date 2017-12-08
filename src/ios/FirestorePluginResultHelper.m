@@ -25,10 +25,10 @@
     NSLog(@"Creating query snapshot result");
     
     if (query.documents != nil) {
-    for (FIRDocumentSnapshot *doc in query.documents) {
-        NSDictionary *document = [FirestorePluginResultHelper createDocumentSnapshot:doc];
-        [result addObject:document];
-    }
+        for (FIRDocumentSnapshot *doc in query.documents) {
+            NSDictionary *document = [FirestorePluginResultHelper createDocumentSnapshot:doc];
+            [result addObject:document];
+        }
     }
     
     querySnapshot = @{ @"docs" : result};

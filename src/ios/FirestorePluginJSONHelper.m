@@ -38,4 +38,8 @@ static NSString *datePrefix = @"__DATE:";
     datePrefix = newDatePrefix;
 }
 
++ (NSString *)getDatePrefix {
+    return datePrefix;
+}
+
 @end

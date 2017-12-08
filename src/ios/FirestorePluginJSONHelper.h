@@ -12,6 +12,7 @@
 
 + (NSDictionary *)toJSON:(NSDictionary *)values;
 + (void)setDatePrefix:(NSString *)datePrefix;
++ (NSString *)getDatePrefix;
 
 @end
 
