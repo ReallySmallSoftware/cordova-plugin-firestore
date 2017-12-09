@@ -176,7 +176,7 @@ DocumentReference.prototype = {
       wrappedCallback = function(documentSnapshot) {};
     }
 
-    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnShapshot', args);
+    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnSnapshot', args);
 
     return function() {
       exec(function() {}, function() {}, PLUGIN_NAME, 'docUnsubscribe', [callbackId]);
@@ -264,7 +264,7 @@ Query.prototype = {
     var callbackWrapper = function(data) {
       callback(new QuerySnapshot(data));
     };
-    exec(callbackWrapper, function() {}, PLUGIN_NAME, 'collectionOnShapshot', args);
+    exec(callbackWrapper, function() {}, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
     return function() {
       exec(function() {}, function() {}, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);

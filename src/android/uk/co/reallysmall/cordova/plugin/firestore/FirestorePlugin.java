@@ -27,14 +27,14 @@ public class FirestorePlugin extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
 
-        handlers.put("collectionOnShapshot", new CollectionOnSnapshotHandler(this));
+        handlers.put("collectionOnSnapshot", new CollectionOnSnapshotHandler(this));
         handlers.put("collectionUnsubscribe", new CollectionUnsubscribeHandler(this));
         handlers.put("collectionAdd", new CollectionAddHandler(this));
         handlers.put("collectionGet", new CollectionGetHandler(this));
         handlers.put("initialise", new InitialiseHandler(this));
         handlers.put("docSet", new DocSetHandler(this));
         handlers.put("docUpdate", new DocUpdateHandler(this));
-        handlers.put("docOnShapshot", new DocOnSnapshotHandler(this));
+        handlers.put("docOnSnapshot", new DocOnSnapshotHandler(this));
         handlers.put("docUnsubscribe", new DocUnsubscribeHandler(this));
         handlers.put("docGet", new DocGetHandler(this));
 
