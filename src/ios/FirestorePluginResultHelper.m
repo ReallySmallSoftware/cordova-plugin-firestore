@@ -43,21 +43,22 @@
 
 + (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc {
     
-    NSString *exists = @"N";
-    NSDictionary *data = nil;
+    NSDictionary *documentSnapshot;
     
     NSLog(@"Creating document snapshot result");
     
     if (doc.exists) {
-        exists = @"Y";
-        data = [FirestorePluginJSONHelper toJSON:doc.data];
+        documentSnapshot = @{ @"id" : doc.documentID,
+                                            @"exists" : @"Y",
+                                            @"ref" : doc.reference.documentID,
+                                            @"_data" : [FirestorePluginJSONHelper toJSON:doc.data]
+                                            };
+    } else {
+        documentSnapshot = @{ @"id" : doc.documentID,
+                                            @"exists" : @"N",
+                                            @"ref" : doc.reference.documentID
+                                            };
     }
-    
-    NSDictionary *documentSnapshot = @{ @"id" : doc.documentID,
-                                        @"exists" : exists,
-                                        @"ref" : doc.reference.documentID,
-                                        @"_data" : data
-                                        };
     
     return documentSnapshot;
 }
