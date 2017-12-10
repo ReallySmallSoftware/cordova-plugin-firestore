@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="0.0.1">
   <name>Cordova Firestore Plugin</name>
-  <description>Google Firebase Firestorm</description>
+  <description>Google Firebase Firestore</description>
   <license>MIT</license>
   <keywords>database, nosql, realtime, cloud</keywords>
   <repo></repo>
