@@ -19,9 +19,15 @@
     "url": "https://github.com/ReallySmallSoftware/cordova-plugin-firestore.git"
   },
   "author": "Richard Windley <richard.windley@gmail.com> (http://www.reallysmall.co.uk)",
-  "license": "Apache",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/ReallySmallSoftware/cordova-plugin-firestore/issues"
   },
-  "homepage": "https://github.com/ReallySmallSoftware/cordova-plugin-firestore"
+  "homepage": "https://github.com/ReallySmallSoftware/cordova-plugin-firestore",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-browser"
+  ]
 }
