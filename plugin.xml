@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="0.0.1">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.2">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
   <keywords>database, nosql, realtime, cloud</keywords>
-  <repo></repo>
-  <issue></issue>
+
+  <dependency id="cordova-plugin-firebase-hooks"/>
 
   <platform name="browser">
     <js-module src="www/browser/firestore.js" name="Firestore">
@@ -25,8 +25,10 @@
       </feature>
     </config-file>
 
-    <framework src="com.google.firebase:firebase-firestore:11.6.0" />
-    <framework src="com.google.code.gson:gson:2.8.2" />
+    <preference name="ANDROID_FIREBASE_VERSION" default="11.6.0"/>
+    <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_VERSION"/>
+    <framework src="com.google.code.gson:gson:2.8.2"/>
+    <framework src="org.json:json:20171018"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>
 
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/ActionHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
@@ -67,6 +69,10 @@
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>
+    <header-file src="src/ios/FirestorePluginJSONHelper.h"/>
+    <source-file src="src/ios/FirestorePluginJSONHelper.m"/>
+    <header-file src="src/ios/FirestorePluginResultHelper.h"/>
+    <source-file src="src/ios/FirestorePluginResultHelper.m"/>
   </platform>
 
 </plugin>

@@ -24,6 +24,17 @@ This is very much a work in progress. Although the planned functionality is beli
 
 This is also the first Cordova plugin that I have written and was probably a fairly ambitious one to start with given not only the relative complexity of the technology being supported but also that I had never touched Objective C prior to this.
 
+Installation
+--
+
+`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0 --save`
+
+or
+
+`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0`
+
+Omitting FIREBASE_VERSION will use a default value.
+
 What is supported?
 --
 
@@ -117,3 +128,16 @@ I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
 - When used on Android ensure that at least `com.google.gms:google-services:3.1.1` is used in build dependencies. Earlier versions did not work for me.
 - Yes, I did spell initialise() with an 's' - I am from the UK
+
+History
+==
+
+1.0.2
+--
+- Updated version
+- Added firebase hooks dependency
+- Corrected iOS source/header-file config
+
+1.0.0
+--
+Initial release
