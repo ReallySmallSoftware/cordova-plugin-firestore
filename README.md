@@ -116,7 +116,7 @@ Therefore, when a date field is retrieved from the database by the native code i
 }
 ```
 
-The number is seconds since EPOC.
+The number is seconds since epoch.
 
 The client will receive the field as a Javascript Date.
 
