@@ -18,7 +18,9 @@ function Firestore(options, resolve) {
 
   var initialise = function() {
 
-    firebase.initializeApp(options.browser);
+    if (firebase.apps.length === 0) {
+      firebase.initializeApp(options.browser);
+    }
 
     if (options.persist) {
       firebase.firestore().enablePersistence().then(function() {
