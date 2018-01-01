@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.3">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -9,11 +9,12 @@
   <dependency id="cordova-plugin-firebase-hooks"/>
 
   <engines>
-      <engine name="cordova" version="&gt;=6.0.0"/>
-      <engine name="cordova-android" version="&gt;=4.0.0"/>
-      <engine name="cordova-plugman" version="&gt;=4.2.0"/>
+      <engine name="cordova" version=">=6.0.0"/>
+      <engine name="cordova-android" version=">=4.0.0"/>
+      <engine name="cordova-plugman" version=">=4.2.0"/>
+      <engine name="cordova-ios" version=">=4.5.4"/>
   </engines>
-  
+
   <platform name="browser">
     <js-module src="www/browser/firestore.js" name="Firestore">
       <clobbers target="Firestore"/>
