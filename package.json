@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-firestore",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "cordova": {
     "id": "cordova-plugin-firestore",
     "platforms": [
