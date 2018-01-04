@@ -132,6 +132,15 @@ I have learnt a number of things whilst implementing this:
 History
 ==
 
+1.0.6
+- Correct README History
+- Make browser firebase dependency loading smarter
+
+1.0.5
+1.0.4
+1.0.3
+- Address plugin dependency issues
+
 1.0.2
 --
 - Updated version

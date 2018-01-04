@@ -2,14 +2,19 @@
 
 var PLUGIN_NAME = 'Firestore';
 
-var loadJS = function(url, implementationCode, location) {
-  var scriptTag = document.createElement('script');
-  scriptTag.src = url;
+var loadJS = function(url, loaded, implementationCode, location) {
 
-  scriptTag.onload = implementationCode;
-  scriptTag.onreadystatechange = implementationCode;
+  if (!loaded) {
+    var scriptTag = document.createElement('script');
+    scriptTag.src = url;
 
-  location.appendChild(scriptTag);
+    scriptTag.onload = implementationCode;
+    scriptTag.onreadystatechange = implementationCode;
+
+    location.appendChild(scriptTag);
+  } else {
+    implementationCode();
+  }
 };
 
 function Firestore(options, resolve) {
@@ -32,8 +37,15 @@ function Firestore(options, resolve) {
       resolve(self);
     }
   };
-  loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase.js', function() {
-    loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase-firestore.js', initialise, document.body);
+
+  var firebaseLoaded = "firebase" in window;
+  var firestoreLoaded = false;
+  if (firebaseLoaded) {
+    firestoreLoaded = "firestore" in firebase;
+  };
+
+  loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase.js', firebaseLoaded, function() {
+    loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase-firestore.js', firestoreLoaded, initialise, document.body);
   }, document.body);
 
 }
