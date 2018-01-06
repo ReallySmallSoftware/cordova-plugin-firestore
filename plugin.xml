@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.6">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.7">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
   <keywords>database, nosql, realtime, cloud</keywords>
-
-  <dependency id="cordova-plugin-firebase-hooks"/>
 
   <engines>
       <engine name="cordova" version=">=6.0.0"/>

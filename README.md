@@ -35,6 +35,26 @@ or
 
 Omitting FIREBASE_VERSION will use a default value.
 
+Firebase configuration
+--
+Android
+--
+You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:
+
+```
+<platform name="android">
+    <resource-file src="google-services.json" target="google-services.json" />
+</platform>
+```
+iOS
+--
+iOS requires `GoogleService-Info.plist` is put in the correct location. Similarly this can be done as follws:
+```
+<platform name="ios">
+    <resource-file src="GoogleService-Info.plist" />
+</platform>
+```
+
 What is supported?
 --
 
@@ -131,6 +151,9 @@ I have learnt a number of things whilst implementing this:
 
 History
 ==
+
+1.0.7
+- Remove dependency on cordova-plugin-firebase-hooks
 
 1.0.6
 - Correct README History
