@@ -11,8 +11,10 @@
 @interface FirestorePluginJSONHelper : NSObject
 
 + (NSDictionary *)toJSON:(NSDictionary *)values;
++ (NSDictionary *)fromJSON:(NSDictionary *)values;
 + (void)setDatePrefix:(NSString *)datePrefix;
 + (NSString *)getDatePrefix;
++ (NSObject *)parseSpecial:(NSObject *)value;
 
 @end
 

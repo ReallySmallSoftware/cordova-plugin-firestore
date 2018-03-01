@@ -1,5 +1,4 @@
 #import <Cordova/CDVPlugin.h>
-@import Firebase;
 @import FirebaseFirestore;
 
 #import "FirestorePluginResultHelper.h"
@@ -35,3 +34,4 @@
 @end
 
 typedef void (^DocumentSetBlock)(NSError *_Nullable error);
+

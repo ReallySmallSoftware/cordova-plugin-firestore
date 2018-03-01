@@ -132,55 +132,40 @@
     NSString *direction = [orderByObject valueForKey:@"direction"];
     NSString *field = [orderByObject valueForKey:@"field"];
 
-    boolValue directionBool = false;
+    BOOL directionBool = false;
 
-    if ([direction isEqualToString:@"DESCENDING"]) {
+    if ([direction isEqualToString:@"desc"]) {
       directionBool = true;
     }
 
-    return [query queryOrderedByField:field descending:[directionBool boolValue]];
+    return [query queryOrderedByField:field descending:directionBool];
 }
 
 - (NSObject *)parseWhereValue:(NSObject *)value {
-    if ([value isKindOfClass:[NSString class]]) {
-        NSString *stringValue = (NSString *)value;
-
-        NSUInteger datePrefixLength = (NSUInteger)[FirestorePluginJSONHelper getDatePrefix].length;
-
-        if ([stringValue substringToIndex:datePrefixLength]) {
-            NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
-            NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timestamp];
-            value = date;
-        }
-    }
-
-    return value;
+    return [FirestorePluginJSONHelper parseSpecial:value];
 }
 
 - (FIRQuery *)processQueryStartAfter:(FIRQuery *)query ForValue:(NSObject *)value {
-    NSArray *array = (NSArray *)value;
-    process date
+    NSMutableArray *array = [[NSMutableArray alloc]init];
+    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
     return [query queryStartingAfterValues:array];
 }
 
 - (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSObject *)value {
-    NSArray *array = (NSArray *)value;
-    process date
-
+    NSMutableArray *array = [[NSMutableArray alloc]init];
+    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
     return [query queryStartingAtValues:array];
 }
 
 - (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSObject *)value {
-    NSArray *array = (NSArray *)value;
-    process date
-
+    NSMutableArray *array = [[NSMutableArray alloc]init];
+    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
     return [query queryEndingAtValues:array];
 }
 
 - (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSObject *)value {
-    NSArray *array = (NSArray *)value;
-    process date
-
+    NSMutableArray *array = [[NSMutableArray alloc]init];
+    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
     return [query queryEndingBeforeValues:array];
 }
 
@@ -193,10 +178,12 @@
 - (void)collectionAdd:(CDVInvokedUrlCommand *)command {
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:1 withDefault:@{} andClass:[NSDictionary class]];
+    
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
 
     FIRCollectionReference *collectionReference = [self.firestore collectionWithPath:collection];
 
-    __block FIRDocumentReference *ref = [collectionReference addDocumentWithData:data completion:^(NSError * _Nullable error) {
+    __block FIRDocumentReference *ref = [collectionReference addDocumentWithData:parsedData completion:^(NSError * _Nullable error) {
 
         CDVPluginResult *pluginResult;
 
@@ -269,6 +256,8 @@
     NSDictionary *data = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
     NSDictionary *options = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
 
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+
     FIRSetOptions *setOptions = [self getSetOptions:options];
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
@@ -295,9 +284,9 @@
     };
 
     if (setOptions == nil) {
-        [documentReference setData:data completion:block];
+        [documentReference setData:parsedData completion:block];
     } else {
-        [documentReference setData:data options:setOptions completion:block];
+        [documentReference setData:parsedData options:setOptions completion:block];
     }
 }
 
@@ -337,9 +326,11 @@
     NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
 
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
 
-    [documentReference updateData:data completion:^(NSError * _Nullable error) {
+    [documentReference updateData:parsedData completion:^(NSError * _Nullable error) {
 
         CDVPluginResult *pluginResult;
 
@@ -451,19 +442,21 @@
     NSString *doc =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
-
-    FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
-        if (snapshot == nil) {
+    
+    [documentReference deleteDocumentWithCompletion:^(NSError * _Nullable error) {
+        
+        CDVPluginResult *pluginResult;
+        
+        if (error != nil) {
             NSLog(@"Document delete error %@", error);
-            return;
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         }
-
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-
-        NSLog(@"Deleted document data");
-
+        
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    };
+    }];
 }
 
 @end
+
