@@ -5,6 +5,11 @@ import com.google.firebase.firestore.Query;
 public class EndBeforeQueryHandler implements QueryHandler {
     @Override
     public Query handle(Query query, Object endBefore) {
+
+        if (JSONDateWrapper.isWrappedDate(endBefore)) {
+            endBefore = JSONDateWrapper.unwrapDate(endBefore);
+        }
+
         return query.endBefore(endBefore);
     }
 }

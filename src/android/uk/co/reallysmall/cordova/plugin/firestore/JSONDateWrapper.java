@@ -14,6 +14,24 @@ public class JSONDateWrapper extends Date {
         JSONDateWrapper.datePrefix = datePrefix;
     }
 
+    public static boolean isWrappedDate(Object value) {
+
+
+        if (value instanceof String && ((String) value).startsWith(datePrefix)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Date unwrapDate(Object value) {
+        String stringValue = (String) value;
+        int prefixLength = datePrefix.length();
+        String timestamp = stringValue.substring(prefixLength).substring(0, stringValue.length() - prefixLength);
+
+        return new Date(Long.parseLong(timestamp));
+    }
+
     @Override
     public String toString() {
         return this.datePrefix + this.getTime();

@@ -9,6 +9,25 @@ var FirestoreOptions = {
   "persist": true
 };
 
+function __wrap(data) {
+
+  if (Object.prototype.toString.call(data) === '[object Date]') {
+    return FirestoreOptions.datePrefix + data.getTime();
+  }
+
+  var keys = Object.keys(data);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+
+    if (Object.prototype.toString.call(data[key]) === '[object Date]') {
+      data[key] = FirestoreOptions.datePrefix + data[key].getTime();
+    } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
+      data[key] = __wrap(data[key]);
+    }
+  }
+  return data;
+}
+
 function Firestore(options) {
   FirestoreOptions = options;
   if (FirestoreOptions.datePrefix === undefined) {
@@ -31,23 +50,32 @@ function DocumentSnapshot(data) {
   this._data = data;
 
   if (data.exists) {
-    var keys = Object.keys(this._data._data);
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-
-      if (typeof this._data._data[key] === 'string' && this._data._data[key].startsWith(FirestoreOptions.datePrefix)) {
-        var length = this._data._data[key].length;
-        var prefixLength = FirestoreOptions.datePrefix.length;
-
-        var timestamp = this._data._data[key].substr(prefixLength, length - prefixLength);
-
-        this._data._data[key] = new Date(parseInt(timestamp));
-      }
-    }
+    this._data._data = this._parse(this._data._data);
   }
 }
 
 DocumentSnapshot.prototype = {
+  _parse: function(data) {
+    var keys = Object.keys(data);
+
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+
+      if (Object.prototype.toString.call(data[key]) === '[object String]' &&
+          data[key].startsWith(FirestoreOptions.datePrefix)) {
+        var length = data[key].length;
+        var prefixLength = FirestoreOptions.datePrefix.length;
+
+        var timestamp = data[key].substr(prefixLength, length - prefixLength);
+
+        data[key] = new Date(parseInt(timestamp));
+      } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
+        data[key] = this._parse(data[key]);
+      }
+    }
+
+    return data;
+  },
   _fieldPath: function(obj, i) {
     return obj[i];
   },
@@ -142,7 +170,13 @@ DocumentReference.prototype = {
     throw "DocumentReference.collection(): Not supported";
   },
   delete: function() {
-    throw "DocumentReference.delete(): Not supported";
+    var args = [this._collectionReference._path, this._id];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docDelete', args);
+    }).then(function() {
+      return;
+    });
   },
   get: function() {
     var args = [this._collectionReference._path, this._id];
@@ -184,7 +218,7 @@ DocumentReference.prototype = {
   },
   set: function(data, options) {
 
-    var args = [this._collectionReference._path, this._id, data, options];
+    var args = [this._collectionReference._path, this._id, __wrap(data), options];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
@@ -192,7 +226,7 @@ DocumentReference.prototype = {
   },
   update: function(data) {
 
-    var args = [this._collectionReference._path, this._id, data];
+    var args = [this._collectionReference._path, this._id, __wrap(data)];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docUpdate', args);
@@ -228,10 +262,10 @@ function Query(ref, queryType, value) {
 
 Query.prototype = {
   endAt: function(snapshotOrVarArgs) {
-    return new Query(this._ref, "endAt", snapshotOrVarArgs);
+    return new Query(this._ref, "endAt", __wrap(snapshotOrVarArgs));
   },
   endBefore: function(snapshotOrVarArgs) {
-    return new Query(this._ref, "endBefore", snapshotOrVarArgs);
+    return new Query(this._ref, "endBefore", __wrap(snapshotOrVarArgs, true));
   },
   limit: function(limit) {
     return new Query(this._ref, "limit", limit);
@@ -271,18 +305,14 @@ Query.prototype = {
     };
   },
   startAfter: function(snapshotOrVarArgs) {
-    return new Query(this._ref, "startAfter", snapshotOrVarArgs);
+    return new Query(this._ref, "startAfter", __wrap(snapshotOrVarArgs));
   },
   startAt: function(snapshotOrVarArgs) {
-    return new Query(this._ref, "startAt", snapshotOrVarArgs);
+    return new Query(this._ref, "startAt", __wrap(snapshotOrVarArgs));
   },
   where: function(fieldPath, opStr, passedValue) {
-    var value;
-    if (passedValue instanceof Date) {
-      value = Firestore.datePrefix + passedValue.getTime();
-    } else {
-      value = passedValue;
-    }
+    var value = __wrap(passedValue);
+
     var whereField = {
       "fieldPath": fieldPath,
       "opStr": opStr,
@@ -318,7 +348,7 @@ CollectionReference.prototype = Object.create(Query.prototype, {
 });
 
 CollectionReference.prototype.add = function(data) {
-  var args = [this._path, data];
+  var args = [this._path, __wrap(data)];
 
   return new Promise(function(resolve, reject) {
     exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);

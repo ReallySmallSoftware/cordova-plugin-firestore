@@ -1,6 +1,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
+import com.google.firebase.FirebaseApp;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -26,7 +27,7 @@ public class InitialiseHandler implements ActionHandler {
 
         try {
             if (firestorePlugin.getDatabase() == null) {
-                Log.d(FirestorePlugin.TAG, "Initialising Firestore...");
+                Log.d(FirestorePlugin.TAG, "InitialiseHandler Initialising Firestore...");
 
                 final JSONObject options = args.getJSONObject(0);
 

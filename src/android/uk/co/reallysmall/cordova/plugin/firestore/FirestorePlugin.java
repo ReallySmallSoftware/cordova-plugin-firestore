@@ -3,6 +3,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
+import com.google.firebase.FirebaseApp;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -37,6 +38,7 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("docOnSnapshot", new DocOnSnapshotHandler(this));
         handlers.put("docUnsubscribe", new DocUnsubscribeHandler(this));
         handlers.put("docGet", new DocGetHandler(this));
+        handlers.put("docDelete", new DocDeleteHandler(this));
 
         Log.d(TAG, "Initializing FirestorePlugin");
     }

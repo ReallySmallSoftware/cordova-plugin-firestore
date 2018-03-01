@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.7">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.0.8">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -42,6 +42,7 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/CollectionOnSnapshotHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/CollectionUnsubscribeHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOnSnapshotHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocSetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocUnsubscribeHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>

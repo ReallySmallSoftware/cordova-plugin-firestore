@@ -27,8 +27,14 @@ public class DocSetHandler implements ActionHandler {
             final String collection = args.getString(0);
             final String docId = args.getString(1);
             final JSONObject data = args.getJSONObject(2);
-            final JSONObject options = args.getJSONObject(3);
 
+            final JSONObject options;
+
+            if (!args.isNull(3)) {
+                options = args.getJSONObject(3);
+            } else {
+                options = null;
+            }
 
             try {
 
@@ -75,7 +81,7 @@ public class DocSetHandler implements ActionHandler {
         SetOptions setOptions = null;
 
         try {
-            if (options.getBoolean("merge")) {
+            if (options != null && options.getBoolean("merge")) {
                 setOptions = SetOptions.merge();
             }
         } catch (JSONException e) {

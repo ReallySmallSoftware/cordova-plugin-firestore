@@ -43,11 +43,8 @@ public class WhereQueryHandler implements QueryHandler {
     private Object parseWhereValue(JSONObject where) throws JSONException {
         Object value = where.get("value");
 
-        if (value instanceof String && ((String) value).startsWith("__DATE(")) {
-            String stringValue = (String) value;
-            String timestamp = stringValue.substring(7).substring(0, stringValue.length() - 8);
-
-            return new Date(Integer.parseInt(timestamp));
+        if (JSONDateWrapper.isWrappedDate(value)) {
+            return JSONDateWrapper.unwrapDate(value);
         }
 
         return value;

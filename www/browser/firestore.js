@@ -42,7 +42,7 @@ function Firestore(options, resolve) {
   var firestoreLoaded = false;
   if (firebaseLoaded) {
     firestoreLoaded = "firestore" in firebase;
-  };
+  }
 
   loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase.js', firebaseLoaded, function() {
     loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase-firestore.js', firestoreLoaded, initialise, document.body);

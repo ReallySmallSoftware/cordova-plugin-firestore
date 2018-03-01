@@ -16,6 +16,7 @@
 - (void)docOnSnapshot:(CDVInvokedUrlCommand *)command;
 - (void)docUnsubscribe:(CDVInvokedUrlCommand *)command;
 - (void)docGet:(CDVInvokedUrlCommand *)command;
+- (void)docDelete:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;

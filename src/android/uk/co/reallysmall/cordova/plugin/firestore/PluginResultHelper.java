@@ -2,6 +2,7 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -13,6 +14,12 @@ import org.json.JSONObject;
 public class PluginResultHelper {
     static PluginResult createPluginResult(DocumentSnapshot doc, boolean reusable) {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, createDocumentSnapshot(doc));
+        pluginResult.setKeepCallback(reusable);
+        return pluginResult;
+    }
+
+    static PluginResult createPluginResult(DocumentReference doc, boolean reusable) {
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, createDocumentReference(doc));
         pluginResult.setKeepCallback(reusable);
         return pluginResult;
     }
@@ -58,5 +65,20 @@ public class PluginResultHelper {
         }
 
         return documentSnapshot;
+    }
+
+    private static JSONObject createDocumentReference(DocumentReference doc) {
+        JSONObject documentReference = new JSONObject();
+
+        Log.e(FirestorePlugin.TAG, "Creating document snapshot result");
+
+        try {
+            documentReference.put("id", doc.getId());
+
+        } catch (JSONException e) {
+            Log.e(FirestorePlugin.TAG, "Error creating document reference result", e);
+        }
+
+        return documentReference;
     }
 }

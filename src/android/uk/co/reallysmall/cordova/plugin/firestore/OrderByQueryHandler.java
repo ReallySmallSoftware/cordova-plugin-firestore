@@ -15,7 +15,12 @@ public class OrderByQueryHandler implements QueryHandler {
         JSONObject order = (JSONObject) orderByObject;
 
         try {
-            Query.Direction direction = Query.Direction.valueOf(order.getString("direction"));
+            Query.Direction direction = Query.Direction.ASCENDING;
+
+            if ("desc".equals(order.getString("direction"))) {
+                direction = Query.Direction.DESCENDING;
+            }
+
             query = query.orderBy(order.getString("field"), direction);
 
             Log.d(FirestorePlugin.TAG, "Order by " + order.getString("field") + " (" + direction.toString() + ")");

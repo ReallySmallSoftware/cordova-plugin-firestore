@@ -4,14 +4,14 @@ Cordova Firestore Plugin
 A Google Firebase Firestore plugin to enable realtime synchronisation between app and cloud and automatically handle limited connectivity.
 
 What is Firestore?
---
+==
 
 From the Google documentation (https://firebase.google.com/docs/firestore/):
 
 > Cloud Firestore is a flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud Platform. Like Firebase Realtime Database, it keeps your data in sync across client apps through realtime listeners and offers offline support for mobile and web so you can build responsive apps that work regardless of network latency or Internet connectivity. Cloud Firestore also offers seamless integration with other Firebase and Google Cloud Platform products, including Cloud Functions
 
 Supported platforms
---
+==
 This plugin supports the following platforms:
 
 - Android
@@ -25,7 +25,7 @@ This is very much a work in progress. Although the planned functionality is beli
 This is also the first Cordova plugin that I have written and was probably a fairly ambitious one to start with given not only the relative complexity of the technology being supported but also that I had never touched Objective C prior to this.
 
 Installation
---
+==
 
 `cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0 --save`
 
@@ -36,7 +36,8 @@ or
 Omitting FIREBASE_VERSION will use a default value.
 
 Firebase configuration
---
+==
+
 Android
 --
 You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:
@@ -55,8 +56,22 @@ iOS requires `GoogleService-Info.plist` is put in the correct location. Similarl
 </platform>
 ```
 
-What is supported?
+Dependencies
+==
+Promise
 --
+This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a Promise polyfill.
+
+Java 7
+--
+The Android code expects Java 7 support. This plugin may help: https://github.com/cvuser0/cordova-plugin-java7
+
+cordova-support-google-services
+--
+In order to ensure Firebase initialises correctly this plugin is required.
+
+What is supported?
+==
 
 DocumentSnapshot
 - data()
@@ -71,6 +86,7 @@ QuerySnapshot
 - size
 
 DocumentReference
+- delete()
 - get()
 - onSnapshot(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError)
 - set(data, options)
@@ -96,7 +112,7 @@ CollectionReference (inherits from Query)
 - doc(id)
 
 Initialisation
---
+==
 The plugin can be initialised as follows:
 
 ```
@@ -152,6 +168,11 @@ I have learnt a number of things whilst implementing this:
 History
 ==
 
+1.0.8
+- Ensure dates work for queries and nested data
+- Implement delete()
+- Update README
+
 1.0.7
 - Remove dependency on cordova-plugin-firebase-hooks
 
@@ -160,7 +181,9 @@ History
 - Make browser firebase dependency loading smarter
 
 1.0.5
+-
 1.0.4
+-
 1.0.3
 - Address plugin dependency issues
 
