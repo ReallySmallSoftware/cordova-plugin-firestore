@@ -1,45 +1,36 @@
-Cordova Firestore Plugin
-==
-
+# Cordova Firestore Plugin
 A Google Firebase Firestore plugin to enable realtime synchronisation between app and cloud and automatically handle limited connectivity.
 
-What is Firestore?
-==
-
+# What is Firestore?
 From the Google documentation (https://firebase.google.com/docs/firestore/):
 
 > Cloud Firestore is a flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud Platform. Like Firebase Realtime Database, it keeps your data in sync across client apps through realtime listeners and offers offline support for mobile and web so you can build responsive apps that work regardless of network latency or Internet connectivity. Cloud Firestore also offers seamless integration with other Firebase and Google Cloud Platform products, including Cloud Functions
 
-Supported platforms
-==
+# Supported platforms
 This plugin supports the following platforms:
 
 - Android
 - iOS
 - Browser
 
-Status
---
-This is very much a work in progress. Although the planned functionality is believed to work on the above platforms there are no guarantees.
-
-This is also the first Cordova plugin that I have written and was probably a fairly ambitious one to start with given not only the relative complexity of the technology being supported but also that I had never touched Objective C prior to this.
-
-Installation
-==
-
+# Installation
 `cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0 --save`
 
 or
 
 `phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0`
 
-Omitting FIREBASE_VERSION will use a default value.
+Omitting `FIREBASE_VERSION` will use a default value.
 
-Firebase configuration
-==
+## Dependencies
+### Promises
+This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a `Promise` polyfill.
 
-Android
---
+### Java 7
+The Android code expects Java 7 support. This plugin may help: [https://github.com/cvuser0/cordova-plugin-java7](https://github.com/cvuser0/cordova-plugin-java7)
+
+## Firebase configuration
+### Android
 You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:
 
 ```
@@ -47,8 +38,13 @@ You must ensure that `google-services.json` is put in the correct location. This
     <resource-file src="google-services.json" target="google-services.json" />
 </platform>
 ```
-iOS
---
+
+#### Dependencies
+##### cordova-support-google-services
+
+In order to ensure Firebase initialises correctly on Android this plugin can be used. This is not automatically added as a dependency to allow for the configuration it performs to be done manually if desired.
+
+### iOS
 iOS requires `GoogleService-Info.plist` is put in the correct location. Similarly this can be done as follws:
 ```
 <platform name="ios">
@@ -56,36 +52,20 @@ iOS requires `GoogleService-Info.plist` is put in the correct location. Similarl
 </platform>
 ```
 
-Dependencies
-==
-Promise
---
-This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a Promise polyfill.
-
-Java 7
---
-The Android code expects Java 7 support. This plugin may help: https://github.com/cvuser0/cordova-plugin-java7
-
-cordova-support-google-services
---
-In order to ensure Firebase initialises correctly this plugin is required.
-
-What is supported?
-==
-
-DocumentSnapshot
+# What is supported?
+## DocumentSnapshot
 - data()
 - get(fieldPath)
 - exists
 - id
 - ref
 
-QuerySnapshot
+## QuerySnapshot
 - docs
 - empty
 - size
 
-DocumentReference
+## DocumentReference
 - delete()
 - get()
 - onSnapshot(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError)
@@ -94,7 +74,7 @@ DocumentReference
 - id
 - parent
 
-Query
+## Query
 - endAt(snapshotOrVarArgs)
 - endBefore(snapshotOrVarArgs)
 - limit(limit)
@@ -105,14 +85,12 @@ Query
 - startAt(snapshotOrVarArgs)
 - where(fieldPath, opStr, passedValue)
 
-
-CollectionReference (inherits from Query)
+## CollectionReference (inherits from Query)
 - add(data)
 - id
 - doc(id)
 
-Initialisation
-==
+# Initialisation
 The plugin can be initialised as follows:
 
 ```
@@ -138,8 +116,7 @@ The plugin can be initialised as follows:
 
 This is initialised as a promise to allow the Browser implementation to dynamically add a reference to the Firestore Javascript SDK.
 
-Dates
---
+## Dates
 Because data is transferred to the client as JSON there is extra logic in place to handle the conversion of dates for some operations.
 
 When initialising the plugin you can set up a prefix that is applied to a string value which is used to identify it as a date. The default prefix is `__DATE:`
@@ -158,41 +135,34 @@ The client will receive the field as a Javascript Date.
 
 This conversion also happens when specify a field in a where condition.
 
-Learnings and notes
---
+## Learnings and notes
 I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
 - When used on Android ensure that at least `com.google.gms:google-services:3.1.1` is used in build dependencies. Earlier versions did not work for me.
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
-History
-==
-
-1.0.8
+# History
+## 1.0.8
 - Ensure dates work for queries and nested data
 - Implement delete()
 - Update README
 
-1.0.7
+## 1.0.7
 - Remove dependency on cordova-plugin-firebase-hooks
 
-1.0.6
+## 1.0.6
 - Correct README History
 - Make browser firebase dependency loading smarter
 
-1.0.5
--
-1.0.4
--
-1.0.3
+## 1.0.5
+## 1.0.4
+## 1.0.3
 - Address plugin dependency issues
 
-1.0.2
---
+## 1.0.2
 - Updated version
 - Added firebase hooks dependency
 - Corrected iOS source/header-file config
 
-1.0.0
---
+## 1.0.0
 Initial release
