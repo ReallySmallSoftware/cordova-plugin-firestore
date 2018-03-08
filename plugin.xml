@@ -73,9 +73,7 @@
       </feature>
     </config-file>
 
-    <preference name="IOS_FIREBASEFIRESTORE_VERSION" default="0.10.2"/>
-
-    <framework src="FirebaseFirestore" type="podspec" spec="~> $IOS_FIREBASEFIRESTORE_VERSION"/>
+    <framework src="FirebaseFirestore" type="podspec" spec="~> 0.10.2"/>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>
