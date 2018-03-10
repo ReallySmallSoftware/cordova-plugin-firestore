@@ -14,11 +14,11 @@ This plugin supports the following platforms:
 - Browser
 
 # Installation
-`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0 --save`
+`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.8.0 --save`
 
 or
 
-`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.6.0`
+`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.8.0`
 
 Omitting `FIREBASE_VERSION` will use a default value.
 
@@ -48,6 +48,8 @@ iOS requires `GoogleService-Info.plist` is put in the correct location. Similarl
     <resource-file src="GoogleService-Info.plist" />
 </platform>
 ```
+#### Keychain Sharing Capability
+If using multiple Firebase plugins it may be necessary to enable this.
 
 # What is supported?
 ## DocumentSnapshot
@@ -139,10 +141,8 @@ I have learnt a number of things whilst implementing this:
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
 # History
-## 1.0.10
-- Updated Dependencies
-
 ## 1.0.9
+- Updated Dependencies
 - Remove incorrect Java 7 dependency
 
 ## 1.0.8
