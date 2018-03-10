@@ -141,6 +141,9 @@ I have learnt a number of things whilst implementing this:
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
 # History
+## 1.0.10
+- Correct log level when creating results
+
 ## 1.0.9
 - Updated Dependencies
 - Remove incorrect Java 7 dependency

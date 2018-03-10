@@ -28,7 +28,7 @@ public class PluginResultHelper {
         JSONObject querySnapshot = new JSONObject();
         JSONArray array = new JSONArray();
 
-        Log.e(FirestorePlugin.TAG, "Creating query snapshot result");
+        Log.d(FirestorePlugin.TAG, "Creating query snapshot result");
 
         for (DocumentSnapshot doc : value) {
             JSONObject document = createDocumentSnapshot(doc);
@@ -49,7 +49,7 @@ public class PluginResultHelper {
     private static JSONObject createDocumentSnapshot(DocumentSnapshot doc) {
         JSONObject documentSnapshot = new JSONObject();
 
-        Log.e(FirestorePlugin.TAG, "Creating document snapshot result");
+        Log.d(FirestorePlugin.TAG, "Creating document snapshot result");
 
         try {
             documentSnapshot.put("id", doc.getId());
