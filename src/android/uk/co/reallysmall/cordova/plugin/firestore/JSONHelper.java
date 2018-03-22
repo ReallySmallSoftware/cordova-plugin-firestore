@@ -69,10 +69,14 @@ public class JSONHelper {
 
         for (Map.Entry<String,Object> entry : value.entrySet()) {
 
-            if (JSONDateWrapper.isWrappedDate(entry.getValue())) {
-                entry.setValue(JSONDateWrapper.unwrapDate(entry.getValue()));
-            } else  if (entry.getValue() instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>)entry.getValue()));
+            Object entryValue = entry.getValue();
+
+            if (JSONDateWrapper.isWrappedDate(entryValue)) {
+                entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
+            } else  if (entryValue instanceof Map) {
+                entry.setValue(toSettableMapInternal((Map<Object, Object>)entryValue));
+            } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
+                entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }
         }
         return value;
@@ -82,10 +86,14 @@ public class JSONHelper {
 
         for (Map.Entry<Object,Object> entry : value.entrySet()) {
 
-            if (JSONDateWrapper.isWrappedDate(entry.getValue())) {
-                entry.setValue(JSONDateWrapper.unwrapDate(entry.getValue()));
-            } else  if (entry.getValue() instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>)entry.getValue()));
+            Object entryValue = entry.getValue();
+
+            if (JSONDateWrapper.isWrappedDate(entryValue)) {
+                entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
+            } else  if (entryValue instanceof Map) {
+                entry.setValue(toSettableMapInternal((Map<Object, Object>)entryValue));
+            } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
+                entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }
         }
         return value;

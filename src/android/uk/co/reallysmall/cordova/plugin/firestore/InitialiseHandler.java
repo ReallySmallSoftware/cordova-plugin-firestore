@@ -16,6 +16,8 @@ public class InitialiseHandler implements ActionHandler {
 
     public static final String PERSIST = "persist";
     public static final String DATE_PREFIX = "datePrefix";
+    public static final String FIELDVALUE_DELETE = "fieldValueDelete";
+    public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
     private FirestorePlugin firestorePlugin;
 
     public InitialiseHandler(FirestorePlugin firestorePlugin) {
@@ -42,6 +44,14 @@ public class InitialiseHandler implements ActionHandler {
 
                 if (options.has(DATE_PREFIX)) {
                     JSONDateWrapper.setDatePrefix(options.getString(DATE_PREFIX));
+                }
+
+                if (options.has(FIELDVALUE_DELETE)) {
+                    FieldValueHelper.setDeletePrefix(options.getString(FIELDVALUE_DELETE));
+                }
+
+                if (options.has(FIELDVALUE_SERVERTIMESTAMP)) {
+                    FieldValueHelper.setServerTimestampPrefix(options.getString(FIELDVALUE_SERVERTIMESTAMP));
                 }
 
                 Log.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);

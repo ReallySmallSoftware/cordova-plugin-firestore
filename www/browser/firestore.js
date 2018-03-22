@@ -54,6 +54,14 @@ Firestore.prototype.get = function() {
   return this.database;
 };
 
+Object.defineProperties(Firestore.prototype, {
+  FieldValue: {
+    get: function() {
+      return firebase.firestore.FieldValue;
+    }
+  }
+});
+
 module.exports = {
   initialise: function(options) {
     return new Promise(function(resolve, reject) {

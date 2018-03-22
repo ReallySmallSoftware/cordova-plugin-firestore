@@ -6,8 +6,18 @@ var utils = require("cordova/utils");
 var PLUGIN_NAME = 'Firestore';
 var FirestoreOptions = {
   "datePrefix": "__DATE:",
+  "fieldValueDelete": "__DELETE",
+  "fieldValueServerTimestamp": "__SERVERTIMESTAMP",
   "persist": true
 };
+
+var __transactionList = {};
+
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function(search, pos) {
+    return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+  };
+}
 
 function __wrap(data) {
 
@@ -28,10 +38,31 @@ function __wrap(data) {
   return data;
 }
 
+function __executeTransaction(transactionId) {
+  __transactionList[transactionId].updateFunction(transactionList[transactionId].transaction);
+  delete __transactionList[transactionId];
+}
+
+var FieldValue = {
+  delete: function() {
+    return FirestoreOptions.fieldValueDelete;
+  },
+  serverTimestamp: function() {
+    return FirestoreOptions.fieldValueServerTimestamp;
+  }
+};
+
 function Firestore(options) {
   FirestoreOptions = options;
+
   if (FirestoreOptions.datePrefix === undefined) {
     this.datePrefix = "__DATE:";
+  }
+  if (FirestoreOptions.fieldValueDelete === undefined) {
+    this.fieldValueDelete = "__DELETE";
+  }
+  if (FirestoreOptions.fieldValueServerTimestamp === undefined) {
+    this.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }
 
   exec(function() {}, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
@@ -41,10 +72,52 @@ Firestore.prototype = {
   get: function() {
     return this;
   },
+  batch: function() {
+    throw "Firestore.batch: Not supported";
+  },
   collection: function(path) {
     return new CollectionReference(path);
+  },
+  disableNetwork: function() {
+    throw "Firestore.disableNetwork: Not supported";
+  },
+  doc: function() {
+    throw "Firestore.doc: Not supported";
+  },
+  enableNetwork: function() {
+    throw "Firestore.enableNetwork: Not supported";
+  },
+  enablePersistence: function() {
+    throw "Firestore.enablePersistence: Not supported. Please specify using initialisation options.";
+  },
+  runTransaction: function(updateFunction) {
+
+    var transactionId = utils.createUUID();
+    var transaction =  new Transaction(transactionId);
+
+    __transactionList[transactionId] = { "transaction": transaction, "updateFunction" : updateFunction };
+
+    var args = [transactionId];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'runTransaction', args);
+    });
+  },
+  setLogLevel: function() {
+    throw "Firestore.setLogLevel: Not supported";
+  },
+  settings: function() {
+    throw "Firestore.settings: Not supported";
   }
 };
+
+Object.defineProperties(Firestore.prototype, {
+  FieldValue: {
+    get: function() {
+      return FieldValue;
+    }
+  }
+});
 
 function DocumentSnapshot(data) {
   this._data = data;
@@ -62,7 +135,7 @@ DocumentSnapshot.prototype = {
       var key = keys[i];
 
       if (Object.prototype.toString.call(data[key]) === '[object String]' &&
-          data[key].startsWith(FirestoreOptions.datePrefix)) {
+        data[key].startsWith(FirestoreOptions.datePrefix)) {
         var length = data[key].length;
         var prefixLength = FirestoreOptions.datePrefix.length;
 
@@ -357,6 +430,45 @@ CollectionReference.prototype.add = function(data) {
 
 CollectionReference.prototype.doc = function(id) {
   return new DocumentReference(this, id);
+};
+
+function Transaction(id) {
+  this._id = id;
+}
+
+Transaction.prototype = {
+  delete: function(documentReference) {
+    var args = [this._id, documentReference];
+
+    exec(resolve, reject, PLUGIN_NAME, 'transactionDocDelete', args);
+
+    return this;
+  },
+  get: function(documentReference) {
+    var args = [this._id, documentReference];
+
+    return new Promise(function(resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'transactionDocGet', args);
+    }).then(function(data) {
+      return new DocumentSnapshot(data);
+    });
+  },
+  set: function(documentReference, data, options) {
+
+    var args = [this._id, documentReference, __wrap(data), options];
+
+    exec(resolve, reject, PLUGIN_NAME, 'transactionDocSet', args);
+
+    return this;
+  },
+  update: function(documentReference, data) {
+
+    var args = [this._id, documentReference, __wrap(data)];
+
+    exec(resolve, reject, PLUGIN_NAME, 'transactionDocUpdate', args);
+
+    return this;
+  }
 };
 
 module.exports = {

@@ -42,7 +42,7 @@ You must ensure that `google-services.json` is put in the correct location. This
 In order to ensure Firebase initialises correctly on Android this plugin can be used. This is not automatically added as a dependency to allow for the configuration it performs to be done manually if desired.
 
 ### iOS
-iOS requires `GoogleService-Info.plist` is put in the correct location. Similarly this can be done as follws:
+iOS requires `GoogleService-Info.plist` is put in the correct location. Similarly this can be done as follows:
 ```
 <platform name="ios">
     <resource-file src="GoogleService-Info.plist" />
@@ -89,13 +89,19 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - id
 - doc(id)
 
+## FieldValue
+- FieldValue.delete()
+- FieldValue.serverTimestamp()
+
 # Initialisation
 The plugin can be initialised as follows:
 
 ```
       var options = {
         datePrefix: '__DATE:',
-        persist: true
+        "fieldValueDelete": "__DELETE",
+        "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
+        "persist": true
       };
 
       if (cordova.platformId === "browser") {
@@ -134,6 +140,14 @@ The client will receive the field as a Javascript Date.
 
 This conversion also happens when specify a field in a where condition.
 
+## FieldValue constants
+Similar to the situation with dates, there are special values used for `FieldValue` values:
+
+- FieldValue.delete() equates to `__DELETE`
+- FieldValue.serverTimestamp() equates to `__SERVERTIMESTAMP`
+
+These values can be changed when initialisation is performed.
+
 ## Learnings and notes
 I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
@@ -141,6 +155,11 @@ I have learnt a number of things whilst implementing this:
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
 # History
+## 1.1.0
+- Add support for FieldValue
+- Add support for Transactions
+- Add startswith polyfill
+
 ## 1.0.10
 - Correct log level when creating results
 
