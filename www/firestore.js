@@ -38,10 +38,6 @@ function __wrap(data) {
   return data;
 }
 
-function __executeTransaction(transactionId) {
-  __transactionList[transactionId].updateFunction(transactionList[transactionId].transaction);
-  delete __transactionList[transactionId];
-}
 
 var FieldValue = {
   delete: function() {
@@ -93,14 +89,25 @@ Firestore.prototype = {
   runTransaction: function(updateFunction) {
 
     var transactionId = utils.createUUID();
-    var transaction =  new Transaction(transactionId);
+    var transaction = new Transaction(transactionId);
 
-    __transactionList[transactionId] = { "transaction": transaction, "updateFunction" : updateFunction };
+    __transactionList[transactionId] = {
+      "transaction": transaction,
+      "updateFunction": updateFunction
+    };
 
     var args = [transactionId];
 
     return new Promise(function(resolve, reject) {
-      exec(resolve, reject, PLUGIN_NAME, 'runTransaction', args);
+      var wrappedResolve = function(data) {
+        delete __transactionList[transactionId];
+        resolve(data);
+      }
+      var wrappedReject = function(err) {
+        delete __transactionList[transactionId];
+        reject(err);
+      }
+      exec(wrappedResolve, wrappedReject, PLUGIN_NAME, 'runTransaction', args);
     });
   },
   setLogLevel: function() {
@@ -283,10 +290,14 @@ DocumentReference.prototype = {
       wrappedCallback = function(documentSnapshot) {};
     }
 
-    exec(wrappedCallback, function() {}, PLUGIN_NAME, 'docOnSnapshot', args);
+    exec(wrappedCallback, function() {
+      throw new Error("Undefined error in docOnSnapshot");
+    }, PLUGIN_NAME, 'docOnSnapshot', args);
 
     return function() {
-      exec(function() {}, function() {}, PLUGIN_NAME, 'docUnsubscribe', [callbackId]);
+      exec(function() {}, function() {
+        throw new Error("Undefined error in docUnsubscribe");
+      }, PLUGIN_NAME, 'docUnsubscribe', [callbackId]);
     };
   },
   set: function(data, options) {
@@ -371,10 +382,14 @@ Query.prototype = {
     var callbackWrapper = function(data) {
       callback(new QuerySnapshot(data));
     };
-    exec(callbackWrapper, function() {}, PLUGIN_NAME, 'collectionOnSnapshot', args);
+    exec(callbackWrapper, function() {
+      throw new Error("Undefined error in collectionOnSnapshot");
+    }, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
     return function() {
-      exec(function() {}, function() {}, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
+      exec(function() {}, function() {
+        throw new Error("Undefined error in collectionUnsubscribe");
+      }, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
     };
   },
   startAfter: function(snapshotOrVarArgs) {
@@ -438,14 +453,16 @@ function Transaction(id) {
 
 Transaction.prototype = {
   delete: function(documentReference) {
-    var args = [this._id, documentReference];
+    var args = [this._id, documentReference._id, documentReference._collectionReference._path];
 
-    exec(resolve, reject, PLUGIN_NAME, 'transactionDocDelete', args);
+    exec(function() {}, function() {
+      throw new Error("Undefined error in transactionDocDelete");
+    }, PLUGIN_NAME, 'transactionDocDelete', args);
 
     return this;
   },
   get: function(documentReference) {
-    var args = [this._id, documentReference];
+    var args = [this._id, documentReference._id, documentReference._collectionReference._path];
 
     return new Promise(function(resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'transactionDocGet', args);
@@ -455,17 +472,21 @@ Transaction.prototype = {
   },
   set: function(documentReference, data, options) {
 
-    var args = [this._id, documentReference, __wrap(data), options];
+    var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data), options];
 
-    exec(resolve, reject, PLUGIN_NAME, 'transactionDocSet', args);
+    exec(function() {}, function() {
+      throw new Error("Undefined error in transactionDocSet");
+    }, PLUGIN_NAME, 'transactionDocSet', args);
 
     return this;
   },
   update: function(documentReference, data) {
 
-    var args = [this._id, documentReference, __wrap(data)];
+    var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data)];
 
-    exec(resolve, reject, PLUGIN_NAME, 'transactionDocUpdate', args);
+    exec(function() {}, function() {
+      throw new Error("Undefined error in transactionDocUpdate");
+    }, PLUGIN_NAME, 'transactionDocUpdate', args);
 
     return this;
   }
@@ -475,6 +496,14 @@ module.exports = {
   initialise: function(options) {
     return new Promise(function(resolve, reject) {
       resolve(new Firestore(options));
+    });
+  },
+  __executeTransaction: function(transactionId) {
+    var result;
+
+    __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function(result) {
+      var args = [transactionId, __wrap(result)];
+      exec(function() {}, function() {}, PLUGIN_NAME, 'transactionResolve', args);
     });
   }
 };

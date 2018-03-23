@@ -38,7 +38,7 @@ public class DocSetHandler implements ActionHandler {
 
             try {
 
-                SetOptions setOptions = getSetOptions(options);
+                SetOptions setOptions = DocSetOptions.getSetOptions(options);
 
                 Log.d(FirestorePlugin.TAG, "Setting document");
 
@@ -75,21 +75,5 @@ public class DocSetHandler implements ActionHandler {
         }
 
         return true;
-    }
-
-    private SetOptions getSetOptions(JSONObject options) {
-        SetOptions setOptions = null;
-
-        try {
-            if (options != null && options.getBoolean("merge")) {
-                setOptions = SetOptions.merge();
-            }
-        } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error getting document option", e);
-        }
-
-        Log.d(FirestorePlugin.TAG, "Set document options");
-
-        return setOptions;
     }
 }

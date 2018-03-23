@@ -52,6 +52,10 @@ iOS requires `GoogleService-Info.plist` is put in the correct location. Similarl
 If using multiple Firebase plugins it may be necessary to enable this.
 
 # What is supported?
+## Firestore
+- collection()
+- runTransaction(updateFunction)
+
 ## DocumentSnapshot
 - data()
 - get(fieldPath)
@@ -88,6 +92,12 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - add(data)
 - id
 - doc(id)
+
+## Transaction
+- get()
+- delete()
+- set()
+- update()
 
 ## FieldValue
 - FieldValue.delete()
@@ -157,7 +167,7 @@ I have learnt a number of things whilst implementing this:
 # History
 ## 1.1.0
 - Add support for FieldValue
-- Add support for Transactions
+- Add experimental support for Transactions
 - Add startswith polyfill
 
 ## 1.0.10

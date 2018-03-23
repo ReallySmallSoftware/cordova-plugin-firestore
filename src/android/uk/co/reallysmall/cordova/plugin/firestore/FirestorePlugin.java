@@ -3,10 +3,10 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
-import com.google.firebase.FirebaseApp;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Transaction;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -24,6 +24,7 @@ public class FirestorePlugin extends CordovaPlugin {
     private static FirebaseFirestore database;
     private Map<String, ActionHandler> handlers = new HashMap<String, ActionHandler>();
     private Map<String, ListenerRegistration> registrations = new Hashtable<String, ListenerRegistration>();
+    private Map<String, TransactionWrapper> transactions = new HashMap<String, TransactionWrapper>();
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
@@ -39,6 +40,12 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("docUnsubscribe", new DocUnsubscribeHandler(this));
         handlers.put("docGet", new DocGetHandler(this));
         handlers.put("docDelete", new DocDeleteHandler(this));
+        handlers.put("runTransaction", new RunTransactionHandler(this));
+        handlers.put("transactionDocGet", new TransactionDocGetHandler(this));
+        handlers.put("transactionDocUpdate", new TransactionDocUpdateHandler(this));
+        handlers.put("transactionDocSet", new TransactionDocSetHandler(this));
+        handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(this));
+        handlers.put("transactionResolve", new TransactionResolveHandler(this));
 
         Log.d(TAG, "Initializing FirestorePlugin");
     }
@@ -73,5 +80,17 @@ public class FirestorePlugin extends CordovaPlugin {
             registrations.remove(callbackId);
             Log.d(TAG, "Unregistered subscriber " + callbackId);
         }
+    }
+
+    public void addTransaction(String transactionId, TransactionWrapper transaction) {
+        transactions.put(transactionId, transaction);
+    }
+
+    public TransactionWrapper getTransaction(String transactionId) {
+        return transactions.get(transactionId);
+    }
+
+    public void removeTransaction(String transactionId) {
+        transactions.remove(transactionId);
     }
 }
