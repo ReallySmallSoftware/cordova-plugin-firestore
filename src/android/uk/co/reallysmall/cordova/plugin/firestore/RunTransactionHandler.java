@@ -54,11 +54,6 @@ public class RunTransactionHandler implements ActionHandler {
                                 wv.evaluateJavascript(String.format("Firestore.__executeTransaction('%s');", transactionId), new ValueCallback<String>() {
                                     @Override
                                     public void onReceiveValue(String value) {
-//                                        sync.append(value);
-                                        Log.d(FirestorePlugin.TAG, "Sync result " + value);
-//                                        synchronized (sync) {
-//                                            sync.notify();
-//                                        }
                                     }
                                 });
                             }
