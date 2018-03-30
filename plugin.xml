@@ -90,6 +90,8 @@
     <source-file src="src/ios/FirestorePluginJSONHelper.m"/>
     <header-file src="src/ios/FirestorePluginResultHelper.h"/>
     <source-file src="src/ios/FirestorePluginResultHelper.m"/>
+    <header-file src="src/ios/FirestoreTransaction.h"/>
+    <source-file src="src/ios/FirestoreTransaction.m"/>
   </platform>
 
 </plugin>

@@ -504,6 +504,8 @@ module.exports = {
     __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function(result) {
       var args = [transactionId, __wrap(result)];
       exec(function() {}, function() {}, PLUGIN_NAME, 'transactionResolve', args);
+    }).catch(function(error) {
+      throw new Error("Unexpected error in transaction " + error);
     });
   }
 };

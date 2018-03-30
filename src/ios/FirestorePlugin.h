@@ -1,6 +1,7 @@
 #import <Cordova/CDVPlugin.h>
 @import FirebaseFirestore;
 
+#import "FirestoreTransaction.h"
 #import "FirestorePluginResultHelper.h"
 
 @interface FirestorePlugin : CDVPlugin
@@ -16,6 +17,12 @@
 - (void)docUnsubscribe:(CDVInvokedUrlCommand *)command;
 - (void)docGet:(CDVInvokedUrlCommand *)command;
 - (void)docDelete:(CDVInvokedUrlCommand *)command;
+- (void)transactionDocSet:(CDVInvokedUrlCommand *)command;
+- (void)transactionDocUpdate:(CDVInvokedUrlCommand *)command;
+- (void)transactionDocGet:(CDVInvokedUrlCommand *)command;
+- (void)transactionDocDelete:(CDVInvokedUrlCommand *)command;
+- (void)runTransaction:(CDVInvokedUrlCommand *)command;
+- (void)transactionResolve:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;
@@ -30,6 +37,8 @@
 
 @property(strong) FIRFirestore *firestore;
 @property(strong) NSMutableDictionary *listeners;
+@property(strong) NSMutableDictionary *transactions;
+@property(strong) FirestoreTransaction *firestoreTransaction;
 
 @end
 

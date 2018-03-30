@@ -1,4 +1,5 @@
 #import "FirestorePlugin.h"
+#import "FirestoreTransaction.h"
 #import "FirestorePluginJSONHelper.h"
 
 #import <Cordova/CDVAvailability.h>
@@ -9,6 +10,9 @@
     if(![FIRApp defaultApp]) {
         [FIRApp configure];
     }
+    
+    self.listeners = [NSMutableDictionary new];
+    self.firestoreTransaction = [FirestoreTransaction new];
 }
 
 - (void)collectionOnSnapshot:(CDVInvokedUrlCommand *)command {
@@ -456,6 +460,327 @@
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
+}
+
+- (BOOL)timedOut:(time_t)started {
+    if (time(nil) - started > 30) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)transactionDocSet:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
+    NSDictionary *options = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionId = transactionId;
+        self.firestoreTransaction.docId = docId;
+        self.firestoreTransaction.collection = collection;
+        self.firestoreTransaction.data = data;
+        self.firestoreTransaction.options = options;
+        self.firestoreTransaction.transactionType = (FirestoreTransactionType)SET;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
+    }
+    
+    time_t started = time(nil);
+    
+    while (self.firestoreTransaction.transactionStatus != (FirestoreTransactionStatus)COMPLETE) {
+        if ([self timedOut:started]) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
+    }
+    
+    [self.commandDelegate sendPluginResult:self.firestoreTransaction.pluginResult callbackId:command.callbackId];
+    }];
+}
+
+
+- (void)executeTransactionDocSet:(FIRTransaction *)transaction {
+    
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:self.firestoreTransaction.data];
+    
+    FIRSetOptions *setOptions = [self getSetOptions:self.firestoreTransaction.options];
+    
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:self.firestoreTransaction.collection] documentWithPath:self.firestoreTransaction.docId];
+    
+    if (setOptions == nil) {
+        [transaction setData:parsedData forDocument:documentReference];
+    } else {
+        [transaction setData:parsedData forDocument:documentReference options:setOptions];
+    }
+    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.pluginResult = pluginResult;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
+    }
+}
+
+- (void)transactionDocUpdate:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionId = transactionId;
+        self.firestoreTransaction.docId = docId;
+        self.firestoreTransaction.collection = collection;
+        self.firestoreTransaction.data = data;
+        self.firestoreTransaction.options = nil;
+        self.firestoreTransaction.transactionType = (FirestoreTransactionType)UPDATE;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
+    }
+    
+    time_t started = time(nil);
+    
+    while (self.firestoreTransaction.transactionStatus != (FirestoreTransactionStatus)COMPLETE) {
+        if ([self timedOut:started]) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
+    }
+    
+    [self.commandDelegate sendPluginResult:self.firestoreTransaction.pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)executeTransactionDocUpdate:(FIRTransaction *)transaction {
+    
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:self.firestoreTransaction.data];
+    
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:self.firestoreTransaction.collection] documentWithPath:self.firestoreTransaction.docId];
+    
+    [transaction updateData:parsedData forDocument:documentReference];
+    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.pluginResult = pluginResult;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
+    }
+}
+
+- (void)transactionDocDelete:(CDVInvokedUrlCommand *)command {
+    
+    [self.commandDelegate runInBackground:^{
+
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionId = transactionId;
+        self.firestoreTransaction.docId = docId;
+        self.firestoreTransaction.collection = collection;
+        self.firestoreTransaction.data = nil;
+        self.firestoreTransaction.options = nil;
+        self.firestoreTransaction.transactionType = (FirestoreTransactionType)DELETE;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
+    }
+    
+    time_t started = time(nil);
+    
+    while (self.firestoreTransaction.transactionStatus != (FirestoreTransactionStatus)COMPLETE) {
+        if ([self timedOut:started]) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
+    }
+    
+    [self.commandDelegate sendPluginResult:self.firestoreTransaction.pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)executeTransactionDocDelete:(FIRTransaction *)transaction {
+    
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:self.firestoreTransaction.collection] documentWithPath:self.firestoreTransaction.docId];
+    
+    [transaction deleteDocument:documentReference];
+    
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.pluginResult = pluginResult;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
+    }
+}
+
+- (void)transactionDocGet:(CDVInvokedUrlCommand *)command {
+    
+    [self.commandDelegate runInBackground:^{
+        NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+        NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+        NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+        
+        @synchronized (self.firestoreTransaction) {
+            self.firestoreTransaction.transactionId = transactionId;
+            self.firestoreTransaction.docId = docId;
+            self.firestoreTransaction.collection = collection;
+            self.firestoreTransaction.data = nil;
+            self.firestoreTransaction.options = nil;
+            self.firestoreTransaction.transactionType = (FirestoreTransactionType)GET;
+            self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
+        }
+        
+        time_t started = time(nil);
+        
+        FirestoreTransactionStatus status = (FirestoreTransactionStatus)PROCESSING;
+        
+        while (status != (FirestoreTransactionStatus)COMPLETE) {
+            
+            @synchronized(self.firestoreTransaction) {
+                status = self.firestoreTransaction.transactionStatus;
+            }
+            
+            if ([self timedOut:started]) {
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+                return;
+            }
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+        
+        @synchronized (self.firestoreTransaction) {
+            self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
+        }
+        
+        [self.commandDelegate sendPluginResult:self.firestoreTransaction.pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)executeTransactionDocGet:(FIRTransaction *)transaction WithError:(NSError * __autoreleasing *)errorPointer {
+
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:self.firestoreTransaction.collection] documentWithPath:self.firestoreTransaction.docId];
+    
+    FIRDocumentSnapshot *snapshot = [transaction getDocument:documentReference error:errorPointer];
+    
+    CDVPluginResult *pluginResult;
+    
+    if (*errorPointer != nil) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    } else {
+        pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :NO];
+    }
+    
+    @synchronized (self.firestoreTransaction) {
+        self.firestoreTransaction.pluginResult = pluginResult;
+        self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
+    }
+}
+
+- (void)runTransaction:(CDVInvokedUrlCommand *)command {
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    
+    self.firestoreTransaction.transactionResolved = [NSNumber numberWithBool:NO];
+
+    [self.firestore runTransactionWithBlock:^id _Nullable(FIRTransaction * _Nonnull transaction, NSError *  __autoreleasing * errorPointer) {
+        
+        NSString *execute = [NSString stringWithFormat:@"Firestore.__executeTransaction('%@');", transactionId];
+
+        [self stringByEvaluatingJavaScriptFromString:execute];
+        
+        @synchronized (self.firestoreTransaction) {
+            self.firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
+            self.firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
+            self.firestoreTransaction.transactionResolved = NO;
+        }
+        
+        time_t started = time(nil);
+        BOOL resolved = NO;
+            
+        while (resolved == NO && [self timedOut:started] == NO)
+        {
+            @synchronized(self.firestoreTransaction) {
+                resolved = self.firestoreTransaction.transactionResolved;
+                
+                if (self.firestoreTransaction.transactionType == (FirestoreTransactionType)SET) {
+                    [self executeTransactionDocSet:transaction];
+                } else if (self.firestoreTransaction.transactionType == (FirestoreTransactionType)UPDATE) {
+                    [self executeTransactionDocUpdate:transaction];
+                } else if (self.firestoreTransaction.transactionType == (FirestoreTransactionType)DELETE) {
+                    [self executeTransactionDocDelete:transaction];
+                } else if (self.firestoreTransaction.transactionType == (FirestoreTransactionType)GET) {
+                    [self executeTransactionDocGet:transaction WithError:errorPointer];
+                }
+                
+                self.firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
+            }
+                
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+        
+        return self.firestoreTransaction.result;
+        
+    } completion:^(id  _Nullable result, NSError * _Nullable error) {
+                
+        CDVPluginResult *pluginResult;
+
+        if (error != nil) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
+                                                                                                          @"code" : @(error.code),
+                                                                                                          @"message" : error.description}
+                            ];
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
+        }
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)transactionResolve:(CDVInvokedUrlCommand *)command {
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *result =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+
+    @synchronized(self.firestoreTransaction) {
+        self.firestoreTransaction.transactionResolved = [NSNumber numberWithBool:YES];
+        self.firestoreTransaction.result = result;
+    }
+}
+
+- (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script {
+    __block NSString *resultString = nil;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.webViewEngine evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+            if (error == nil) {
+                if (result != nil) {
+                    resultString = [NSString stringWithFormat:@"%@", result];
+                }
+            } else {
+                NSLog(@"evaluateJavaScript error : %@", error.localizedDescription);
+            }
+        }];
+    });
+
+    
+    return resultString;
 }
 
 @end

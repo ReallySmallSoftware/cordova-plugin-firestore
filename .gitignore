@@ -1,2 +1,3 @@
 .git.safe
 /node_modules
+.DS_Store
