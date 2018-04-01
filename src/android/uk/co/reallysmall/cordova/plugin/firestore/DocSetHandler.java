@@ -67,11 +67,11 @@ public class DocSetHandler implements ActionHandler {
                 }
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing document set in thread", e);
+                callbackContext.error(e.getMessage());
             }
-
-
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document set", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

@@ -45,10 +45,11 @@ public class DocUpdateHandler implements ActionHandler {
                 });
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing document update in thread", e);
-            }
-            ;
+                callbackContext.error(e.getMessage());
+            };
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document update", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

@@ -87,12 +87,14 @@ public class RunTransactionHandler implements ActionHandler {
                     }
                 });
 
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error running transaction", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error running transaction", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error running transaction", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

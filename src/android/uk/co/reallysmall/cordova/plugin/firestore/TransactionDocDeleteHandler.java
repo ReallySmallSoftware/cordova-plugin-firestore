@@ -38,12 +38,14 @@ public class TransactionDocDeleteHandler implements ActionHandler {
 
                 Log.d(FirestorePlugin.TAG, "Successfully deleted document transactionally");
 
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document delete in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing transactional document delete in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document delete", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

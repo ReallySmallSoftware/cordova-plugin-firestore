@@ -49,12 +49,14 @@ public class DocDeleteHandler implements ActionHandler {
                         callbackContext.error(e.getMessage());
                     }
                 });
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing document delete in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing document delete in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document delete", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

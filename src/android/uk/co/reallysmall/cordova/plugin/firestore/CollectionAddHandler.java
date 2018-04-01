@@ -45,11 +45,13 @@ public class CollectionAddHandler implements ActionHandler {
                         callbackContext.error(e.getMessage());
                     }
                 });
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing collection add in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing collection add in thread", e);
+                callbackContext.error(e.getMessage());
             }
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing collection add", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

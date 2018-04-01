@@ -60,11 +60,13 @@ public class InitialiseHandler implements ActionHandler {
                         .setPersistenceEnabled(persist)
                         .build();
                 firestorePlugin.getDatabase().setFirestoreSettings(settings);
+
+                callbackContext.success();
             }
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
+            callbackContext.error(e.getMessage());
         }
-
 
         return true;
     }

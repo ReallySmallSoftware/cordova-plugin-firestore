@@ -35,6 +35,7 @@ public class WhereQueryHandler implements QueryHandler {
             }
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing where", e);
+            throw  new RuntimeException(e);
         }
 
         return query;

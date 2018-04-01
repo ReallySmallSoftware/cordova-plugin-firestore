@@ -38,7 +38,7 @@ public class PluginResultHelper {
         try {
             querySnapshot.put("docs", array);
         } catch (JSONException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, querySnapshot);
@@ -62,6 +62,7 @@ public class PluginResultHelper {
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error creating document snapshot result", e);
+            throw new RuntimeException(e);
         }
 
         return documentSnapshot;
@@ -77,6 +78,7 @@ public class PluginResultHelper {
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error creating document reference result", e);
+            throw new RuntimeException(e);
         }
 
         return documentReference;

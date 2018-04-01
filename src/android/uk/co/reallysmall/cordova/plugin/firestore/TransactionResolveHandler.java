@@ -30,6 +30,7 @@ public class TransactionResolveHandler implements ActionHandler {
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error resolving transaction", e);
+            callbackContext.error(e.getMessage());
         }
 
         return false;

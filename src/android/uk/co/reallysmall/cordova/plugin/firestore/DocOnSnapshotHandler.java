@@ -66,6 +66,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;
@@ -83,6 +84,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 }
             } catch (JSONException e) {
                 Log.e(FirestorePlugin.TAG, "Error getting document option includeMetadataChanges", e);
+                throw new RuntimeException(e);
             }
 
             Log.d(FirestorePlugin.TAG, "Set document options");

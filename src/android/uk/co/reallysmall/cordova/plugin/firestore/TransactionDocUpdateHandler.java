@@ -42,12 +42,14 @@ public class TransactionDocUpdateHandler implements ActionHandler {
 
                 Log.d(FirestorePlugin.TAG, "Successfully updated document transactionally");
 
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document update in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing transactional document update in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document update", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

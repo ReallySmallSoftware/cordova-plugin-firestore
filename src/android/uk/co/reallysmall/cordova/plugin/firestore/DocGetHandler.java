@@ -49,12 +49,14 @@ public class DocGetHandler implements ActionHandler {
                         callbackContext.error(e.getMessage());
                     }
                 });
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing document get in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing document get in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

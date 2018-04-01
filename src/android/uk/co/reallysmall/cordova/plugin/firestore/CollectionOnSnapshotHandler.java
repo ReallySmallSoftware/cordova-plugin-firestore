@@ -61,10 +61,12 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing collection snapshot", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;
@@ -85,6 +87,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                 }
             } catch (JSONException e) {
                 Log.e(FirestorePlugin.TAG, "Error getting query options", e);
+                throw new RuntimeException(e);
             }
 
             Log.d(FirestorePlugin.TAG, "Set document options");

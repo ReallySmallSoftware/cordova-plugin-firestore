@@ -43,12 +43,14 @@ public class TransactionDocGetHandler implements ActionHandler {
                 callbackContext.sendPluginResult(createPluginResult(transactionWrapper.transaction.get(documentRef), false));
                 Log.d(FirestorePlugin.TAG, "Successfully got document transactionally");
 
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document snapshot", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;

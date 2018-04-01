@@ -57,12 +57,14 @@ public class TransactionDocSetHandler implements ActionHandler {
 
                 Log.d(FirestorePlugin.TAG, "Successfully set document transactionally");
 
-            } catch (Exception ex) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document set in thread", ex);
+            } catch (Exception e) {
+                Log.e(FirestorePlugin.TAG, "Error processing transactional document set in thread", e);
+                callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document set", e);
+            callbackContext.error(e.getMessage());
         }
 
         return true;
