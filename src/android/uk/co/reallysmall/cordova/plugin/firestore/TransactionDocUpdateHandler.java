@@ -28,19 +28,17 @@ public class TransactionDocUpdateHandler implements ActionHandler {
             final String collectionPath = args.getString(2);
             final JSONObject data = args.getJSONObject(3);
 
-            Log.d(FirestorePlugin.TAG, "Transactional document update");
+            Log.d(FirestorePlugin.TAG, String.format("Transactional document update for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction(transactionId);
+            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, "Transactional update for document " + collectionPath + "/" + doc);
+                Log.d(FirestorePlugin.TAG, String.format("Transactional %s update for document %s", transactionId, collectionPath + "/" + doc));
 
                 transactionWrapper.transaction.update(documentRef, JSONHelper.toSettableMap(data));
                 callbackContext.success();
-
-                Log.d(FirestorePlugin.TAG, "Successfully updated document transactionally");
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing transactional document update in thread", e);

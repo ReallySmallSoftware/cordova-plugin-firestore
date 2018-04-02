@@ -24,7 +24,7 @@ public class FirestorePlugin extends CordovaPlugin {
     private static FirebaseFirestore database;
     private Map<String, ActionHandler> handlers = new HashMap<String, ActionHandler>();
     private Map<String, ListenerRegistration> registrations = new Hashtable<String, ListenerRegistration>();
-    private Map<String, TransactionWrapper> transactions = new HashMap<String, TransactionWrapper>();
+    private TransactionWrapper threadTransactionWrapper = new TransactionWrapper();
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
@@ -82,15 +82,18 @@ public class FirestorePlugin extends CordovaPlugin {
         }
     }
 
-    public void addTransaction(String transactionId, TransactionWrapper transaction) {
-        transactions.put(transactionId, transaction);
+    public void storeTransaction(String transactionId, Transaction transaction) {
+        threadTransactionWrapper.transactionId = transactionId;
+        threadTransactionWrapper.transaction = transaction;
+        threadTransactionWrapper.sync.setLength(0);
     }
 
-    public TransactionWrapper getTransaction(String transactionId) {
-        return transactions.get(transactionId);
+    public TransactionWrapper getTransaction() {
+        return threadTransactionWrapper;
     }
 
-    public void removeTransaction(String transactionId) {
-        transactions.remove(transactionId);
+    public void removeTransaction() {
+        threadTransactionWrapper.transaction = null;
+        threadTransactionWrapper.sync.setLength(0);
     }
 }

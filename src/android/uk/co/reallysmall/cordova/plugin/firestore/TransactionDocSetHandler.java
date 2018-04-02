@@ -37,16 +37,16 @@ public class TransactionDocSetHandler implements ActionHandler {
                 options = null;
             }
 
-            Log.d(FirestorePlugin.TAG, "Transactional document set");
+            Log.d(FirestorePlugin.TAG, String.format("Transactional document set for %s", transactionId));
 
             SetOptions setOptions = DocSetOptions.getSetOptions(options);
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction(transactionId);
+            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, "Transactional set for document " + collectionPath + "/" + doc);
+                Log.d(FirestorePlugin.TAG, String.format("Transactional %s set for document %s", transactionId, collectionPath + "/" + doc));
 
                 if (setOptions == null) {
                     transactionWrapper.transaction.set(documentRef, JSONHelper.toSettableMap(data));
@@ -54,8 +54,6 @@ public class TransactionDocSetHandler implements ActionHandler {
                     transactionWrapper.transaction.set(documentRef, JSONHelper.toSettableMap(data), setOptions);
                 }
                 callbackContext.success();
-
-                Log.d(FirestorePlugin.TAG, "Successfully set document transactionally");
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing transactional document set in thread", e);

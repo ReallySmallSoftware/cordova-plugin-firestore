@@ -31,17 +31,16 @@ public class TransactionDocGetHandler implements ActionHandler {
             final String doc = args.getString(1);
             final String collectionPath = args.getString(2);
 
-            Log.d(FirestorePlugin.TAG, "Transactional document get");
+            Log.d(FirestorePlugin.TAG, String.format("Transactional document get for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction(transactionId);
+            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, "Transactional get for document " + collectionPath + "/" + doc);
+                Log.d(FirestorePlugin.TAG, String.format("Transactional %s get for document %s", transactionId, collectionPath + "/" + doc));
 
                 callbackContext.sendPluginResult(createPluginResult(transactionWrapper.transaction.get(documentRef), false));
-                Log.d(FirestorePlugin.TAG, "Successfully got document transactionally");
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);

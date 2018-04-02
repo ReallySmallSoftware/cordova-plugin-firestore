@@ -24,19 +24,17 @@ public class TransactionDocDeleteHandler implements ActionHandler {
             final String doc = args.getString(1);
             final String collectionPath = args.getString(2);
 
-            Log.d(FirestorePlugin.TAG, "Transactional document delete");
+            Log.d(FirestorePlugin.TAG, String.format("Transactional document delete for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction(transactionId);
+            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, "Transactional delete for document " + collectionPath + "/" + doc);
+                Log.d(FirestorePlugin.TAG, String.format("Transactional %s delete for document %s", transactionId, collectionPath + "/" + doc));
 
                 transactionWrapper.transaction.delete(documentRef);
                 callbackContext.success();
-
-                Log.d(FirestorePlugin.TAG, "Successfully deleted document transactionally");
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing transactional document delete in thread", e);

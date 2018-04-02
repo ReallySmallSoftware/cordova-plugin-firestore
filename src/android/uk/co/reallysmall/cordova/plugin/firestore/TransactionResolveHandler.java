@@ -21,7 +21,9 @@ public class TransactionResolveHandler implements ActionHandler {
             String transactionId = args.getString(0);
             String result = args.getString(1);
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction(transactionId);
+            Log.d(FirestorePlugin.TAG, String.format("Transactional resolve for %s", transactionId));
+
+            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
             transactionWrapper.sync.append(result);
 
             synchronized (transactionWrapper.sync) {
