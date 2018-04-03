@@ -37,7 +37,6 @@
 
 @property(strong) FIRFirestore *firestore;
 @property(strong) NSMutableDictionary *listeners;
-@property(strong) NSMutableDictionary *transactions;
 @property(strong) FirestoreTransaction *firestoreTransaction;
 
 @end

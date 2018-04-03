@@ -7,6 +7,7 @@
 
 #import "FirestorePluginResultHelper.h"
 #import "FirestorePluginJSONHelper.h"
+#include <asl.h>
 
 @implementation FirestorePluginResultHelper;
 
@@ -30,7 +31,7 @@
     NSDictionary *querySnapshot = @{};
     NSMutableArray *result = [[NSMutableArray alloc] init];
 
-    NSLog(@"Creating query snapshot result");
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating query snapshot result");
 
     if (query.documents != nil) {
         for (FIRDocumentSnapshot *doc in query.documents) {
@@ -40,9 +41,7 @@
     }
 
     querySnapshot = @{ @"docs" : result};
-
-    NSLog(@"%@", querySnapshot);
-
+    
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:querySnapshot];
     [pluginResult setKeepCallbackAsBool:reusable];
 
@@ -53,17 +52,17 @@
 
     NSDictionary *documentSnapshot;
 
-    NSLog(@"Creating document snapshot result");
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating document snapshot result");
 
     if (doc.exists) {
         documentSnapshot = @{ @"id" : doc.documentID,
-                                            @"exists" : @"Y",
+                                            @"exists" : @YES,
                                             @"ref" : doc.reference.documentID,
                                             @"_data" : [FirestorePluginJSONHelper toJSON:doc.data]
                                             };
     } else {
         documentSnapshot = @{ @"id" : doc.documentID,
-                                            @"exists" : @"N",
+                                            @"exists" : @NO,
                                             @"ref" : doc.reference.documentID
                                             };
     }
@@ -75,7 +74,7 @@
 
     NSDictionary *documentReference;
 
-    NSLog(@"Creating document reference result");
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating document reference result");
 
     documentReference = @{ @"id" : doc.documentID};
 

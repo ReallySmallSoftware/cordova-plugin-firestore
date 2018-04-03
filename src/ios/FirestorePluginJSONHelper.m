@@ -7,10 +7,13 @@
 
 #import "FirestorePluginJSONHelper.h"
 #import "FirestorePlugin.h"
+@import FirebaseFirestore;
 
 @implementation FirestorePluginJSONHelper;
 
 static NSString *datePrefix = @"__DATE:";
+static NSString *fieldValueDelete = @"__DELETE";
+static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
 + (NSDictionary *)toJSON:(NSDictionary *)values {
     NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithCapacity:[values count]];
@@ -59,13 +62,21 @@ static NSString *datePrefix = @"__DATE:";
     if ([value isKindOfClass:[NSString class]]) {
         NSString *stringValue = (NSString *)value;
         
-        NSUInteger datePrefixLength = (NSUInteger)[FirestorePluginJSONHelper getDatePrefix].length;
+        NSUInteger datePrefixLength = (NSUInteger)datePrefix.length;
     
         if ([stringValue length] > datePrefixLength && [datePrefix isEqualToString:[stringValue substringToIndex:datePrefixLength]]) {
             NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
             timestamp /= 1000;
             NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timestamp];
             value = date;
+        }
+        
+        if ([fieldValueDelete isEqualToString:stringValue]) {
+            value = FIRFieldValue.fieldValueForDelete;
+        }
+        
+        if ([fieldValueServerTimestamp isEqualToString:stringValue]) {
+            value = FIRFieldValue.fieldValueForServerTimestamp;
         }
     }
     
@@ -76,9 +87,12 @@ static NSString *datePrefix = @"__DATE:";
     datePrefix = newDatePrefix;
 }
 
-+ (NSString *)getDatePrefix {
-    return datePrefix;
++ (void)setFieldValueDelete:(NSString *)newFieldValueDelete {
+    fieldValueDelete = newFieldValueDelete;
 }
 
++ (void)setFieldValueServerTimestamp:(NSString *)newFieldValueServerTimestamp {
+    fieldValueServerTimestamp = newFieldValueServerTimestamp;
+}
 @end
 

@@ -13,7 +13,8 @@
 + (NSDictionary *)toJSON:(NSDictionary *)values;
 + (NSDictionary *)fromJSON:(NSDictionary *)values;
 + (void)setDatePrefix:(NSString *)datePrefix;
-+ (NSString *)getDatePrefix;
++ (void)setFieldValueDelete:(NSString *)fieldValueDelete;
++ (void)setFieldValueServerTimestamp:(NSString *)fieldValueServerTimestamp;
 + (NSObject *)parseSpecial:(NSObject *)value;
 
 @end
