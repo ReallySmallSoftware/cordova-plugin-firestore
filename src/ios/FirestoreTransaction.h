@@ -16,7 +16,6 @@ typedef NS_ENUM(NSInteger, FirestoreTransactionType) {
 
 @interface FirestoreTransaction : NSObject
 
-@property(strong) NSString *transactionId;
 @property(assign) FirestoreTransactionType transactionType;
 @property(assign) BOOL transactionResolved;
 @property(assign) FirestoreTransactionStatus transactionStatus;
