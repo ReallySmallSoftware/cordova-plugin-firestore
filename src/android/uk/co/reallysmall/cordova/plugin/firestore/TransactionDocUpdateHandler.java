@@ -35,8 +35,6 @@ public class TransactionDocUpdateHandler implements ActionHandler {
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, String.format("Transactional %s update for document %s", transactionId, collectionPath + "/" + doc));
-
                 transactionWrapper.transaction.update(documentRef, JSONHelper.toSettableMap(data));
                 callbackContext.success();
 

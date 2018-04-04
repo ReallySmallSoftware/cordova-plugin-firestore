@@ -29,7 +29,6 @@ public class DocDeleteHandler implements ActionHandler {
             final String collectionPath = args.getString(0);
             final String doc = args.getString(1);
 
-
             Log.d(FirestorePlugin.TAG, "Deleting document");
 
             try {

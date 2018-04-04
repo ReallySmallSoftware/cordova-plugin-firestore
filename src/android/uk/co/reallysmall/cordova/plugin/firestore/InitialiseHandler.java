@@ -29,7 +29,7 @@ public class InitialiseHandler implements ActionHandler {
 
         try {
             if (firestorePlugin.getDatabase() == null) {
-                Log.d(FirestorePlugin.TAG, "InitialiseHandler Initialising Firestore...");
+                Log.d(FirestorePlugin.TAG, "Initialising Firestore...");
 
                 final JSONObject options = args.getJSONObject(0);
 

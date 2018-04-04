@@ -37,8 +37,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 options = null;
             }
 
-
-            Log.d(FirestorePlugin.TAG, "Listening to document " + collectionPath + " " + doc);
+            Log.d(FirestorePlugin.TAG, "Listening to document");
 
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
             DocumentListenOptions documentListenOptions = getDocumentListenOptions(options);

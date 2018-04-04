@@ -46,8 +46,6 @@ public class TransactionDocSetHandler implements ActionHandler {
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, String.format("Transactional %s set for document %s", transactionId, collectionPath + "/" + doc));
-
                 if (setOptions == null) {
                     transactionWrapper.transaction.set(documentRef, JSONHelper.toSettableMap(data));
                 } else {

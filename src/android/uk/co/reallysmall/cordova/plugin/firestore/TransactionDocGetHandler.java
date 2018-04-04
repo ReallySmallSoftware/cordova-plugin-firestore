@@ -38,8 +38,6 @@ public class TransactionDocGetHandler implements ActionHandler {
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                Log.d(FirestorePlugin.TAG, String.format("Transactional %s get for document %s", transactionId, collectionPath + "/" + doc));
-
                 callbackContext.sendPluginResult(createPluginResult(transactionWrapper.transaction.get(documentRef), false));
 
             } catch (Exception e) {

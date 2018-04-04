@@ -34,7 +34,6 @@ public class DocGetHandler implements ActionHandler {
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-                Log.d(FirestorePlugin.TAG, "Get for document " + collectionPath + "/" + doc);
 
                 documentRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
