@@ -167,7 +167,7 @@ I have learnt a number of things whilst implementing this:
 # History
 ## 1.1.0
 - Add support for FieldValue
-- Add experimental support for Transactions
+- Add experimental support for Transactions. _Please note this is **experimental**!_
 - Add startswith polyfill
 
 ## 1.0.10

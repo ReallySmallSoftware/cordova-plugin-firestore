@@ -69,6 +69,7 @@ public class RunTransactionHandler implements ActionHandler {
                             timedOut = timedOut(started);
 
                             while (transactionQueue.queue.size() < 1 && !timedOut) {
+                              timedOut = timedOut(started);
                             }
 
                             TransactionDetails transactionDetails = transactionQueue.queue.get(0);
