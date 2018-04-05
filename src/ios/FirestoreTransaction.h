@@ -1,30 +1,28 @@
 #import <Cordova/CDVPlugin.h>
 
-typedef NS_ENUM(NSInteger, FirestoreTransactionStatus) {
-    READY,
-    PROCESSING,
-    COMPLETE
-};
-
-typedef NS_ENUM(NSInteger, FirestoreTransactionType) {
-    UNDEFINED,
+typedef NS_ENUM(NSInteger, FirestoreTransactionOperationType) {
+    NONE,
     SET,
     UPDATE,
     DELETE,
-    GET
+    GET,
+    RESOLVE
 };
 
 @interface FirestoreTransaction : NSObject
 
-@property(assign) FirestoreTransactionType transactionType;
-@property(assign) BOOL transactionResolved;
-@property(assign) FirestoreTransactionStatus transactionStatus;
+@property(strong) NSString *collectionPath;
 @property(strong) NSString *docId;
-@property(strong) NSString *collection;
 @property(strong) NSDictionary *data;
 @property(strong) NSDictionary *options;
-@property(strong) CDVPluginResult *pluginResult;
-@property(strong) NSString *result;
+@property(assign) FirestoreTransactionOperationType transactionOperationType;
 
 @end
 
+@interface FirestoreTransactionQueue : NSObject
+
+@property(strong) NSString *result;
+@property(strong) NSMutableArray *queue;
+@property(strong) CDVPluginResult *pluginResult;
+
+@end

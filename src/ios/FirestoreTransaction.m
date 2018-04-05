@@ -3,3 +3,5 @@
 @implementation FirestoreTransaction
 @end
 
+@implementation FirestoreTransactionQueue
+@end

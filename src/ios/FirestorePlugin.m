@@ -37,7 +37,7 @@ static int logcount = 0;
 
     FIRQuerySnapshotBlock snapshotBlock =^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
         if (snapshot == nil) {
-            asl_log(NULL, NULL, ASL_LEVEL_ERR, "Collection snapshot listener error %s", [self localError:error]);
+            NSLog(@"Collection snapshot listener error %s", [self localError:error]);
             return;
         }
 
@@ -112,7 +112,7 @@ static int logcount = 0;
         } else if ([queryType isEqualToString:@"endBefore"]) {
             query = [self processQueryEndBefore:query ForValue:value];
         } else {
-            asl_log(NULL,NULL, ASL_LEVEL_ERR, "Unknown query type %s", [self convertString:queryType]);
+            NSLog(@"Unknown query type %s", [self convertString:queryType]);
         }
     }
 
@@ -141,7 +141,7 @@ static int logcount = 0;
     } else if ([opStr isEqualToString:@"<="]) {
         return [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
     } else {
-        asl_log(NULL,NULL, ASL_LEVEL_ERR, "Unknown operator type %s", [self convertString:opStr]);
+        NSLog(@"Unknown operator type %s", [self convertString:opStr]);
     }
 
     return query;
@@ -219,7 +219,7 @@ static int logcount = 0;
                     @"message" : error.description}
             ];
 
-            asl_log(NULL,NULL, ASL_LEVEL_ERR, "Error writing document to collection %s", [self localError:error]);
+            NSLog(@"Error writing document to collection %s", [self localError:error]);
 
         } else {
             pluginResult = [FirestorePluginResultHelper createDocumentReferencePluginResult:ref :NO];
@@ -243,7 +243,7 @@ static int logcount = 0;
     
     [query getDocumentsWithCompletion:^(FIRQuerySnapshot * snapshot, NSError * error) {
         if (error != nil) {
-            asl_log(NULL,NULL, ASL_LEVEL_ERR, "Error getting collection %s", [self localError:error]);
+            NSLog(@"Error getting collection %s", [self localError:error]);
             return;
         }
 
@@ -313,7 +313,7 @@ static int logcount = 0;
                                                                                                           @"message" : error.description}
                             ];
 
-            asl_log(NULL, NULL, ASL_LEVEL_ERR, "Error writing document %s", [self localError:error]);
+            NSLog(@"Error writing document %s", [self localError:error]);
 
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -362,7 +362,7 @@ static int logcount = 0;
                                                                                                           @"message" : error.description}
                             ];
 
-            asl_log(NULL,NULL,ASL_LEVEL_ERR, "Error updating document %s", [self localError:error]);
+            NSLog(@"Error updating document %s", [self localError:error]);
 
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -393,7 +393,7 @@ static int logcount = 0;
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
         if (snapshot == nil) {
-            asl_log(NULL,NULL,ASL_LEVEL_ERR,"Document snapshot listener error %s", [self localError:error]);
+            NSLog(@"Document snapshot listener error %s", [self localError:error]);
             return;
         }
 
@@ -451,7 +451,7 @@ static int logcount = 0;
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
         if (snapshot == nil) {
-            asl_log(NULL,NULL,ASL_LEVEL_ERR,"Error getting document %s", [self localError:error]);
+            NSLog(@"Error getting document %s", [self localError:error]);
             return;
         }
 
@@ -478,7 +478,7 @@ static int logcount = 0;
         CDVPluginResult *pluginResult;
         
         if (error != nil) {
-            asl_log(NULL,NULL,ASL_LEVEL_ERR,"Error deleting document %s", [self localError:error]);
+            NSLog(@"Error deleting document %s", [self localError:error]);
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
         } else {
             asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Successfully deleted document");
@@ -499,312 +499,166 @@ static int logcount = 0;
 
 - (void)transactionDocSet:(CDVInvokedUrlCommand *)command {
 
-        NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
-        NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
-        NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
-        NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
-        NSDictionary *options = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
-        
-        NSLog(@"Firestore: Transaction document set %s %d" , [self convertString:transactionId], logcount++);
-
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document set for %s", [self convertString:transactionId]);
-        
-        FirestoreTransaction *transaction;
-        
-        @synchronized(self) {
-            
-            transaction = [self waitForPendingTransactionOperation:transactionId];;
-            
-            transaction.docId = docId;
-            transaction.collection = collection;
-            transaction.data = data;
-            transaction.options = options;
-            transaction.transactionType = (FirestoreTransactionType)SET;
-            transaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
-        }
-        
-    [self.commandDelegate runInBackground:^{
-        time_t started = time(nil);
-        
-        FirestoreTransactionStatus status = (FirestoreTransactionStatus)PROCESSING;
-        
-        while (status != (FirestoreTransactionStatus)COMPLETE) {
-            
-            @synchronized(self) {
-                status = transaction.transactionStatus;
-            }
-            
-            if ([self timedOut:started]) {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
-                @synchronized(self) {
-                    transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-                }
-                return;
-            }
-        }
-        
-        @synchronized(self) {
-            [self.commandDelegate sendPluginResult:transaction.pluginResult callbackId:command.callbackId];
-            transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-        }
-        
-        NSLog(@"Firestore: Transaction document set complete %s %d" , [self convertString:transactionId], logcount++);
-
-    }];
-}
-
-- (FirestoreTransaction *)getTransaction:(NSString *)transactionId {
-    return self.transactions[transactionId];
-}
-
-- (FirestoreTransaction *)waitForPendingTransactionOperation:(NSString *)transactionId {
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
+    NSDictionary *options = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
     
-    FirestoreTransaction *transaction = [self getTransaction:transactionId];
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document set for %s", [self convertString:transactionId]);
     
-    time_t started = time(nil);
-
-    while (transaction.transactionStatus != (FirestoreTransactionStatus)READY) {
-        
-        if ([self timedOut:started]) {
-            @throw @"Timeout waiting for transaction operation to complete";
-        }
+    FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
+    FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
+    
+    firestoreTransaction.docId = docId;
+    firestoreTransaction.collectionPath = collectionPath;
+    firestoreTransaction.data = data;
+    firestoreTransaction.options = options;
+    firestoreTransaction.transactionOperationType = (FirestoreTransactionOperationType)SET;
+    
+    @synchronized(self) {
+        [transactionQueue.queue addObject:firestoreTransaction];
     }
     
-    return transaction;
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
 }
 
-- (void)executeTransactionDocSet:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction {
+- (void)executeTransactionDocSet:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId {
     
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data];
     
     FIRSetOptions *setOptions = [self getSetOptions:firestoreTransaction.options];
     
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document set");
-    NSLog(@"Firestore: Execute transaction document set  %d",logcount++);
 
-    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collection] documentWithPath:firestoreTransaction.docId];
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
     
     if (setOptions == nil) {
         [transaction setData:parsedData forDocument:documentReference];
     } else {
         [transaction setData:parsedData forDocument:documentReference options:setOptions];
     }
-    
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    
-    @synchronized(self) {
-    firestoreTransaction.pluginResult = pluginResult;
-    firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
-    }
-    NSLog(@"Firestore: Execute transaction document set complete %d",logcount++);
-
 }
 
 - (void)transactionDocUpdate:(CDVInvokedUrlCommand *)command {
 
-        NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
-        NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
-        NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
-        NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
 
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document update for %s", [self convertString:transactionId]);
-        NSLog(@"Firestore: Transaction document update %s %d" , [self convertString:transactionId],logcount++);
-
-        FirestoreTransaction *transaction;
-        
-        @synchronized(self) {
-            
-            transaction = [self waitForPendingTransactionOperation:transactionId];;
-
-            transaction.docId = docId;
-            transaction.collection = collection;
-            transaction.data = data;
-            transaction = nil;
-            transaction.transactionType = (FirestoreTransactionType)UPDATE;
-            transaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
-        }
-        
-    [self.commandDelegate runInBackground:^{
-        time_t started = time(nil);
-        
-        FirestoreTransactionStatus status = (FirestoreTransactionStatus)PROCESSING;
-        
-        while (status != (FirestoreTransactionStatus)COMPLETE) {
-            
-            @synchronized(self) {
-                status = transaction.transactionStatus;
-            }
-            
-            if ([self timedOut:started]) {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
-                @synchronized(self) {
-                    transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-                }
-                return;
-            }
-        }
-        
-        @synchronized(self) {
-            [self.commandDelegate sendPluginResult:transaction.pluginResult callbackId:command.callbackId];
-            transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-        }
-        NSLog(@"Firestore: Transaction document update complete %s %d" , [self convertString:transactionId],logcount++);
-
-    }];
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document update for %s", [self convertString:transactionId]);
+    
+    FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
+    FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
+    
+    firestoreTransaction.docId = docId;
+    firestoreTransaction.collectionPath = collectionPath;
+    firestoreTransaction.data = data;
+    firestoreTransaction.transactionOperationType = (FirestoreTransactionOperationType)UPDATE;
+    
+    @synchronized(self) {
+        [transactionQueue.queue addObject:firestoreTransaction];
+    }
+    
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
 }
 
-- (void)executeTransactionDocUpdate:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction {
+- (void)executeTransactionDocUpdate:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId {
     
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data];
     
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document update");
-    NSLog(@"Firestore: Execute transaction document update %d",logcount++);
 
-    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collection] documentWithPath:firestoreTransaction.docId];
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
     
     [transaction updateData:parsedData forDocument:documentReference];
-    
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    
-    @synchronized(self) {
-    firestoreTransaction.pluginResult = pluginResult;
-    firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
-    }
-    NSLog(@"Firestore: Execute transaction document update complete %d",logcount++);
-
 }
 
 - (void)transactionDocDelete:(CDVInvokedUrlCommand *)command {
     
-        NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
-        NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
-        NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
     
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document delete for %s", [self convertString:transactionId]);
-        NSLog(@"Firestore: Transaction document delete %s %d" , [self convertString:transactionId],logcount++);
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document delete for %s", [self convertString:transactionId]);
 
-        FirestoreTransaction *transaction;
-        
-        @synchronized(self) {
-            
-            transaction = [self waitForPendingTransactionOperation:transactionId];;
-
-            transaction.docId = docId;
-            transaction.collection = collection;
-            transaction.data = nil;
-            transaction.options = nil;
-            transaction.transactionType = (FirestoreTransactionType)DELETE;
-            transaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
-        }
-        
-    [self.commandDelegate runInBackground:^{
-        
-        time_t started = time(nil);
-        
-        FirestoreTransactionStatus status = (FirestoreTransactionStatus)PROCESSING;
-        
-        while (status != (FirestoreTransactionStatus)COMPLETE) {
-            
-            @synchronized(self) {
-                status = transaction.transactionStatus;
-            }
-            
-            if ([self timedOut:started]) {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
-                @synchronized(self) {
-                    transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-                }
-                return;
-            }
-        }
-        
-        @synchronized(self) {
-            [self.commandDelegate sendPluginResult:transaction.pluginResult callbackId:command.callbackId];
-            transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-        }
-        NSLog(@"Firestore: Transaction document delete complete %s %d" , [self convertString:transactionId],logcount++);
-
-    }];
-}
-
-- (void)executeTransactionDocDelete:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction {
+    FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
+    FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
     
-    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collection] documentWithPath:firestoreTransaction.docId];
-    
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document delete");
-    NSLog(@"Firestore: Execute transaction document delete %d",logcount++);
-
-    [transaction deleteDocument:documentReference];
-    
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    firestoreTransaction.docId = docId;
+    firestoreTransaction.collectionPath = collectionPath;
+    firestoreTransaction.transactionOperationType = (FirestoreTransactionOperationType)DELETE;
     
     @synchronized(self) {
-    firestoreTransaction.pluginResult = pluginResult;
-    firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
+        [transactionQueue.queue addObject:firestoreTransaction];
     }
-    NSLog(@"Firestore: Execute transaction document delete complete %d",logcount++);
+    
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
 
+- (void)executeTransactionDocDelete:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId {
+    
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document delete");
+
+    [transaction deleteDocument:documentReference];
 }
 
 - (void)transactionDocGet:(CDVInvokedUrlCommand *)command {
     
-    NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
-    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
-    NSString *collection =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
-    
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document get for %s", [self convertString:transactionId]);
-        NSLog(@"Firestore: Transaction document get %s %d" , [self convertString:transactionId],logcount++);
+    [self.commandDelegate runInBackground:^{
 
-        FirestoreTransaction *transaction;
+        NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+        NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+        NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+        
+        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document get for %s", [self convertString:transactionId]);
+
+        FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
+        FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
+        
+        firestoreTransaction.docId = docId;
+        firestoreTransaction.collectionPath = collectionPath;
+        firestoreTransaction.transactionOperationType = (FirestoreTransactionOperationType)GET;
         
         @synchronized(self) {
-            
-            transaction = [self waitForPendingTransactionOperation:transactionId];;
-
-            transaction.docId = docId;
-            transaction.collection = collection;
-            transaction.data = nil;
-            transaction.options = nil;
-            transaction.transactionType = (FirestoreTransactionType)GET;
-            transaction.transactionStatus = (FirestoreTransactionStatus)PROCESSING;
+            [transactionQueue.queue addObject:firestoreTransaction];
+            transactionQueue.pluginResult = nil;
         }
-        
-    [self.commandDelegate runInBackground:^{
         
         time_t started = time(nil);
+        BOOL timedOut = NO;
         
-        FirestoreTransactionStatus status = (FirestoreTransactionStatus)PROCESSING;
+        CDVPluginResult *pluginResult;
         
-        while (status != (FirestoreTransactionStatus)COMPLETE) {
+        @synchronized(self) {
+            pluginResult = transactionQueue.pluginResult;
+        }
+        
+        while (pluginResult == nil && timedOut == NO) {
+            
+            timedOut = [self timedOut:started];
             
             @synchronized(self) {
-                status = transaction.transactionStatus;
-            }
-            
-            if ([self timedOut:started]) {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
-                @synchronized(self) {
-                    transaction.transactionStatus = (FirestoreTransactionStatus)READY;
-                }
-                return;
+                pluginResult = transactionQueue.pluginResult;
             }
         }
-    
-
-        @synchronized (self) {
-            [self.commandDelegate sendPluginResult:transaction.pluginResult callbackId:command.callbackId];
-            transaction.transactionStatus = (FirestoreTransactionStatus)READY;
+        
+        if (timedOut == YES) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+        } else {
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
-        NSLog(@"Firestore: Transaction document get complete %s %d" , [self convertString:transactionId],logcount++);
     }];
 }
 
-- (void)executeTransactionDocGet:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithError:(NSError * __autoreleasing *)errorPointer {
+- (CDVPluginResult *)executeTransactionDocGet:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId WithError:(NSError * __autoreleasing *)errorPointer {
     
-    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collection] documentWithPath:firestoreTransaction.docId];
+    FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
     
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document get");
-    NSLog(@"Firestore: Execute transaction document get %d",logcount++);
 
     FIRDocumentSnapshot *snapshot = [transaction getDocument:documentReference error:errorPointer];
 
@@ -816,12 +670,7 @@ static int logcount = 0;
         pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :NO];
     }
 
-    @synchronized(self) {
-    firestoreTransaction.pluginResult = pluginResult;
-    firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)COMPLETE;
-    }
-    NSLog(@"Firestore: Execute transaction document get complete %d",logcount++);
-
+    return pluginResult;
 }
 
 - (void)runTransaction:(CDVInvokedUrlCommand *)command {
@@ -832,15 +681,13 @@ static int logcount = 0;
     [self.firestore runTransactionWithBlock:^id _Nullable(FIRTransaction * _Nonnull transaction, NSError *  __autoreleasing * errorPointer) {
         
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Applying transaction %s", [self convertString:transactionId]);
-        NSLog(@"Firestore: Transaction run %s %d" , [self convertString:transactionId],logcount++);
 
-        FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
-        
+        FirestoreTransactionQueue *firestoreTransactionQueue = [FirestoreTransactionQueue new];
+        firestoreTransactionQueue.queue = [NSMutableArray new];
+        firestoreTransactionQueue.pluginResult = nil;
+
         @synchronized(self) {
-            firestoreTransaction.transactionStatus = (FirestoreTransactionStatus)READY;
-            firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
-            firestoreTransaction.transactionResolved = NO;
-            [self.transactions setObject:firestoreTransaction forKey:transactionId];
+            [self.transactions setObject:firestoreTransactionQueue forKey:transactionId];
         }
         
         NSString *execute = [NSString stringWithFormat:@"Firestore.__executeTransaction('%@');", transactionId];
@@ -848,47 +695,68 @@ static int logcount = 0;
         [self stringByEvaluatingJavaScriptFromString:execute];
         
         time_t started = time(nil);
-        BOOL resolved = NO;
-        FirestoreTransactionType transactionType;
-        NSString *result = @"";
-            
-        while (resolved == NO && [self timedOut:started] == NO)
+        
+        BOOL timedOut = NO;
+        
+        FirestoreTransactionOperationType transactionOperationType = (FirestoreTransactionOperationType)NONE;
+        
+        while (transactionOperationType != (FirestoreTransactionOperationType)RESOLVE && timedOut == NO)
         {
+            timedOut = [self timedOut:started];
+            
+            int count;
+            
             @synchronized(self) {
-                resolved = firestoreTransaction.transactionResolved;
-                transactionType = firestoreTransaction.transactionType;
+                count = (int)firestoreTransactionQueue.queue.count;
             }
             
-                if (transactionType == (FirestoreTransactionType)SET) {
-                    [self executeTransactionDocSet:transaction For:firestoreTransaction];
-                    @synchronized(self) {
-                        firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
-                        result = firestoreTransaction.result;
-                    }
-                } else if (transactionType == (FirestoreTransactionType)UPDATE) {
-                    [self executeTransactionDocUpdate:transaction For:firestoreTransaction];
-                    @synchronized(self) {
-                        firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
-                        result = firestoreTransaction.result;
-                    }
-                } else if (transactionType == (FirestoreTransactionType)DELETE) {
-                    [self executeTransactionDocDelete:transaction For:firestoreTransaction];
-                    @synchronized(self) {
-                        firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
-                        result = firestoreTransaction.result;
-                    }
-                } else if (transactionType == (FirestoreTransactionType)GET) {
-                    [self executeTransactionDocGet:transaction For:firestoreTransaction WithError:errorPointer];
-                    @synchronized(self) {
-                        firestoreTransaction.transactionType = (FirestoreTransactionType)UNDEFINED;
-                        result = firestoreTransaction.result;
-                    }
-                }
-            
-        }
-        NSLog(@"Firestore: Transaction run complete %s %d" , [self convertString:transactionId],logcount++);
+            while (count == 0 && timedOut == NO) {
+                timedOut = [self timedOut:started];
 
-        return result;
+                @synchronized(self) {
+                    count = (int)firestoreTransactionQueue.queue.count;
+                }
+            }
+            
+            FirestoreTransaction *firestoreTransaction;
+            
+            @synchronized(self) {
+                firestoreTransaction = (FirestoreTransaction *)firestoreTransactionQueue.queue[0];
+            }
+            
+            transactionOperationType = firestoreTransaction.transactionOperationType;
+            
+            CDVPluginResult *pluginResult;
+            
+            switch (transactionOperationType) {
+                case (FirestoreTransactionOperationType)SET:
+                    [self executeTransactionDocSet:transaction For:firestoreTransaction WithId:transactionId];
+                    break;
+                case (FirestoreTransactionOperationType)UPDATE:
+                    [self executeTransactionDocUpdate:transaction For:firestoreTransaction WithId:transactionId];
+                    break;
+                case (FirestoreTransactionOperationType)DELETE:
+                    [self executeTransactionDocDelete:transaction For:firestoreTransaction WithId:transactionId];
+                    break;
+                case (FirestoreTransactionOperationType)GET:
+                    pluginResult = [self executeTransactionDocGet:transaction For:firestoreTransaction WithId:transactionId WithError:errorPointer];
+                    @synchronized(self) {
+                        firestoreTransactionQueue.pluginResult = pluginResult;
+                    }
+                    break;
+                case (FirestoreTransactionOperationType)NONE:
+                case (FirestoreTransactionOperationType)RESOLVE:
+                    break;
+            }
+            
+            @synchronized(self) {
+                [firestoreTransactionQueue.queue removeObjectAtIndex:0];
+            }
+        }
+        
+        [self.transactions removeObjectForKey:transactionId];
+        
+        return firestoreTransactionQueue.result;
         
     } completion:^(id  _Nullable result, NSError * _Nullable error) {
                 
@@ -899,13 +767,11 @@ static int logcount = 0;
                                                                                                           @"code" : @(error.code),
                                                                                                           @"message" : error.description}
                             ];
-            asl_log(NULL, NULL, ASL_LEVEL_ERR, "Transaction failure %s", [self localError:error]);
+            NSLog(@"Transaction failure %s", [self localError:error]);
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
             asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction success");
         }
-        
-        [self.transactions removeObjectForKey:transactionId];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -916,18 +782,15 @@ static int logcount = 0;
     NSString *result =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
 
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction resolve for %s", [self convertString:transactionId]);
-    NSLog(@"Firestore: Transaction resolve %s %s %d" , [self convertString:transactionId], [self convertString:result],logcount++);
 
+    FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
+    FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
+    
+    firestoreTransaction.transactionOperationType = (FirestoreTransactionOperationType)RESOLVE;
+    
     @synchronized(self) {
-        
-        FirestoreTransaction *firestoreTransaction = [self waitForPendingTransactionOperation:transactionId];
-        
-        if (firestoreTransaction.transactionType != (FirestoreTransactionType)UNDEFINED) {
-            @throw @"Attemped to resolve with outstanding process";
-        }
-        
-        firestoreTransaction.transactionResolved = YES;
-        firestoreTransaction.result = result;
+        [transactionQueue.queue addObject:firestoreTransaction];
+        transactionQueue.result = result;
     }
 }
 
@@ -941,8 +804,7 @@ static int logcount = 0;
                     resultString = [NSString stringWithFormat:@"%@", result];
                 }
             } else {
-                asl_log(NULL,NULL,ASL_LEVEL_ERR,"evaluateJavaScript error : %s", [self localError:error]);
-                
+                NSLog(@"evaluateJavaScript error : %s", [self localError:error]);
             }
         }];
     });
