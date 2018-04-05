@@ -1,14 +1,9 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Transaction;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -33,12 +28,12 @@ public class TransactionDocGetHandler implements ActionHandler {
 
             Log.d(FirestorePlugin.TAG, String.format("Transactional document get for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
+            TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
 
-                callbackContext.sendPluginResult(createPluginResult(transactionWrapper.transaction.get(documentRef), false));
+                callbackContext.sendPluginResult(createPluginResult(transactionQueue.transaction.get(documentRef), false));
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);

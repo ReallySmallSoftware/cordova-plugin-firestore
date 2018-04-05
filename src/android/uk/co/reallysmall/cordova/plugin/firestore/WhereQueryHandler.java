@@ -7,8 +7,6 @@ import com.google.firebase.firestore.Query;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Date;
-
 public class WhereQueryHandler implements QueryHandler {
     @Override
     public Query handle(Query query, Object whereObject) {
@@ -35,7 +33,7 @@ public class WhereQueryHandler implements QueryHandler {
             }
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing where", e);
-            throw  new RuntimeException(e);
+            throw new RuntimeException(e);
         }
 
         return query;

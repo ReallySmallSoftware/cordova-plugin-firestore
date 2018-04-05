@@ -3,12 +3,9 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.DocumentReference;
-
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class TransactionDocDeleteHandler implements ActionHandler {
     private final FirestorePlugin firestorePlugin;
@@ -21,25 +18,20 @@ public class TransactionDocDeleteHandler implements ActionHandler {
     public boolean handle(JSONArray args, final CallbackContext callbackContext) {
         try {
             final String transactionId = args.getString(0);
-            final String doc = args.getString(1);
+            final String docId = args.getString(1);
             final String collectionPath = args.getString(2);
 
             Log.d(FirestorePlugin.TAG, String.format("Transactional document delete for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
+            TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
-            try {
-                DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
+            TransactionDetails transactionDetails = new TransactionDetails();
+            transactionDetails.collectionPath = collectionPath;
+            transactionDetails.docId = docId;
+            transactionDetails.transactionOperationType = TransactionOperationType.DELETE;
 
-                Log.d(FirestorePlugin.TAG, String.format("Transactional %s delete for document %s", transactionId, collectionPath + "/" + doc));
-
-                transactionWrapper.transaction.delete(documentRef);
-                callbackContext.success();
-
-            } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document delete in thread", e);
-                callbackContext.error(e.getMessage());
-            }
+            transactionQueue.queue.add(transactionDetails);
+            callbackContext.success();
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document delete", e);

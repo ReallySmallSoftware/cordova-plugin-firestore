@@ -16,7 +16,7 @@ public class FieldValueHelper {
     }
 
     public static Object unwrapFieldValue(Object value) {
-        String valueString = (String)value;
+        String valueString = (String) value;
 
         if (fieldValueDelete.equals(valueString)) {
             return FieldValue.delete();
@@ -31,7 +31,7 @@ public class FieldValueHelper {
 
     public static boolean isWrappedFieldValue(Object value) {
         if (value instanceof String) {
-            String valueString = (String)value;
+            String valueString = (String) value;
 
             if (fieldValueDelete.equals(valueString)) {
                 return true;

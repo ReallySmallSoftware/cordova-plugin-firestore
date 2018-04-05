@@ -38,7 +38,7 @@ public class QueryHelper {
             if (queryHandlers.containsKey(queryType)) {
                 query = queryHandlers.get(queryType).handle(query, queryDefinition.get("value"));
             } else {
-              Log.e(FirestorePlugin.TAG, String.format("Unknown query type %s", queryType));
+                Log.e(FirestorePlugin.TAG, String.format("Unknown query type %s", queryType));
             }
         }
 

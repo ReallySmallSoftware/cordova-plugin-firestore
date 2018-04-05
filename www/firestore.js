@@ -42,7 +42,6 @@ function __wrap(data) {
   return data;
 }
 
-
 var FieldValue = {
   delete: function() {
     return FirestoreOptions.fieldValueDelete;
@@ -52,7 +51,6 @@ var FieldValue = {
   }
 };
 
-
 function Transaction(id) {
   this._id = id;
 }
@@ -61,9 +59,14 @@ Transaction.prototype = {
   delete: function(documentReference) {
     var args = [this._id, documentReference._id, documentReference._collectionReference._path];
 
-    exec(function() {}, function() {
-      throw new Error("Undefined error in transactionDocDelete");
-    }, PLUGIN_NAME, 'transactionDocDelete', args);
+    var success = function() {
+    };
+
+    var failure = function() {
+        throw new Error("Undefined error in transactionDocDelete");
+    };
+
+    exec(success, failure, PLUGIN_NAME, 'transactionDocDelete', args);
 
     return this;
   },
@@ -74,15 +77,21 @@ Transaction.prototype = {
       exec(resolve, reject, PLUGIN_NAME, 'transactionDocGet', args);
     }).then(function(data) {
       return new DocumentSnapshot(data);
+    }).catch(function(err) {
     });
   },
   set: function(documentReference, data, options) {
 
     var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data), options];
 
-    exec(function() {}, function() {
-      throw new Error("Undefined error in transactionDocSet");
-    }, PLUGIN_NAME, 'transactionDocSet', args);
+    var success = function() {
+    };
+
+    var failure = function() {
+        throw new Error("Undefined error in transactionDocSet");
+    };
+
+    exec(success, failure, PLUGIN_NAME, 'transactionDocSet', args);
 
     return this;
   },
@@ -90,9 +99,14 @@ Transaction.prototype = {
 
     var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data)];
 
-    exec(function() {}, function() {
-      throw new Error("Undefined error in transactionDocUpdate");
-    }, PLUGIN_NAME, 'transactionDocUpdate', args);
+    var success = function() {
+    };
+
+    var failure = function() {
+        throw new Error("Undefined error in transactionDocUpdate");
+    };
+
+    exec(success, failure, PLUGIN_NAME, 'transactionDocUpdate', args);
 
     return this;
   }

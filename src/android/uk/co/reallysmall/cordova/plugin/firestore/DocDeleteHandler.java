@@ -7,13 +7,10 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import static uk.co.reallysmall.cordova.plugin.firestore.PluginResultHelper.createPluginResult;
 
 public class DocDeleteHandler implements ActionHandler {
 

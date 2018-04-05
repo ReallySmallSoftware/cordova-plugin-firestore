@@ -15,16 +15,15 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
 public class FirestorePlugin extends CordovaPlugin {
     static final String TAG = "FirestorePlugin";
     private static FirebaseFirestore database;
-    private Map<String, ActionHandler> handlers = new HashMap<String, ActionHandler>();
+    private Map<String, ActionHandler> handlers = new Hashtable<String, ActionHandler>();
     private Map<String, ListenerRegistration> registrations = new Hashtable<String, ListenerRegistration>();
-    private TransactionWrapper threadTransactionWrapper = new TransactionWrapper();
+    private Map<String, TransactionQueue> transactions = new Hashtable<String, TransactionQueue>();
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
@@ -83,17 +82,16 @@ public class FirestorePlugin extends CordovaPlugin {
     }
 
     public void storeTransaction(String transactionId, Transaction transaction) {
-        threadTransactionWrapper.transactionId = transactionId;
-        threadTransactionWrapper.transaction = transaction;
-        threadTransactionWrapper.sync.setLength(0);
+        TransactionQueue transactionQueue = new TransactionQueue();
+        transactionQueue.transaction = transaction;
+        transactions.put(transactionId, transactionQueue);
     }
 
-    public TransactionWrapper getTransaction() {
-        return threadTransactionWrapper;
+    public TransactionQueue getTransaction(String transactionId) {
+        return transactions.get(transactionId);
     }
 
-    public void removeTransaction() {
-        threadTransactionWrapper.transaction = null;
-        threadTransactionWrapper.sync.setLength(0);
+    public void removeTransaction(String transactionId) {
+        transactions.remove(transactionId);
     }
 }

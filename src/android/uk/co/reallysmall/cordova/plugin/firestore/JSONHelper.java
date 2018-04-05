@@ -1,9 +1,6 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
@@ -14,7 +11,6 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import android.util.Log;
 
 public class JSONHelper {
     static JSONObject toJSON(Map<String, Object> values) throws JSONException {
@@ -23,7 +19,8 @@ public class JSONHelper {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof Map) {
-                value = toJSON((Map<String, Object>)value);;
+                value = toJSON((Map<String, Object>) value);
+                ;
             } else if (value instanceof List) {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
@@ -39,7 +36,8 @@ public class JSONHelper {
 
         for (Object value : values) {
             if (value instanceof Map) {
-                value = toJSON((Map)value);;
+                value = toJSON((Map) value);
+                ;
             } else if (value instanceof List) {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
@@ -67,14 +65,14 @@ public class JSONHelper {
         }.getType();
         Map<String, Object> value = new Gson().fromJson(rawValue.toString(), type);
 
-        for (Map.Entry<String,Object> entry : value.entrySet()) {
+        for (Map.Entry<String, Object> entry : value.entrySet()) {
 
             Object entryValue = entry.getValue();
 
             if (JSONDateWrapper.isWrappedDate(entryValue)) {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
-            } else  if (entryValue instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>)entryValue));
+            } else if (entryValue instanceof Map) {
+                entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
                 entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }
@@ -84,14 +82,14 @@ public class JSONHelper {
 
     static Map<Object, Object> toSettableMapInternal(Map<Object, Object> value) {
 
-        for (Map.Entry<Object,Object> entry : value.entrySet()) {
+        for (Map.Entry<Object, Object> entry : value.entrySet()) {
 
             Object entryValue = entry.getValue();
 
             if (JSONDateWrapper.isWrappedDate(entryValue)) {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
-            } else  if (entryValue instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>)entryValue));
+            } else if (entryValue instanceof Map) {
+                entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
                 entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }

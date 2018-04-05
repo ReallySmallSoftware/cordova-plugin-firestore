@@ -2,17 +2,10 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 
 import android.util.Log;
 
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.SetOptions;
-
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-/**
- * Created by richard on 23/03/18.
- */
 
 public class TransactionDocSetHandler implements ActionHandler {
     private final FirestorePlugin firestorePlugin;
@@ -25,7 +18,7 @@ public class TransactionDocSetHandler implements ActionHandler {
     public boolean handle(JSONArray args, final CallbackContext callbackContext) {
         try {
             final String transactionId = args.getString(0);
-            final String doc = args.getString(1);
+            final String docId = args.getString(1);
             final String collectionPath = args.getString(2);
             final JSONObject data = args.getJSONObject(3);
 
@@ -39,24 +32,17 @@ public class TransactionDocSetHandler implements ActionHandler {
 
             Log.d(FirestorePlugin.TAG, String.format("Transactional document set for %s", transactionId));
 
-            SetOptions setOptions = DocSetOptions.getSetOptions(options);
+            TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
+            TransactionDetails transactionDetails = new TransactionDetails();
+            transactionDetails.collectionPath = collectionPath;
+            transactionDetails.docId = docId;
+            transactionDetails.data = data;
+            transactionDetails.options = options;
+            transactionDetails.transactionOperationType = TransactionOperationType.SET;
 
-            try {
-                DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-
-                if (setOptions == null) {
-                    transactionWrapper.transaction.set(documentRef, JSONHelper.toSettableMap(data));
-                } else {
-                    transactionWrapper.transaction.set(documentRef, JSONHelper.toSettableMap(data), setOptions);
-                }
-                callbackContext.success();
-
-            } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document set in thread", e);
-                callbackContext.error(e.getMessage());
-            }
+            transactionQueue.queue.add(transactionDetails);
+            callbackContext.success();
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing transactional document set", e);

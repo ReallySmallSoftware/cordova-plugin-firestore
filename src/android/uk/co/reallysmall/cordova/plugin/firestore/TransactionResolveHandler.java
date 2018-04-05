@@ -23,12 +23,13 @@ public class TransactionResolveHandler implements ActionHandler {
 
             Log.d(FirestorePlugin.TAG, String.format("Transactional resolve for %s", transactionId));
 
-            TransactionWrapper transactionWrapper = firestorePlugin.getTransaction();
-            transactionWrapper.sync.append(result);
+            TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
+            transactionQueue.results.append(result);
 
-            synchronized (transactionWrapper.sync) {
-                transactionWrapper.sync.notify();
-            }
+            TransactionDetails transactionDetails = new TransactionDetails();
+            transactionDetails.transactionOperationType = TransactionOperationType.RESOLVE;
+
+            transactionQueue.queue.add(transactionDetails);
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error resolving transaction", e);

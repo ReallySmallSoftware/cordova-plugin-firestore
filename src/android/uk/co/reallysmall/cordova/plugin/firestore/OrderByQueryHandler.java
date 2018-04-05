@@ -23,7 +23,7 @@ public class OrderByQueryHandler implements QueryHandler {
 
             query = query.orderBy(order.getString("field"), direction);
 
-            Log.d(FirestorePlugin.TAG, String.format("Order by %s (%s)", order.getString("field"),direction.toString()));
+            Log.d(FirestorePlugin.TAG, String.format("Order by %s (%s)", order.getString("field"), direction.toString()));
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing ordering", e);

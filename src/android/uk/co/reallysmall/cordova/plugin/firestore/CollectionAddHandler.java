@@ -12,8 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static uk.co.reallysmall.cordova.plugin.firestore.PluginResultHelper.createPluginResult;
-
 public class CollectionAddHandler implements ActionHandler {
 
     private FirestorePlugin firestorePlugin;
