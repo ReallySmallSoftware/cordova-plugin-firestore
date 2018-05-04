@@ -84,7 +84,7 @@
       </feature>
     </config-file>
 
-    <framework src="Firebase/Firestore" type="podspec"/>
+    <framework src="Firebase/Firestore" type="podspec" spec=""/>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>
