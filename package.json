@@ -1,5 +1,5 @@
 {
-  "name": "cordova-plugin-firestore",
+  "name": "@engagemobile/cordova-plugin-firestore",
   "version": "1.1.0",
   "cordova": {
     "id": "cordova-plugin-firestore",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ReallySmallSoftware/cordova-plugin-firestore.git"
+    "url": "https://github.com/EngageMobile/cordova-plugin-firestore.git"
   },
   "author": "Richard Windley <richard.windley@gmail.com> (http://www.reallysmall.co.uk)",
   "license": "Apache-2.0",
