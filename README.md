@@ -165,6 +165,11 @@ I have learnt a number of things whilst implementing this:
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
 # History
+## 1.2.0
+- Update Android dependency versions
+- Update iOS dependency versions
+- WARNING: The Android update may require you to update com.google.gms:google-services to 3.2.1, com.android.tools.build:gradle to 3.1.2 and gradle to 4.4.4 (look in platforms/android/cordova/lib/builders/GradleBuilder.js)
+
 ## 1.1.0
 - Add support for FieldValue
 - Add experimental support for Transactions. _Please note this is **experimental**!_
