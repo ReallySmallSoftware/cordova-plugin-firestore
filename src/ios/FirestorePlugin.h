@@ -1,5 +1,5 @@
 #import <Cordova/CDVPlugin.h>
-@import FirebaseFirestore/FirebaseFirestore;
+@import FirebaseFirestore;
 
 #import "FirestoreTransaction.h"
 #import "FirestorePluginResultHelper.h"

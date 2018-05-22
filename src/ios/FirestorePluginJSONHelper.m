@@ -7,7 +7,7 @@
 
 #import "FirestorePluginJSONHelper.h"
 #import "FirestorePlugin.h"
-@import FirebaseFirestore/FirebaseFirestore;
+@import FirebaseFirestore;
 
 @implementation FirestorePluginJSONHelper;
 
