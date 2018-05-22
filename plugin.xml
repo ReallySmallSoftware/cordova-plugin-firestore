@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.1.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="engage-cordova-plugin-firestore" version="1.1.5">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -84,6 +84,7 @@
       </feature>
     </config-file>
 
+    <framework src="Firebase/Core" type="podspec" spec=""/>
     <framework src="Firebase/Firestore" type="podspec" spec=""/>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
