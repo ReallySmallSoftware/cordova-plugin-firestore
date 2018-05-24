@@ -30,8 +30,10 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_VERSION" default="16.0.0"/>
-    <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_VERSION"/>
+    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.0"/>
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="17.0.1"/>
+    <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
+    <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
     <framework src="org.json:json:20171018"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>

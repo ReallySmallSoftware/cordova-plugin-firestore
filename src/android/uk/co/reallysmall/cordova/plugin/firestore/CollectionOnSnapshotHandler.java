@@ -7,7 +7,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryListenOptions;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.apache.cordova.CallbackContext;
@@ -34,7 +34,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
-                QueryListenOptions queryListenOptions = getQueryListenOptions(options);
+                MetadataChanges metadataChanges = getMetadataChanges(options);
 
                 Query query = QueryHelper.processQueries(queries, collectionRef);
 
@@ -53,11 +53,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                     }
                 };
 
-                if (queryListenOptions == null) {
-                    firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(eventListener));
-                } else {
-                    firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(queryListenOptions, eventListener));
-                }
+                firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(metadataChanges, eventListener));
 
             } catch (Exception e) {
                 Log.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
@@ -72,18 +68,20 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
         return true;
     }
 
-    private QueryListenOptions getQueryListenOptions(JSONObject options) {
-        QueryListenOptions queryListenOptions = null;
+    private MetadataChanges getMetadataChanges(JSONObject options) {
+        MetadataChanges metadataChanges = MetadataChanges.EXCLUDE;
 
         if (options != null) {
-            queryListenOptions = new QueryListenOptions();
 
             try {
                 if (options.getBoolean("includeDocumentMetadataChanges")) {
-                    queryListenOptions.includeDocumentMetadataChanges();
+                    metadataChanges = MetadataChanges.INCLUDE;
                 }
                 if (options.getBoolean("includeQueryMetadataChanges")) {
-                    queryListenOptions.includeQueryMetadataChanges();
+                    metadataChanges = MetadataChanges.INCLUDE;
+                }
+                if (options.getBoolean("includeMetadataChanges")) {
+                    metadataChanges = MetadataChanges.INCLUDE;
                 }
             } catch (JSONException e) {
                 Log.e(FirestorePlugin.TAG, "Error getting query options", e);
@@ -93,6 +91,6 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
             Log.d(FirestorePlugin.TAG, "Set document options");
         }
 
-        return queryListenOptions;
+        return metadataChanges;
     }
 }

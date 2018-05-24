@@ -4,11 +4,11 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.firebase.firestore.DocumentListenOptions;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -40,7 +40,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
             Log.d(FirestorePlugin.TAG, "Listening to document");
 
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-            DocumentListenOptions documentListenOptions = getDocumentListenOptions(options);
+            MetadataChanges metadataChanges = getMetadataChanges(options);
             Log.d(FirestorePlugin.TAG, "SS for document " + collectionPath + "/" + doc);
 
             EventListener eventListener = new EventListener<DocumentSnapshot>() {
@@ -57,11 +57,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 }
             };
 
-            if (documentListenOptions == null) {
-                firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(eventListener));
-            } else {
-                firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(documentListenOptions, eventListener));
-            }
+            firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(metadataChanges, eventListener));
 
         } catch (JSONException e) {
             Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
@@ -71,15 +67,14 @@ public class DocOnSnapshotHandler implements ActionHandler {
         return true;
     }
 
-    private DocumentListenOptions getDocumentListenOptions(JSONObject options) {
-        DocumentListenOptions documentListenOptions = null;
+    private MetadataChanges getMetadataChanges(JSONObject options) {
+        MetadataChanges metadataChanges = MetadataChanges.EXCLUDE;
 
         if (options != null) {
-            documentListenOptions = new DocumentListenOptions();
 
             try {
                 if (options.getBoolean("includeMetadataChanges")) {
-                    documentListenOptions.includeMetadataChanges();
+                    metadataChanges = MetadataChanges.INCLUDE;
                 }
             } catch (JSONException e) {
                 Log.e(FirestorePlugin.TAG, "Error getting document option includeMetadataChanges", e);
@@ -89,6 +84,6 @@ public class DocOnSnapshotHandler implements ActionHandler {
             Log.d(FirestorePlugin.TAG, "Set document options");
         }
 
-        return documentListenOptions;
+        return metadataChanges;
     }
 }

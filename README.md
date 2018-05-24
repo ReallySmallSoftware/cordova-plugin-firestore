@@ -14,11 +14,11 @@ This plugin supports the following platforms:
 - Browser
 
 # Installation
-`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.8.0 --save`
+`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_CORE_VERSION=16.0.0 --variable ANDROID_FIREBASE_FIRESTORE_VERSION=17.0.1 --save`
 
 or
 
-`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_VERSION=11.8.0`
+`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_CORE_VERSION=16.0.0 --variable ANDROID_FIREBASE_FIRESTORE_VERSION=17.0.1`
 
 Omitting `FIREBASE_VERSION` will use a default value.
 
@@ -168,7 +168,7 @@ I have learnt a number of things whilst implementing this:
 ## 1.2.0
 - Update Android dependency versions
 - Update iOS dependency versions
-- WARNING: The Android update may require you to update com.google.gms:google-services to 3.2.1, com.android.tools.build:gradle to 3.1.2 and gradle to 4.4.4 (look in platforms/android/cordova/lib/builders/GradleBuilder.js)
+- WARNING: The Android update may require you to update com.google.gms:google-services to 4.0.0, com.android.tools.build:gradle to 3.1.2 and gradle to 4.4.4 (look in platforms/android/cordova/lib/builders/GradleBuilder.js)
 
 ## 1.1.0
 - Add support for FieldValue
