@@ -1,5 +1,5 @@
 #import <Cordova/CDVPlugin.h>
-@import FirebaseFirestore/FirebaseFirestore;
+@import FirebaseFirestore;
 
 #import "FirestoreTransaction.h"
 #import "FirestorePluginResultHelper.h"
@@ -32,8 +32,6 @@
 - (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSObject *)value;
 - (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSObject *)value;
 - (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSObject *)value;
-
-- (FIRQueryListenOptions *)getQueryListenOptions:(NSDictionary *)options;
 
 @property(strong) FIRFirestore *firestore;
 @property(strong) NSMutableDictionary *listeners;

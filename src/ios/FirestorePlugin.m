@@ -31,7 +31,7 @@ static int logcount = 0;
     
     FIRCollectionReference *collectionReference = [self.firestore collectionWithPath:collection];
 
-    FIRQueryListenOptions *queryListenOptions = [self getQueryListenOptions:options];
+    BOOL includeMetadataChanges = [self getIncludeMetadataChanges:options];
 
     FIRQuery *query = [self processQueries:queries ForQuery:collectionReference];
 
@@ -50,11 +50,7 @@ static int logcount = 0;
 
     id<FIRListenerRegistration> listener;
 
-    if (queryListenOptions == nil) {
-        listener = [query addSnapshotListener:snapshotBlock];
-    } else {
-        listener = [query addSnapshotListenerWithOptions:queryListenOptions listener:snapshotBlock];
-    }
+    listener = [query addSnapshotListenerWithIncludeMetadataChanges:includeMetadataChanges listener:snapshotBlock];
 
     [self.listeners setObject:listener forKey:callbackId];
 }
@@ -66,27 +62,32 @@ static int logcount = 0;
     return [input UTF8String];
 }
 
-- (FIRQueryListenOptions *)getQueryListenOptions:(NSDictionary *)options {
+- (BOOL)getIncludeMetadataChanges:(NSDictionary *)options {
 
-    FIRQueryListenOptions *queryListenOptions = nil;
+    BOOL queryIncludeMetadataChanges = NO;
 
     if (options != nil) {
-        queryListenOptions = [FIRQueryListenOptions alloc];
 
         bool includeDocumentMetadataChanges = [options valueForKey:@"includeDocumentMetadataChanges"];
 
         if (includeDocumentMetadataChanges) {
-            [queryListenOptions includeQueryMetadataChanges:true];
+            queryIncludeMetadataChanges = YES;
         }
 
         bool includeQueryMetadataChanges = [options valueForKey:@"includeQueryMetadataChanges"];
 
         if (includeQueryMetadataChanges) {
-            [queryListenOptions includeQueryMetadataChanges:true];
+            queryIncludeMetadataChanges = YES;
+        }
+        
+        bool includeMetadataChanges = [options valueForKey:@"includeMetadataChanges"];
+        
+        if (includeMetadataChanges) {
+            queryIncludeMetadataChanges = YES;
         }
     }
 
-    return queryListenOptions;
+    return queryIncludeMetadataChanges;
 }
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query {
@@ -297,7 +298,7 @@ static int logcount = 0;
 
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
 
-    FIRSetOptions *setOptions = [self getSetOptions:options];
+    BOOL merge = [self getMerge:options];
 
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document");
     
@@ -324,21 +325,17 @@ static int logcount = 0;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
 
-    if (setOptions == nil) {
-        [documentReference setData:parsedData completion:block];
-    } else {
-        [documentReference setData:parsedData options:setOptions completion:block];
-    }
+    [documentReference setData:parsedData merge:merge completion:block];
 }
 
-- (FIRSetOptions *)getSetOptions:(NSDictionary *)options {
-    FIRSetOptions *setOptions = nil;
+- (BOOL)getMerge:(NSDictionary *)options {
+    BOOL merge = NO;
 
     if (options[@"merge"]) {
-        setOptions = [FIRSetOptions merge];
+        merge = YES;
     }
 
-    return setOptions;
+    return merge;
 }
 
 - (void)docUpdate:(CDVInvokedUrlCommand *)command {
@@ -389,7 +386,7 @@ static int logcount = 0;
     
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
 
-    FIRDocumentListenOptions *documentListenOptions = [self getDocumentListenOptions:options];
+    BOOL includeMetadataChanges = [self getIncludeMetadataChanges:options];
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
         if (snapshot == nil) {
@@ -406,31 +403,10 @@ static int logcount = 0;
 
     id<FIRListenerRegistration> listener;
 
-    if (documentListenOptions == nil) {
-        listener = [documentReference addSnapshotListener:snapshotBlock];
-    } else {
-        listener = [documentReference addSnapshotListenerWithOptions:documentListenOptions listener:snapshotBlock];
-    }
+    listener = [documentReference addSnapshotListenerWithIncludeMetadataChanges:includeMetadataChanges listener:snapshotBlock];
 
     [self.listeners setObject:listener forKey:callbackId];
 
-}
-
-- (FIRDocumentListenOptions *)getDocumentListenOptions:(NSDictionary *)options {
-
-    FIRDocumentListenOptions *documentListenOptions = nil;
-
-    if (options != nil) {
-        documentListenOptions = [FIRDocumentListenOptions alloc];
-
-        bool includeMetadataChanges = [options valueForKey:@"includeMetadataChanges"];
-
-        if (includeMetadataChanges) {
-            [documentListenOptions includeMetadataChanges:true];
-        }
-    }
-
-    return documentListenOptions;
 }
 
 - (void)docUnsubscribe:(CDVInvokedUrlCommand *)command {
@@ -527,17 +503,13 @@ static int logcount = 0;
     
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data];
     
-    FIRSetOptions *setOptions = [self getSetOptions:firestoreTransaction.options];
+    BOOL merge = [self getMerge:firestoreTransaction.options];
     
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document set");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
     
-    if (setOptions == nil) {
-        [transaction setData:parsedData forDocument:documentReference];
-    } else {
-        [transaction setData:parsedData forDocument:documentReference options:setOptions];
-    }
+    [transaction setData:parsedData forDocument:documentReference merge:merge];
 }
 
 - (void)transactionDocUpdate:(CDVInvokedUrlCommand *)command {
