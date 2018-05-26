@@ -9,6 +9,15 @@
       "browser"
     ]
   },
+  "engines": {
+    "cordovaDependencies": {
+      "0.0.7": {
+        "cordova": ">=7.0.0",
+        "cordova-android": ">=5.0.0",
+        "cordova-ios": ">=4.0.0"
+      }
+    }
+  },
   "description": "A Google Firebase Firestore plugin",
   "devDependencies": {
     "grunt": "^1.0.1",
