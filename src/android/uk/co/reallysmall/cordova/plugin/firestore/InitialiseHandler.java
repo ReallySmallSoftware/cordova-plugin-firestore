@@ -3,6 +3,8 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
