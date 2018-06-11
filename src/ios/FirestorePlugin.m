@@ -257,7 +257,25 @@ static int logcount = 0;
 
 - (void)initialise:(CDVInvokedUrlCommand *)command {
     NSDictionary *options = [command argumentAtIndex:0 withDefault:@{} andClass:[NSDictionary class]];
-    self.firestore = [FIRFirestore firestore];
+
+    NSDictionary *config = options[@"config"];
+    if (config != NULL) {
+        FIROptions *customOptions = [[FIROptions alloc] initWithGoogleAppID:config[@"googleAppID"] GCMSenderID:config[@"gcmSenderID"]];
+        customOptions.bundleID = config[@"bundleID"];
+        customOptions.APIKey = config[@"apiKey"];
+        customOptions.clientID = config[@"clientID"];
+        customOptions.databaseURL = config[@"databaseURL"];
+        customOptions.storageBucket = config[@"storageBucket"];
+        customOptions.projectID = config[@"projectID"];
+
+        if ([FIRApp appNamed:config[@"apiKey"]] == nil) {
+            [FIRApp configureWithName:config[@"apiKey"] options:customOptions];
+        }
+        FIRApp *customApp = [FIRApp appNamed:config[@"apiKey"]];
+        self.firestore = [FIRFirestore firestoreForApp:customApp];
+    } else {
+        self.firestore = [FIRFirestore firestore];
+    }
 
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Initialising Firestore...");
     

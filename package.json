@@ -1,6 +1,6 @@
 {
   "name": "engage-cordova-plugin-firestore",
-  "version": "1.1.9",
+  "version": "1.1.11",
   "cordova": {
     "id": "engage-cordova-plugin-firestore",
     "platforms": [
