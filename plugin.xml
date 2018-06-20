@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="engage-cordova-plugin-firestore" version="1.1.11">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="engage-cordova-plugin-firestore" version="1.1.12">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -30,7 +30,9 @@
       </feature>
     </config-file>
 
+    <preference name="FIREBASE_CORE_VERSION" default="11.8.0"/>
     <preference name="ANDROID_FIREBASE_VERSION" default="11.8.0"/>
+    <framework src="com.google.firebase:firebase-core:$FIREBASE_CORE_VERSION" />
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
     <framework src="org.json:json:20171018"/>
@@ -72,6 +74,7 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocSetOptions.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/LogEventHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
   </platform>
 
   <platform name="ios">

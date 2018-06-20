@@ -23,6 +23,7 @@
 - (void)transactionDocDelete:(CDVInvokedUrlCommand *)command;
 - (void)runTransaction:(CDVInvokedUrlCommand *)command;
 - (void)transactionResolve:(CDVInvokedUrlCommand *)command;
+- (void)logEvent:(CDVInvokedUrlCommand*)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;

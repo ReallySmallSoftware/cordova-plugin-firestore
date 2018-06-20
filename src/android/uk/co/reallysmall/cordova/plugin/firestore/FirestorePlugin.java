@@ -45,6 +45,7 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("transactionDocSet", new TransactionDocSetHandler(this));
         handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(this));
         handlers.put("transactionResolve", new TransactionResolveHandler(this));
+        handlers.put("logEvent", new LogEventHandler(webView.getContext().getApplicationContext(),this));
 
         Log.d(TAG, "Initializing FirestorePlugin");
     }
