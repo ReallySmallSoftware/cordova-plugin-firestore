@@ -513,6 +513,11 @@ CollectionReference.prototype.doc = function(id) {
 
 
 module.exports = {
+  logEvent: function(name, params) {
+      return new Promise(function(resolve, reject) {
+          exec(resolve, reject, PLUGIN_NAME, "logEvent", [name, params || {}]);
+      });
+  },
   initialise: function(options) {
     return new Promise(function(resolve, reject) {
       resolve(new Firestore(options));

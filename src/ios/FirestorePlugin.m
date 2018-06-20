@@ -21,6 +21,16 @@ static int logcount = 0;
     self.transactions = [NSMutableDictionary new];
 }
 
+- (void)logEvent:(CDVInvokedUrlCommand *)command {
+    NSString* name = [command.arguments objectAtIndex:0];
+    NSDictionary* parameters = [command.arguments objectAtIndex:1];
+
+    [FIRAnalytics logEventWithName:name parameters:parameters];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)collectionOnSnapshot:(CDVInvokedUrlCommand *)command {
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSArray *queries = [command argumentAtIndex:1 withDefault:@[] andClass:[NSArray class]];
