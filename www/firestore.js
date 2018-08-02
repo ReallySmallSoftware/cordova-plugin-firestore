@@ -311,7 +311,7 @@ DocumentReference.prototype = {
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
   },
   collection: function(collectionPath) {
-    throw "DocumentReference.collection(): Not supported";
+    return new SubCollectionReference(this, collectionPath);
   },
   delete: function() {
     var args = [this._collectionReference._path, this._id];
@@ -511,6 +511,84 @@ CollectionReference.prototype.doc = function(id) {
   return new DocumentReference(this, id);
 };
 
+function SubCollectionReference(documentReference, id) {
+    this._id = id;
+    this._documentReference = documentReference;
+}
+
+SubCollectionReference.prototype.doc = function(id) {
+    return new DocumentOfSubCollectionReference(this, id);
+};
+
+SubCollectionReference.prototype.get = function() {
+    var args = [this._documentReference._collectionReference._path,
+        this._documentReference._id,
+        this._id];
+
+    return new Promise(function(resolve, reject) {
+        exec(resolve, reject, PLUGIN_NAME, 'subCollectionGet', args);
+    }).then(function(data) {
+        return new QuerySnapshot(data);
+    });
+};
+
+function DocumentOfSubCollectionReference(subCollectionReference, id) {
+    this._id = id;
+    this._subCollectionReference = subCollectionReference;
+}
+
+DocumentOfSubCollectionReference.prototype = {
+    delete: function() {
+        var args = [this._subCollectionReference._documentReference._collectionReference._path,
+            this._subCollectionReference._documentReference._id,
+            this._subCollectionReference._id,
+            this._id];
+
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionDelete', args);
+        }).then(function() {
+            return;
+        });
+    },
+    get: function() {
+        var args = [this._subCollectionReference._documentReference._collectionReference._path,
+            this._subCollectionReference._documentReference._id,
+            this._subCollectionReference._id,
+            this._id];
+
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionGet', args);
+        }).then(function(data) {
+            return new DocumentSnapshot(data);
+        });
+    },
+    set: function(data, options) {
+
+        var args = [
+            this._subCollectionReference._documentReference._collectionReference._path,
+            this._subCollectionReference._documentReference._id,
+            this._subCollectionReference._id,
+            this._id,
+            __wrap(data),
+            options];
+
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionSet', args);
+        });
+    },
+    update: function(data) {
+
+        var args = [this._subCollectionReference._documentReference._collectionReference._path,
+            this._subCollectionReference._documentReference._id,
+            this._subCollectionReference._id,
+            this._id,
+            __wrap(data)];
+
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionUpdate', args);
+        });
+    }
+};
 
 module.exports = {
   logEvent: function(name, params) {
