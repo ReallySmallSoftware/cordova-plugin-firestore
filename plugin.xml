@@ -75,6 +75,11 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/LogEventHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionSetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionUpdateHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/SubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
   </platform>
 
   <platform name="ios">
