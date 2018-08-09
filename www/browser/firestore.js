@@ -43,15 +43,16 @@ function Firestore(options, resolve) {
 
     const settings = {timestampsInSnapshots: timestampsInSnapshots};
 
+    var firestore = firebase.firestore();
+    firestore.settings(settings);
+
     if (options.persist) {
-      firebase.firestore().enablePersistence().then(function() {
-        self.database = firebase.firestore();
-        firestore.settings(settings);
+      firestore.enablePersistence().then(function() {
+        self.database = firestore;
         resolve(self);
       });
     } else {
-      self.database = firebase.firestore();
-      firestore.settings(settings);
+      self.database = firestore;
       resolve(self);
     }
   };
