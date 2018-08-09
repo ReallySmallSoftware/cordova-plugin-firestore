@@ -32,7 +32,7 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("collectionUnsubscribe", new CollectionUnsubscribeHandler(this));
         handlers.put("collectionAdd", new CollectionAddHandler(this));
         handlers.put("collectionGet", new CollectionGetHandler(this));
-        handlers.put("initialise", new InitialiseHandler(this));
+        handlers.put("initialise", new InitialiseHandler(webView.getContext().getApplicationContext(), this));
         handlers.put("docSet", new DocSetHandler(this));
         handlers.put("docUpdate", new DocUpdateHandler(this));
         handlers.put("docOnSnapshot", new DocOnSnapshotHandler(this));
@@ -45,7 +45,12 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("transactionDocSet", new TransactionDocSetHandler(this));
         handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(this));
         handlers.put("transactionResolve", new TransactionResolveHandler(this));
-
+        handlers.put("docOfSubCollectionSet", new DocOfSubCollectionSetHandler(this));
+        handlers.put("docOfSubCollectionGet", new DocOfSubCollectionGetHandler(this));
+        handlers.put("docOfSubCollectionUpdate", new DocOfSubCollectionUpdateHandler(this));
+        handlers.put("docOfSubCollectionDelete", new DocOfSubCollectionDeleteHandler(this));
+        handlers.put("subCollectionGet", new SubCollectionGetHandler(this));
+        
         Log.d(TAG, "Initializing FirestorePlugin");
     }
 

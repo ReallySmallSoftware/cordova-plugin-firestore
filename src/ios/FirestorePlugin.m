@@ -258,10 +258,29 @@ static int logcount = 0;
 
 - (void)initialise:(CDVInvokedUrlCommand *)command {
     NSDictionary *options = [command argumentAtIndex:0 withDefault:@{} andClass:[NSDictionary class]];
-    self.firestore = [FIRFirestore firestore];
+
+    NSDictionary *config = options[@"config"];
 
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Initialising Firestore...");
     
+    if (config != NULL) {
+        FIROptions *customOptions = [[FIROptions alloc] initWithGoogleAppID:config[@"googleAppID"] GCMSenderID:config[@"gcmSenderID"]];
+        customOptions.bundleID = config[@"bundleID"];
+        customOptions.APIKey = config[@"apiKey"];
+        customOptions.clientID = config[@"clientID"];
+        customOptions.databaseURL = config[@"databaseURL"];
+        customOptions.storageBucket = config[@"storageBucket"];
+        customOptions.projectID = config[@"projectID"];
+
+        if ([FIRApp appNamed:config[@"apiKey"]] == nil) {
+            [FIRApp configureWithName:config[@"apiKey"] options:customOptions];
+        }
+        FIRApp *customApp = [FIRApp appNamed:config[@"apiKey"]];
+        self.firestore = [FIRFirestore firestoreForApp:customApp];
+    } else {
+        self.firestore = [FIRFirestore firestore];
+    }
+
     FIRFirestoreSettings *settings = self.firestore.settings;
 
     if (options[@"persist"] != NULL && (int)options[@"persist"] == true) {
@@ -783,6 +802,160 @@ static int logcount = 0;
 
     
     return resultString;
+}
+
+- (void)docOfSubCollectionSet:(CDVInvokedUrlCommand *)command {
+    NSString *collection = [command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId = [command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *subCollection = [command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSString *docOfSubCollectionId = [command argumentAtIndex:3 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
+    NSDictionary *options = [command argumentAtIndex:5 withDefault:@{} andClass:[NSDictionary class]];
+    
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+    
+    FIRSetOptions *setOptions = [self getSetOptions:options];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document of sub collection");
+    
+    FIRDocumentReference *documentOfSubCollectionReference = [[[[self.firestore collectionWithPath:collection] documentWithPath:docId] collectionWithPath:subCollection] documentWithPath:docOfSubCollectionId];
+    
+    DocumentSetBlock block = ^(NSError * _Nullable error) {
+        
+        CDVPluginResult *pluginResult;
+        
+        if (error != nil) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
+                                                                                                          @"code" : @(error.code),
+                                                                                                          @"message" : error.description}
+                            ];
+            
+            NSLog(@"Error writing document of sub collection %s", [self localError:error]);
+            
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            
+            asl_log(NULL,NULL, ASL_LEVEL_DEBUG, "Successfully written document of sub collection");
+        }
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    };
+    
+    if (setOptions == nil) {
+        [documentOfSubCollectionReference setData:parsedData completion:block];
+    } else {
+        [documentOfSubCollectionReference setData:parsedData options:setOptions completion:block];
+    }
+}
+
+- (void)docOfSubCollectionGet:(CDVInvokedUrlCommand *)command {
+    NSString *collection = [command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId = [command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *subCollection = [command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSString *docOfSubCollectionId = [command argumentAtIndex:3 withDefault:@"/" andClass:[NSString class]];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Listening to document of sub collection");
+    
+    FIRDocumentReference *documentOfSubCollectionReference = [[[[self.firestore collectionWithPath:collection] documentWithPath:docId] collectionWithPath:subCollection] documentWithPath:docOfSubCollectionId];
+    
+    FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+        if (snapshot == nil) {
+            NSLog(@"Error getting document of sub collection %s", [self localError:error]);
+            return;
+        }
+        
+        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
+        
+        asl_log(NULL,NULL,ASL_LEVEL_DEBUG,"Successfully got document of sub collection");
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    };
+    
+    [documentOfSubCollectionReference getDocumentWithCompletion:snapshotBlock];
+}
+
+- (void)docOfSubCollectionUpdate:(CDVInvokedUrlCommand *)command {
+    NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *subCollection = [command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSString *docOfSubCollectionId = [command argumentAtIndex:3 withDefault:@"/" andClass:[NSString class]];
+    NSDictionary *data = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
+    
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Updating document of sub collection");
+    
+    FIRDocumentReference *documentOfSubCollectionReference = [[[[self.firestore collectionWithPath:collection] documentWithPath:docId] collectionWithPath:subCollection] documentWithPath:docOfSubCollectionId];
+    
+    [documentOfSubCollectionReference updateData:parsedData completion:^(NSError * _Nullable error) {
+        
+        CDVPluginResult *pluginResult;
+        
+        if (error != nil) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
+                                                                                                          @"code" : @(error.code),
+                                                                                                          @"message" : error.description}
+                            ];
+            
+            NSLog(@"Error updating document of sub collection %s", [self localError:error]);
+            
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            
+            asl_log(NULL,NULL,ASL_LEVEL_DEBUG,"Successfully updated document of sub collection");
+        }
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)docOfSubCollectionDelete:(CDVInvokedUrlCommand *)command {
+    NSString *collection = [command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId = [command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *subCollection = [command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    NSString *docOfSubCollectionId = [command argumentAtIndex:3 withDefault:@"/" andClass:[NSString class]];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Deleting document of sub collection");
+    
+    FIRDocumentReference *documentOfSubCollectionReference = [[[[self.firestore collectionWithPath:collection] documentWithPath:docId] collectionWithPath:subCollection] documentWithPath:docOfSubCollectionId];
+    
+    [documentOfSubCollectionReference deleteDocumentWithCompletion:^(NSError * _Nullable error) {
+        
+        CDVPluginResult *pluginResult;
+        
+        if (error != nil) {
+            NSLog(@"Error deleting document of sub collection %s", [self localError:error]);
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        } else {
+            asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Successfully deleted document of sub collection");
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        }
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)subCollectionGet:(CDVInvokedUrlCommand *)command {
+    NSString *collection = [command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId = [command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *subCollection = [command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
+    
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Getting document from sub collection");
+    
+    FIRCollectionReference *collectionReference = [[[self.firestore collectionWithPath:collection] documentWithPath:docId] collectionWithPath:subCollection];
+    
+    [collectionReference getDocumentsWithCompletion:^(FIRQuerySnapshot * snapshot, NSError * error) {
+        if (error != nil) {
+            NSLog(@"Error getting sub collection %s", [self localError:error]);
+            return;
+        }
+        
+        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :NO];
+        
+        asl_log(NULL, NULL,ASL_LEVEL_DEBUG, "Successfully got sub collection");
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
 }
 
 @end

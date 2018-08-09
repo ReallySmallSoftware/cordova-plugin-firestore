@@ -69,6 +69,7 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - size
 
 ## DocumentReference
+- collection(collectionPath)
 - delete()
 - get()
 - onSnapshot(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError)
@@ -165,6 +166,11 @@ I have learnt a number of things whilst implementing this:
 - Yes, I did spell initialise() with an 's' - I am from the UK
 
 # History
+## 1.3.0
+- Merge multi-project config changes
+- Merge sub document changes
+- Update Web SDK reference to 5.2.0
+
 ## 1.2.0
 - Update Android dependency versions
 - Update iOS dependency versions

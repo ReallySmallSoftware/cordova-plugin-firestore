@@ -44,8 +44,8 @@ function Firestore(options, resolve) {
     firestoreLoaded = "firestore" in firebase;
   }
 
-  loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase.js', firebaseLoaded, function() {
-    loadJS('https://www.gstatic.com/firebasejs/4.7.0/firebase-firestore.js', firestoreLoaded, initialise, document.body);
+  loadJS('https://www.gstatic.com/firebasejs/5.2.0/firebase.js', firebaseLoaded, function() {
+    loadJS('https://www.gstatic.com/firebasejs/5.2.0/firebase-firestore.js', firestoreLoaded, initialise, document.body);
   }, document.body);
 
 }

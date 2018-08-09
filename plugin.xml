@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.2.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.3.0">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -74,6 +74,11 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocSetOptions.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionSetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionUpdateHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/SubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
   </platform>
 
   <platform name="ios">

@@ -14,7 +14,7 @@ var FirestoreOptions = {
 var __transactionList = {};
 
 if (!String.prototype.startsWith) {
-  String.prototype.startsWith = function(search, pos) {
+  String.prototype.startsWith = function (search, pos) {
     return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
   };
 }
@@ -43,10 +43,10 @@ function __wrap(data) {
 }
 
 var FieldValue = {
-  delete: function() {
+  delete: function () {
     return FirestoreOptions.fieldValueDelete;
   },
-  serverTimestamp: function() {
+  serverTimestamp: function () {
     return FirestoreOptions.fieldValueServerTimestamp;
   }
 };
@@ -56,54 +56,54 @@ function Transaction(id) {
 }
 
 Transaction.prototype = {
-  delete: function(documentReference) {
+  delete: function (documentReference) {
     var args = [this._id, documentReference._id, documentReference._collectionReference._path];
 
-    var success = function() {
+    var success = function () {
     };
 
-    var failure = function() {
-        throw new Error("Undefined error in transactionDocDelete");
+    var failure = function () {
+      throw new Error("Undefined error in transactionDocDelete");
     };
 
     exec(success, failure, PLUGIN_NAME, 'transactionDocDelete', args);
 
     return this;
   },
-  get: function(documentReference) {
+  get: function (documentReference) {
     var args = [this._id, documentReference._id, documentReference._collectionReference._path];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'transactionDocGet', args);
-    }).then(function(data) {
+    }).then(function (data) {
       return new DocumentSnapshot(data);
-    }).catch(function(err) {
+    }).catch(function (err) {
     });
   },
-  set: function(documentReference, data, options) {
+  set: function (documentReference, data, options) {
 
     var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data), options];
 
-    var success = function() {
+    var success = function () {
     };
 
-    var failure = function() {
-        throw new Error("Undefined error in transactionDocSet");
+    var failure = function () {
+      throw new Error("Undefined error in transactionDocSet");
     };
 
     exec(success, failure, PLUGIN_NAME, 'transactionDocSet', args);
 
     return this;
   },
-  update: function(documentReference, data) {
+  update: function (documentReference, data) {
 
     var args = [this._id, documentReference._id, documentReference._collectionReference._path, __wrap(data)];
 
-    var success = function() {
+    var success = function () {
     };
 
-    var failure = function() {
-        throw new Error("Undefined error in transactionDocUpdate");
+    var failure = function () {
+      throw new Error("Undefined error in transactionDocUpdate");
     };
 
     exec(success, failure, PLUGIN_NAME, 'transactionDocUpdate', args);
@@ -125,32 +125,32 @@ function Firestore(options) {
     this.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }
 
-  exec(function() {}, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
+  exec(function () { }, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
 }
 
 Firestore.prototype = {
-  get: function() {
+  get: function () {
     return this;
   },
-  batch: function() {
+  batch: function () {
     throw "Firestore.batch: Not supported";
   },
-  collection: function(path) {
+  collection: function (path) {
     return new CollectionReference(path);
   },
-  disableNetwork: function() {
+  disableNetwork: function () {
     throw "Firestore.disableNetwork: Not supported";
   },
-  doc: function() {
+  doc: function () {
     throw "Firestore.doc: Not supported";
   },
-  enableNetwork: function() {
+  enableNetwork: function () {
     throw "Firestore.enableNetwork: Not supported";
   },
-  enablePersistence: function() {
+  enablePersistence: function () {
     throw "Firestore.enablePersistence: Not supported. Please specify using initialisation options.";
   },
-  runTransaction: function(updateFunction) {
+  runTransaction: function (updateFunction) {
 
     var transactionId = utils.createUUID();
     var transaction = new Transaction(transactionId);
@@ -162,29 +162,29 @@ Firestore.prototype = {
 
     var args = [transactionId];
 
-    return new Promise(function(resolve, reject) {
-      var wrappedResolve = function(data) {
+    return new Promise(function (resolve, reject) {
+      var wrappedResolve = function (data) {
         delete __transactionList[transactionId];
         resolve(data);
       };
-      var wrappedReject = function(err) {
+      var wrappedReject = function (err) {
         delete __transactionList[transactionId];
         reject(err);
       };
       exec(wrappedResolve, wrappedReject, PLUGIN_NAME, 'runTransaction', args);
     });
   },
-  setLogLevel: function() {
+  setLogLevel: function () {
     throw "Firestore.setLogLevel: Not supported";
   },
-  settings: function() {
+  settings: function () {
     throw "Firestore.settings: Not supported";
   }
 };
 
 Object.defineProperties(Firestore.prototype, {
   FieldValue: {
-    get: function() {
+    get: function () {
       return FieldValue;
     }
   }
@@ -199,7 +199,7 @@ function DocumentSnapshot(data) {
 }
 
 DocumentSnapshot.prototype = {
-  _parse: function(data) {
+  _parse: function (data) {
     var keys = Object.keys(data);
 
     for (var i = 0; i < keys.length; i++) {
@@ -220,35 +220,35 @@ DocumentSnapshot.prototype = {
 
     return data;
   },
-  _fieldPath: function(obj, i) {
+  _fieldPath: function (obj, i) {
     return obj[i];
   },
-  data: function() {
+  data: function () {
     return this._data._data;
   },
-  get: function(fieldPath) {
+  get: function (fieldPath) {
     return fieldPath.split('.').reduce(this._fieldPath, this._data);
   }
 };
 
 Object.defineProperties(DocumentSnapshot.prototype, {
   exists: {
-    get: function() {
+    get: function () {
       return this._data.exists;
     }
   },
   id: {
-    get: function() {
+    get: function () {
       return this._data.id;
     }
   },
   metadata: {
-    get: function() {
+    get: function () {
       throw "DocumentReference.metadata: Not supported";
     }
   },
   ref: {
-    get: function() {
+    get: function () {
       return this._data.ref;
     }
   }
@@ -259,7 +259,7 @@ function QuerySnapshot(data) {
 }
 
 QuerySnapshot.prototype = {
-  forEach: function(callback, thisArg) {
+  forEach: function (callback, thisArg) {
     var keys = Object.keys(this._data.docs);
     for (var i = 0; i < keys.length; i++) {
       callback(new DocumentSnapshot(this._data.docs[i]));
@@ -269,32 +269,32 @@ QuerySnapshot.prototype = {
 
 Object.defineProperties(QuerySnapshot.prototype, {
   docChanges: {
-    get: function() {
+    get: function () {
       throw "QuerySnapshot.docChanges: Not supported";
     }
   },
   docs: {
-    get: function() {
+    get: function () {
       return this._data.docs;
     }
   },
   empty: {
-    get: function() {
+    get: function () {
       return this._data.docs.length === 0;
     }
   },
   metadata: {
-    get: function() {
+    get: function () {
       throw "QuerySnapshot.metadata: Not supported";
     }
   },
   query: {
-    get: function() {
+    get: function () {
       throw "QuerySnapshot.query: Not supported";
     }
   },
   size: {
-    get: function() {
+    get: function () {
       return this._data.docs.length;
     }
   }
@@ -306,32 +306,32 @@ function DocumentReference(collectionReference, id) {
 }
 
 DocumentReference.prototype = {
-  _isFunction: function(functionToCheck) {
+  _isFunction: function (functionToCheck) {
     var getType = {};
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
   },
-  collection: function(collectionPath) {
-    throw "DocumentReference.collection(): Not supported";
+  collection: function (collectionPath) {
+    return new SubCollectionReference(this, collectionPath);
   },
-  delete: function() {
+  delete: function () {
     var args = [this._collectionReference._path, this._id];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docDelete', args);
-    }).then(function() {
+    }).then(function () {
       return;
     });
   },
-  get: function() {
+  get: function () {
     var args = [this._collectionReference._path, this._id];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docGet', args);
-    }).then(function(data) {
+    }).then(function (data) {
       return new DocumentSnapshot(data);
     });
   },
-  onSnapshot: function(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
+  onSnapshot: function (optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
 
     var callbackId = utils.createUUID();
 
@@ -343,40 +343,40 @@ DocumentReference.prototype = {
     var wrappedCallback;
 
     if (this._isFunction(optionsOrObserverOrOnNext)) {
-      wrappedCallback = function(documentSnapshot) {
+      wrappedCallback = function (documentSnapshot) {
         optionsOrObserverOrOnNext(new DocumentSnapshot(documentSnapshot));
       };
     } else if (this._isFunction(observerOrOnNextOrOnError)) {
-      wrappedCallback = function(documentSnapshot) {
+      wrappedCallback = function (documentSnapshot) {
         observerOrOnNextOrOnError(new DocumentSnapshot(documentSnapshot));
       };
     } else {
-      wrappedCallback = function(documentSnapshot) {};
+      wrappedCallback = function (documentSnapshot) { };
     }
 
-    exec(wrappedCallback, function() {
+    exec(wrappedCallback, function () {
       throw new Error("Undefined error in docOnSnapshot");
     }, PLUGIN_NAME, 'docOnSnapshot', args);
 
-    return function() {
-      exec(function() {}, function() {
+    return function () {
+      exec(function () { }, function () {
         throw new Error("Undefined error in docUnsubscribe");
       }, PLUGIN_NAME, 'docUnsubscribe', [callbackId]);
     };
   },
-  set: function(data, options) {
+  set: function (data, options) {
 
     var args = [this._collectionReference._path, this._id, __wrap(data), options];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
     });
   },
-  update: function(data) {
+  update: function (data) {
 
     var args = [this._collectionReference._path, this._id, __wrap(data)];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docUpdate', args);
     });
   }
@@ -384,17 +384,17 @@ DocumentReference.prototype = {
 
 Object.defineProperties(DocumentReference.prototype, {
   firestore: {
-    get: function() {
+    get: function () {
       throw "DocumentReference.firestore: Not supported";
     }
   },
   id: {
-    get: function() {
+    get: function () {
       return this._id;
     }
   },
   parent: {
-    get: function() {
+    get: function () {
       return this._collectionReference;
     }
   }
@@ -409,16 +409,16 @@ function Query(ref, queryType, value) {
 }
 
 Query.prototype = {
-  endAt: function(snapshotOrVarArgs) {
+  endAt: function (snapshotOrVarArgs) {
     return new Query(this._ref, "endAt", __wrap(snapshotOrVarArgs));
   },
-  endBefore: function(snapshotOrVarArgs) {
+  endBefore: function (snapshotOrVarArgs) {
     return new Query(this._ref, "endBefore", __wrap(snapshotOrVarArgs, true));
   },
-  limit: function(limit) {
+  limit: function (limit) {
     return new Query(this._ref, "limit", limit);
   },
-  orderBy: function(field, direction) {
+  orderBy: function (field, direction) {
     if (direction === undefined) {
       direction = "ASCENDING";
     }
@@ -429,40 +429,40 @@ Query.prototype = {
     };
     return new Query(this._ref, "orderBy", orderByField);
   },
-  get: function() {
+  get: function () {
     var args = [this._ref._path, this._ref._queries];
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
-    }).then(function(data) {
+    }).then(function (data) {
       return new QuerySnapshot(data);
     });
   },
-  onSnapshot: function(callback, options) {
+  onSnapshot: function (callback, options) {
 
     var callbackId = utils.createUUID();
     var args = [this._ref._path, this._ref._queries, options, callbackId];
 
-    var callbackWrapper = function(data) {
+    var callbackWrapper = function (data) {
       callback(new QuerySnapshot(data));
     };
-    exec(callbackWrapper, function() {
+    exec(callbackWrapper, function () {
       throw new Error("Undefined error in collectionOnSnapshot");
     }, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
-    return function() {
-      exec(function() {}, function() {
+    return function () {
+      exec(function () { }, function () {
         throw new Error("Undefined error in collectionUnsubscribe");
       }, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
     };
   },
-  startAfter: function(snapshotOrVarArgs) {
+  startAfter: function (snapshotOrVarArgs) {
     return new Query(this._ref, "startAfter", __wrap(snapshotOrVarArgs));
   },
-  startAt: function(snapshotOrVarArgs) {
+  startAt: function (snapshotOrVarArgs) {
     return new Query(this._ref, "startAt", __wrap(snapshotOrVarArgs));
   },
-  where: function(fieldPath, opStr, passedValue) {
+  where: function (fieldPath, opStr, passedValue) {
     var value = __wrap(passedValue);
 
     var whereField = {
@@ -483,48 +483,115 @@ function CollectionReference(path, id) {
 
 CollectionReference.prototype = Object.create(Query.prototype, {
   firestore: {
-    get: function() {
+    get: function () {
       throw "CollectionReference.firestore: Not supported";
     }
   },
   id: {
-    get: function() {
+    get: function () {
       return this._id;
     }
   },
   parent: {
-    get: function() {
+    get: function () {
       throw "CollectionReference.parent: Not supported";
     }
   }
 });
 
-CollectionReference.prototype.add = function(data) {
+CollectionReference.prototype.add = function (data) {
   var args = [this._path, __wrap(data)];
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
   });
 };
 
-CollectionReference.prototype.doc = function(id) {
+CollectionReference.prototype.doc = function (id) {
   return new DocumentReference(this, id);
 };
 
+function SubCollectionReference(documentReference, id) {
+  this._id = id;
+  this._documentReference = documentReference;
+}
+SubCollectionReference.prototype.doc = function (id) {
+  return new DocumentOfSubCollectionReference(this, id);
+};
+SubCollectionReference.prototype.get = function () {
+  var args = [this._documentReference._collectionReference._path,
+  this._documentReference._id,
+  this._id];
+  return new Promise(function (resolve, reject) {
+    exec(resolve, reject, PLUGIN_NAME, 'subCollectionGet', args);
+  }).then(function (data) {
+    return new QuerySnapshot(data);
+  });
+};
+function DocumentOfSubCollectionReference(subCollectionReference, id) {
+  this._id = id;
+  this._subCollectionReference = subCollectionReference;
+}
+DocumentOfSubCollectionReference.prototype = {
+  delete: function () {
+    var args = [this._subCollectionReference._documentReference._collectionReference._path,
+    this._subCollectionReference._documentReference._id,
+    this._subCollectionReference._id,
+    this._id];
+    return new Promise(function (resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionDelete', args);
+    }).then(function () {
+      return;
+    });
+  },
+  get: function () {
+    var args = [this._subCollectionReference._documentReference._collectionReference._path,
+    this._subCollectionReference._documentReference._id,
+    this._subCollectionReference._id,
+    this._id];
+    return new Promise(function (resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionGet', args);
+    }).then(function (data) {
+      return new DocumentSnapshot(data);
+    });
+  },
+  set: function (data, options) {
+    var args = [
+      this._subCollectionReference._documentReference._collectionReference._path,
+      this._subCollectionReference._documentReference._id,
+      this._subCollectionReference._id,
+      this._id,
+      __wrap(data),
+      options];
+    return new Promise(function (resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionSet', args);
+    });
+  },
+  update: function (data) {
+    var args = [this._subCollectionReference._documentReference._collectionReference._path,
+    this._subCollectionReference._documentReference._id,
+    this._subCollectionReference._id,
+    this._id,
+    __wrap(data)];
+    return new Promise(function (resolve, reject) {
+      exec(resolve, reject, PLUGIN_NAME, 'docOfSubCollectionUpdate', args);
+    });
+  }
+};
 
 module.exports = {
-  initialise: function(options) {
-    return new Promise(function(resolve, reject) {
+  initialise: function (options) {
+    return new Promise(function (resolve, reject) {
       resolve(new Firestore(options));
     });
   },
-  __executeTransaction: function(transactionId) {
+  __executeTransaction: function (transactionId) {
     var result;
 
-    __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function(result) {
+    __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function (result) {
       var args = [transactionId, __wrap(result)];
-      exec(function() {}, function() {}, PLUGIN_NAME, 'transactionResolve', args);
-    }).catch(function(error) {
+      exec(function () { }, function () { }, PLUGIN_NAME, 'transactionResolve', args);
+    }).catch(function (error) {
       throw new Error("Unexpected error in transaction " + error);
     });
   }
