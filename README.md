@@ -56,7 +56,7 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - collection()
 - runTransaction(updateFunction)
 
-## DocumentSnapshot
+## DocumentSnapshot and QueryDataSnapshot
 - data()
 - get(fieldPath)
 - exists
@@ -109,15 +109,19 @@ The plugin can be initialised as follows:
 
 ```
       var options = {
-        datePrefix: '__DATE:',
+        "datePrefix": '__DATE:',
         "fieldValueDelete": "__DELETE",
         "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
-        "persist": true
+        "persist": true,
+        "timestampsInSnapshots" : false,
+        "config" : {
+
+        }
       };
 
       if (cordova.platformId === "browser") {
 
-        options.browser = {
+        options.config = {
           apiKey: 'my API key',
           authDomain: 'my domain',
           projectId: 'my project id',
@@ -131,6 +135,9 @@ The plugin can be initialised as follows:
 ```
 
 This is initialised as a promise to allow the Browser implementation to dynamically add a reference to the Firestore Javascript SDK.
+
+## options.config
+In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
 
 ## Dates
 Because data is transferred to the client as JSON there is extra logic in place to handle the conversion of dates for some operations.
@@ -151,6 +158,35 @@ The client will receive the field as a Javascript Date.
 
 This conversion also happens when specify a field in a where condition.
 
+### timestampsInSnapshots
+This option is provided for compatability with upcoming Firestore changes. By default this option is set to `false` but you
+are advised to heed the following if you wish for your app to continue to work in the browser implementation:
+
+```
+The behavior for Date objects stored in Firestore is going to change
+AND YOUR APP MAY BREAK.
+To hide this warning and ensure your app does not break, you need to add the
+following code to your app before calling any other Cloud Firestore methods:
+
+  const firestore = firebase.firestore();
+  const settings = {/* your settings... */ timestampsInSnapshots: true};
+  firestore.settings(settings);
+
+With this change, timestamps stored in Cloud Firestore will be read back as
+Firebase Timestamp objects instead of as system Date objects. So you will also
+need to update code expecting a Date to instead expect a Timestamp. For example:
+
+  // Old:
+  const date = snapshot.get('created_at');
+  // New:
+  const timestamp = snapshot.get('created_at');
+  const date = timestamp.toDate();
+
+Please audit all existing usages of Date when you enable the new behavior. In a
+future release, the behavior will change to the new behavior, so if you do not
+follow these steps, YOUR APP MAY BREAK.
+```
+
 ## FieldValue constants
 Similar to the situation with dates, there are special values used for `FieldValue` values:
 
@@ -170,6 +206,8 @@ I have learnt a number of things whilst implementing this:
 - Merge multi-project config changes
 - Merge sub document changes
 - Update Web SDK reference to 5.2.0
+- Introduce QueryDataSnapshot
+- Implement timestampsInSnapshots option in configuration
 
 ## 1.2.0
 - Update Android dependency versions

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
@@ -30,7 +31,7 @@ public class PluginResultHelper {
 
         Log.d(FirestorePlugin.TAG, "Creating query snapshot result");
 
-        for (DocumentSnapshot doc : value) {
+        for (QueryDocumentSnapshot doc : value) {
             JSONObject document = createDocumentSnapshot(doc);
             array.put(document);
         }

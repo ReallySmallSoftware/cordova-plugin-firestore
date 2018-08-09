@@ -8,7 +8,8 @@ var FirestoreOptions = {
   "datePrefix": "__DATE:",
   "fieldValueDelete": "__DELETE",
   "fieldValueServerTimestamp": "__SERVERTIMESTAMP",
-  "persist": true
+  "persist": true,
+  "timestampsInSnapshots": false
 };
 
 var __transactionList = {};
@@ -124,6 +125,12 @@ function Firestore(options) {
   if (FirestoreOptions.fieldValueServerTimestamp === undefined) {
     this.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }
+  if (FirestoreOptions.persist === undefined) {
+    this.persist = true;
+  }
+  if (FirestoreOptions.timestampsInSnapshots === undefined) {
+    this.timestampsInSnapshots = false;
+  }
 
   exec(function () { }, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
 }
@@ -190,6 +197,16 @@ Object.defineProperties(Firestore.prototype, {
   }
 });
 
+function Timestamp(timestamp) {
+  this._timestamp = timestamp;
+}
+
+Timestamp.prototype = {
+  toDate: function() {
+    return new Date(this._timestamp);
+  }
+}
+
 function DocumentSnapshot(data) {
   this._data = data;
 
@@ -212,7 +229,11 @@ DocumentSnapshot.prototype = {
 
         var timestamp = data[key].substr(prefixLength, length - prefixLength);
 
-        data[key] = new Date(parseInt(timestamp));
+        if (FirestoreOptions.timestampsInSnapshots) {
+          data[key] = new Timestamp(parseInt(timestamp));
+        } else {
+          data[key] = new Date(parseInt(timestamp));
+        }
       } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
         data[key] = this._parse(data[key]);
       }
@@ -254,6 +275,13 @@ Object.defineProperties(DocumentSnapshot.prototype, {
   }
 });
 
+function QueryDocumentSnapshot(data) {
+  DocumentSnapshot.call(this, data);
+}
+
+QueryDocumentSnapshot.prototype = Object.create(DocumentSnapshot.prototype);
+QueryDocumentSnapshot.prototype.constructor = QueryDocumentSnapshot;
+
 function QuerySnapshot(data) {
   this._data = data;
 }
@@ -262,7 +290,7 @@ QuerySnapshot.prototype = {
   forEach: function (callback, thisArg) {
     var keys = Object.keys(this._data.docs);
     for (var i = 0; i < keys.length; i++) {
-      callback(new DocumentSnapshot(this._data.docs[i]));
+      callback(new QueryDocumentSnapshot(this._data.docs[i]));
     }
   }
 };

@@ -23,17 +23,35 @@ function Firestore(options, resolve) {
 
   var initialise = function() {
 
-    if (firebase.apps.length === 0) {
-      firebase.initializeApp(options.browser);
+    var initialised = false;
+
+    for (var i = 0;i < firebase.apps.length;i++) {
+      if (firebase.apps[i].options.projectId === options.config.projectId) {
+        initialised = true;
+      }
     }
+
+    if (!initialised) {
+      firebase.initializeApp(options.config);
+    }
+
+    var timestampsInSnapshots = false;
+
+    if (options.timestampsInSnapshots !== undefined) {
+      timestampsInSnapshots = options.timestampsInSnapshots;
+    }
+
+    const settings = {timestampsInSnapshots: timestampsInSnapshots};
 
     if (options.persist) {
       firebase.firestore().enablePersistence().then(function() {
         self.database = firebase.firestore();
+        firestore.settings(settings);
         resolve(self);
       });
     } else {
       self.database = firebase.firestore();
+      firestore.settings(settings);
       resolve(self);
     }
   };

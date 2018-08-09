@@ -34,7 +34,7 @@
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating query snapshot result");
 
     if (query.documents != nil) {
-        for (FIRDocumentSnapshot *doc in query.documents) {
+        for (FIRQueryDocumentSnapshot *doc in query.documents) {
             NSDictionary *document = [FirestorePluginResultHelper createDocumentSnapshot:doc];
             [result addObject:document];
         }
