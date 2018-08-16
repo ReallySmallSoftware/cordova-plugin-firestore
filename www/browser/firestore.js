@@ -86,5 +86,8 @@ module.exports = {
     return new Promise(function(resolve, reject) {
       var db = new Firestore(options, resolve);
     });
+  },
+  newTimestamp: function(date) {
+    return firebase.firestore.Timestamp.fromDate(date);
   }
 };

@@ -197,11 +197,11 @@ Object.defineProperties(Firestore.prototype, {
   }
 });
 
-function Timestamp(timestamp) {
+function FirestoreTimestamp(timestamp) {
   this._timestamp = timestamp;
 }
 
-Timestamp.prototype = {
+FirestoreTimestamp.prototype = {
   toDate: function() {
     return new Date(this._timestamp);
   }
@@ -230,7 +230,7 @@ DocumentSnapshot.prototype = {
         var timestamp = data[key].substr(prefixLength, length - prefixLength);
 
         if (FirestoreOptions.timestampsInSnapshots) {
-          data[key] = new Timestamp(parseInt(timestamp));
+          data[key] = new FirestoreTimestamp(parseInt(timestamp));
         } else {
           data[key] = new Date(parseInt(timestamp));
         }
@@ -622,5 +622,8 @@ module.exports = {
     }).catch(function (error) {
       throw new Error("Unexpected error in transaction " + error);
     });
+  },
+  newTimestamp: function(date) {
+    return new FirestoreTimestamp(date.getTime());
   }
 };
