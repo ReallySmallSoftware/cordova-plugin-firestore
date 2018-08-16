@@ -814,7 +814,7 @@ static int logcount = 0;
     
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
     
-    FIRSetOptions *setOptions = [self getSetOptions:options];
+    BOOL merge = [self getMerge:options];
     
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document of sub collection");
     
@@ -829,7 +829,6 @@ static int logcount = 0;
                                                                                                           @"code" : @(error.code),
                                                                                                           @"message" : error.description}
                             ];
-            
             NSLog(@"Error writing document of sub collection %s", [self localError:error]);
             
         } else {
@@ -841,11 +840,7 @@ static int logcount = 0;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
     
-    if (setOptions == nil) {
-        [documentOfSubCollectionReference setData:parsedData completion:block];
-    } else {
-        [documentOfSubCollectionReference setData:parsedData options:setOptions completion:block];
-    }
+    [documentOfSubCollectionReference setData:parsedData merge:merge completion:block];
 }
 
 - (void)docOfSubCollectionGet:(CDVInvokedUrlCommand *)command {
