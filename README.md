@@ -22,10 +22,6 @@ or
 
 Omitting `FIREBASE_VERSION` will use a default value.
 
-## Dependencies
-### Promises
-This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a `Promise` polyfill.
-
 ## Firebase configuration
 ### Android
 You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:

@@ -1,5 +1,9 @@
 /* global firebase: false, Promise: false */
 
+if (!window.Promise) {
+  window.Promise = require('cordova-plugin-firestore.Promise');
+}
+
 var PLUGIN_NAME = 'Firestore';
 
 var loadJS = function(url, loaded, implementationCode, location) {

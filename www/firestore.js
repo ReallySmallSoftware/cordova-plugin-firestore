@@ -3,6 +3,10 @@
 var exec = require('cordova/exec');
 var utils = require("cordova/utils");
 
+if (!window.Promise) {
+  window.Promise = require('./Promise');
+}
+
 var PLUGIN_NAME = 'Firestore';
 var FirestoreOptions = {
   "datePrefix": "__DATE:",
