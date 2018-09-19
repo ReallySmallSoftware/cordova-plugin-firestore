@@ -1,5 +1,5 @@
- /* global firebase: false, Promise: false */
-var FireStoreClass = require('cordova-plugin-firestore.FireStore');
+  /* global firebase: false, Promise: false */
+var FireStoreClass = require('cordova-plugin-firestore.Firestore');
 
 if (!window.Promise) {
   window.Promise = require('cordova-plugin-firestore.Promise');
@@ -67,7 +67,7 @@ function createInstance(options) {
       'timestampsInSnapshots': timestampsInSnapshots
     });
 
-    var instance = new Firestore(firestore);
+    var instance = new FireStoreClass(firestore);
 
     if (options.persist) {
       firestore
