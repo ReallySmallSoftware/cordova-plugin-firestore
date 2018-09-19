@@ -209,7 +209,7 @@ FirestoreTimestamp.prototype = {
   toDate: function() {
     return new Date(this._timestamp);
   }
-}
+};
 
 function DocumentSnapshot(data) {
   this._data = data;
@@ -611,12 +611,16 @@ DocumentOfSubCollectionReference.prototype = {
   }
 };
 
+function initialise(options) {
+  return new Promise(function (resolve, reject) {
+    resolve(new Firestore(options));
+  });
+}
+
 module.exports = {
-  initialise: function (options) {
-    return new Promise(function (resolve, reject) {
-      resolve(new Firestore(options));
-    });
-  },
+  initialise: initialise, // original implementation
+  initialize: initialise, // better for common usage
+
   __executeTransaction: function (transactionId) {
     var result;
 
