@@ -99,7 +99,7 @@ function initialise(options) {
 }
 module.exports = {
   initialise: initialise, // original developer name
-  initialize: initialise, // common used name
+  initialize: initialise, // better for common usage
 
   newTimestamp: function(date) {
     return firebase.firestore.Timestamp.fromDate(date);
