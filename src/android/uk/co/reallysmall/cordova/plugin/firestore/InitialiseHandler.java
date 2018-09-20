@@ -41,15 +41,27 @@ public class InitialiseHandler implements ActionHandler {
             FirebaseFirestore.setLoggingEnabled(true);
             if (options.has(CONFIG)) {
                 JSONObject config = options.getJSONObject(CONFIG);
+                FirebaseOptions.Builder configBuilder = new FirebaseOptions.Builder();
+                if (options.has("applicationId")) {
+                    configBuilder.setApplicationId("applicationId");
+                }
+                if (options.has("gcmSenderID")) {
+                    configBuilder.setGcmSenderId("gcmSenderID");
+                }
+                if (options.has("apiKey")) {
+                    configBuilder.setApiKey("apiKey");
+                }
+                if (options.has("projectID")) {
+                    configBuilder.setProjectId("projectID");
+                }
+                if (options.has("databaseURL")) {
+                    configBuilder.setDatabaseUrl("databaseURL");
+                }
+                if (options.has("storageBucket")) {
+                    configBuilder.setStorageBucket("storageBucket");
+                }
 
-                FirebaseOptions customOptions = new FirebaseOptions.Builder()
-                        .setApplicationId(config.getString("applicationId"))
-                        .setGcmSenderId(config.getString("gcmSenderID"))
-                        .setApiKey(config.getString("apiKey"))
-                        .setProjectId(config.getString("projectID"))
-                        .setDatabaseUrl(config.getString("databaseURL"))
-                        .setStorageBucket(config.getString("storageBucket"))
-                        .build();
+                FirebaseOptions customOptions = configBuilder.build();
 
                 FirebaseApp customApp;
                 try {
