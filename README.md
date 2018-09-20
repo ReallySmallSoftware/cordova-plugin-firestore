@@ -164,38 +164,6 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - FieldValue.delete()
 - FieldValue.serverTimestamp()
 
-# Initialisation
-The plugin can be initialised as follows:
-
-```
-      var options = {
-        "datePrefix": '__DATE:',
-        "fieldValueDelete": "__DELETE",
-        "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
-        "persist": true,
-        "timestampsInSnapshots" : false,
-        "config" : {
-
-        }
-      };
-
-      if (cordova.platformId === "browser") {
-
-        options.config = {
-          apiKey: 'my API key',
-          authDomain: 'my domain',
-          projectId: 'my project id',
-        };
-      }
-
-      Firestore.initialise(options).then(function(database) {
-        myDatabaseReference = database;
-      });
-    });
-```
-
-This is initialised as a promise to allow the Browser implementation to dynamically add a reference to the Firestore Javascript SDK.
-
 ## options.config
 In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
 
@@ -259,4 +227,4 @@ These values can be changed when initialisation is performed.
 I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
 - When used on Android ensure that at least `com.google.gms:google-services:3.1.1` is used in build dependencies. Earlier versions did not work for me.
-- Yes, I did spell initialise() with an 's' - I am from the UK
+- Yes, I did spell initialise() with an 's' - The original plugin developer @ReallySmallSoftware is from the UK
