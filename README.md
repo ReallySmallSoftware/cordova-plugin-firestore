@@ -108,10 +108,8 @@ This plugin supports the following platforms:
     The `com.google.firebase:firebase-firestore` version.
     You can find the latest version at [here](https://firebase.google.com/docs/android/setup#available_libraries).
 
-#### Keychain Sharing Capability
-If using multiple Firebase plugins it may be necessary to enable this.
-
 # What is supported?
+
 ## Firestore
 - collection()
 - runTransaction(updateFunction)
@@ -163,6 +161,11 @@ If using multiple Firebase plugins it may be necessary to enable this.
 ## FieldValue
 - FieldValue.delete()
 - FieldValue.serverTimestamp()
+
+## GeoPoint
+```
+var point = new Firestore.GeoPoint();
+```
 
 ## options.config
 In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
