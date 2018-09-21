@@ -68,9 +68,9 @@ This plugin supports the following platforms:
     if (cordova.platformId === "browser") {
 
       options.config = {
-        apiKey: "AIzaSyB1Tqdt15UXdQTuvgD1_KkbSX0xTaUtpcw",
+        apiKey: "(your api key)",
         authDomain: "localhost",
-        projectId: "geofire-example-572f9"
+        projectId: "(your project id)"
       };
     }
 
