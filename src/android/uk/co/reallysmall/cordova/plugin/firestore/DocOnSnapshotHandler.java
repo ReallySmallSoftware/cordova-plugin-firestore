@@ -37,22 +37,22 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 options = null;
             }
 
-            Log.d(FirestorePlugin.TAG, "Listening to document");
+            FirestoreLog.d(FirestorePlugin.TAG, "Listening to document");
 
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
             MetadataChanges metadataChanges = getMetadataChanges(options);
-            Log.d(FirestorePlugin.TAG, "SS for document " + collectionPath + "/" + doc);
+            FirestoreLog.d(FirestorePlugin.TAG, "SS for document " + collectionPath + "/" + doc);
 
             EventListener eventListener = new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
                                     @Nullable FirebaseFirestoreException e) {
                     if (e != null) {
-                        Log.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
                         return;
                     }
 
-                    Log.d(FirestorePlugin.TAG, "Got document snapshot data");
+                    FirestoreLog.d(FirestorePlugin.TAG, "Got document snapshot data");
                     callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentSnapshot, true));
                 }
             };
@@ -60,7 +60,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
             firestorePlugin.addRegistration(callbackId, documentRef.addSnapshotListener(metadataChanges, eventListener));
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
             callbackContext.error(e.getMessage());
         }
 
@@ -77,11 +77,11 @@ public class DocOnSnapshotHandler implements ActionHandler {
                     metadataChanges = MetadataChanges.INCLUDE;
                 }
             } catch (JSONException e) {
-                Log.e(FirestorePlugin.TAG, "Error getting document option includeMetadataChanges", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error getting document option includeMetadataChanges", e);
                 throw new RuntimeException(e);
             }
 
-            Log.d(FirestorePlugin.TAG, "Set document options");
+            FirestoreLog.d(FirestorePlugin.TAG, "Set document options");
         }
 
         return metadataChanges;

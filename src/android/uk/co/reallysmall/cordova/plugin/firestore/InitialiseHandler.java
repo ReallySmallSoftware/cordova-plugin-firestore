@@ -18,6 +18,7 @@ public class InitialiseHandler implements ActionHandler {
 
     public static final String PERSIST = "persist";
     public static final String DATE_PREFIX = "datePrefix";
+    public static final String GEOPOINT_PREFIX = "geopointPrefix";
     public static final String FIELDVALUE_DELETE = "fieldValueDelete";
     public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
     public static final String CONFIG = "config";
@@ -34,7 +35,7 @@ public class InitialiseHandler implements ActionHandler {
 
         try {
 
-            Log.d(FirestorePlugin.TAG, "Initialising Firestore...");
+            FirestoreLog.d(FirestorePlugin.TAG, "Initialising Firestore...");
 
             final JSONObject options = args.getJSONObject(0);
 
@@ -86,6 +87,9 @@ public class InitialiseHandler implements ActionHandler {
             if (options.has(DATE_PREFIX)) {
                 JSONDateWrapper.setDatePrefix(options.getString(DATE_PREFIX));
             }
+            if (options.has(GEOPOINT_PREFIX)) {
+                JSONGeopointWrapper.setGeopointPrefix(options.getString(GEOPOINT_PREFIX));
+            }
 
             if (options.has(FIELDVALUE_DELETE)) {
                 FieldValueHelper.setDeletePrefix(options.getString(FIELDVALUE_DELETE));
@@ -95,16 +99,17 @@ public class InitialiseHandler implements ActionHandler {
                 FieldValueHelper.setServerTimestampPrefix(options.getString(FIELDVALUE_SERVERTIMESTAMP));
             }
 
-            Log.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
+            FirestoreLog.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
 
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(persist)
+                    .setTimestampsInSnapshotsEnabled(true)
                     .build();
             firestorePlugin.getDatabase().setFirestoreSettings(settings);
 
             callbackContext.success();
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
             callbackContext.error(e.getMessage());
         }
 

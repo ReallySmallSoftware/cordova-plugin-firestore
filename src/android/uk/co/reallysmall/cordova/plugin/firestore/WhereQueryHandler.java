@@ -32,7 +32,7 @@ public class WhereQueryHandler implements QueryHandler {
                 throw new RuntimeException("Unknown operator type " + opStr);
             }
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing where", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing where", e);
             throw new RuntimeException(e);
         }
 
@@ -44,6 +44,8 @@ public class WhereQueryHandler implements QueryHandler {
 
         if (JSONDateWrapper.isWrappedDate(value)) {
             return JSONDateWrapper.unwrapDate(value);
+        } else if (JSONGeopointWrapper.isWrappedGeoPoint(value)) {
+            return JSONGeopointWrapper.unwrapGeoPoint(value);
         }
 
         return value;

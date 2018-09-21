@@ -29,7 +29,7 @@ public class CollectionGetHandler implements ActionHandler {
             final JSONArray queries = args.getJSONArray(1);
 
 
-            Log.d(FirestorePlugin.TAG, "Getting document from collection");
+            FirestoreLog.d(FirestorePlugin.TAG, "Getting document from collection");
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath);
@@ -39,22 +39,22 @@ public class CollectionGetHandler implements ActionHandler {
                     @Override
                     public void onSuccess(QuerySnapshot querySnapshot) {
                         callbackContext.sendPluginResult(createPluginResult(querySnapshot, false));
-                        Log.d(FirestorePlugin.TAG, "Successfully got collection");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully got collection");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error getting collection", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error getting collection", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing collection get in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection get in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing collection get", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection get", e);
             callbackContext.error(e.getMessage());
         }
 

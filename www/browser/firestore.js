@@ -1,8 +1,9 @@
-/* global firebase: false, Promise: false */
+ /* global firebase: false, Promise: false */
 
 if (!window.Promise) {
   window.Promise = require('cordova-plugin-firestore.Promise');
 }
+
 
 var isInitialized = function(packageName) {
   var parent = window;
@@ -43,6 +44,11 @@ var loadJs = function(options) {
 
 
 function createInstance(options) {
+  Object.defineProperty(EXPORT_OBJECT, 'GeoPoint', {
+    value: firebase.firestore.GeoPoint,
+    writable: false
+  });
+
   return new Promise(function(resolve, reject) {
 
     var initialised = false;
@@ -97,7 +103,9 @@ function initialise(options) {
     return createInstance(options);
   });
 }
-module.exports = {
+
+
+var EXPORT_OBJECT = {
   initialise: initialise, // original developer name
   initialize: initialise, // better for common usage
 
@@ -105,3 +113,5 @@ module.exports = {
     return firebase.firestore.Timestamp.fromDate(date);
   }
 };
+
+module.exports = EXPORT_OBJECT;

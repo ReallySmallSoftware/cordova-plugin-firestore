@@ -12,7 +12,8 @@
 
 + (NSDictionary *)toJSON:(NSDictionary *)values;
 + (NSDictionary *)fromJSON:(NSDictionary *)values;
-+ (void)setDatePrefix:(NSString *)datePrefix;
++ (void)setGeopointPrefix:(NSString *)datePrefix;
++ (void)setDatePrefix:(NSString *)geopointPrefix;
 + (void)setFieldValueDelete:(NSString *)fieldValueDelete;
 + (void)setFieldValueServerTimestamp:(NSString *)fieldValueServerTimestamp;
 + (NSObject *)parseSpecial:(NSObject *)value;

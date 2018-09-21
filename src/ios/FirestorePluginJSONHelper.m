@@ -12,6 +12,7 @@
 @implementation FirestorePluginJSONHelper;
 
 static NSString *datePrefix = @"__DATE:";
+static NSString *geopointPrefix = @"__GEOPOINT:";
 static NSString *fieldValueDelete = @"__DELETE";
 static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
@@ -85,6 +86,10 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
 + (void)setDatePrefix:(NSString *)newDatePrefix {
     datePrefix = newDatePrefix;
+}
+
++ (void)setGeopointPrefix:(NSString *)newGeopointPrefix {
+    geopointPrefix = newGeopointPrefix;
 }
 
 + (void)setFieldValueDelete:(NSString *)newFieldValueDelete {

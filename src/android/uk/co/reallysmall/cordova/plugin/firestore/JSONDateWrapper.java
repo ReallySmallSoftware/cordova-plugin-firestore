@@ -1,5 +1,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
+import com.google.firebase.firestore.GeoPoint;
+
 import java.util.Date;
 
 public class JSONDateWrapper extends Date {

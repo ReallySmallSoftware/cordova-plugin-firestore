@@ -26,7 +26,7 @@ public class CollectionAddHandler implements ActionHandler {
             final String collectionPath = args.getString(0);
             final JSONObject data = args.getJSONObject(1);
 
-            Log.d(FirestorePlugin.TAG, "Writing document to collection");
+            FirestoreLog.d(FirestorePlugin.TAG, "Writing document to collection");
 
             try {
                 firestorePlugin.getDatabase().collection(collectionPath).add(JSONHelper.toSettableMap(data)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -34,21 +34,21 @@ public class CollectionAddHandler implements ActionHandler {
                     public void onSuccess(DocumentReference documentReference) {
                         callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentReference, false));
 
-                        Log.d(FirestorePlugin.TAG, "Successfully written document to collection");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully written document to collection");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error writing document to collection", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error writing document to collection", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing collection add in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection add in thread", e);
                 callbackContext.error(e.getMessage());
             }
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing collection add", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection add", e);
             callbackContext.error(e.getMessage());
         }
 

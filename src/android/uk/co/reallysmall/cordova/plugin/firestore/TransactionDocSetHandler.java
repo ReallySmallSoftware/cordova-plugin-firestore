@@ -30,7 +30,7 @@ public class TransactionDocSetHandler implements ActionHandler {
                 options = null;
             }
 
-            Log.d(FirestorePlugin.TAG, String.format("Transactional document set for %s", transactionId));
+            FirestoreLog.d(FirestorePlugin.TAG, String.format("Transactional document set for %s", transactionId));
 
             TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
@@ -45,7 +45,7 @@ public class TransactionDocSetHandler implements ActionHandler {
             callbackContext.success();
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing transactional document set", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document set", e);
             callbackContext.error(e.getMessage());
         }
 

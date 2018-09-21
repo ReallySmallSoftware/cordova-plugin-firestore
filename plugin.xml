@@ -38,6 +38,7 @@
     <js-module src="www/android_ios/transaction.js" name="Transaction"/>
     <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
     <js-module src="www/android_ios/firestore_options.js" name="FirestoreOptions"/>
+    <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="Firestore">
         <param name="android-package" value="uk.co.reallysmall.cordova.plugin.firestore.FirestorePlugin"/>
@@ -69,6 +70,7 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestorePlugin.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/InitialiseHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/JSONDateWrapper.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/JSONGeopointWrapper.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/JSONHelper.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/LimitQueryHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/OrderByQueryHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
@@ -94,6 +96,7 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionUpdateHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/SubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestoreLog.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
 
     <dependency id="cordova-support-google-services" />
 
@@ -115,6 +118,7 @@
     <js-module src="www/android_ios/transaction.js" name="Transaction"/>
     <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
     <js-module src="www/android_ios/firestore_options.js" name="FirestoreOptions"/>
+    <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
 
     <config-file target="config.xml" parent="/*">
       <feature name="Firestore">

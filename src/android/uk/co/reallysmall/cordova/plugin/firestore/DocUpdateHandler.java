@@ -27,29 +27,29 @@ public class DocUpdateHandler implements ActionHandler {
             final JSONObject data = args.getJSONObject(2);
 
 
-            Log.d(FirestorePlugin.TAG, "Updating document");
+            FirestoreLog.d(FirestorePlugin.TAG, "Updating document");
 
             try {
                 firestorePlugin.getDatabase().collection(collection).document(docId).update(JSONHelper.toSettableMap(data)).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success();
-                        Log.d(FirestorePlugin.TAG, "Successfully updated document");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully updated document");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         callbackContext.error(e.getMessage());
-                        Log.w(FirestorePlugin.TAG, "Error updating document", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error updating document", e);
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing document update in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document update in thread", e);
                 callbackContext.error(e.getMessage());
             }
             ;
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing document update", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing document update", e);
             callbackContext.error(e.getMessage());
         }
 

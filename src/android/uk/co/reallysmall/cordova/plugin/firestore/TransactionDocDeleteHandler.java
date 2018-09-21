@@ -21,7 +21,7 @@ public class TransactionDocDeleteHandler implements ActionHandler {
             final String docId = args.getString(1);
             final String collectionPath = args.getString(2);
 
-            Log.d(FirestorePlugin.TAG, String.format("Transactional document delete for %s", transactionId));
+            FirestoreLog.d(FirestorePlugin.TAG, String.format("Transactional document delete for %s", transactionId));
 
             TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
@@ -34,7 +34,7 @@ public class TransactionDocDeleteHandler implements ActionHandler {
             callbackContext.success();
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing transactional document delete", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document delete", e);
             callbackContext.error(e.getMessage());
         }
 

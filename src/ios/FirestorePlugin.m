@@ -8,7 +8,6 @@
 
 @implementation FirestorePlugin
 
-static int logcount = 0;
 
 - (void)pluginInitialize {
     if(![FIRApp defaultApp]) {
@@ -965,5 +964,13 @@ static int logcount = 0;
     }];
 }
 
+- (void)setLogLevel:(CDVInvokedUrlCommand *)command {
+  
+  CDVPluginResult *pluginResult = [[CDVPluginResult alloc] init];
+
+  asl_log(NULL, NULL,ASL_LEVEL_DEBUG, "This method is not supported in iOS");
+
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 @end
 

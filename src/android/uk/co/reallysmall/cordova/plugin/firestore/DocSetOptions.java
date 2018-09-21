@@ -17,11 +17,11 @@ public class DocSetOptions {
                 setOptions = SetOptions.merge();
             }
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error getting document option", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error getting document option", e);
             throw new RuntimeException(e);
         }
 
-        Log.d(FirestorePlugin.TAG, "Set document options");
+        FirestoreLog.d(FirestorePlugin.TAG, "Set document options");
 
         return setOptions;
     }

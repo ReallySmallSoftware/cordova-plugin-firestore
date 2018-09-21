@@ -27,7 +27,7 @@ public class QueryHelper {
 
     public static Query processQueries(JSONArray queries, Query query) throws JSONException {
 
-        Log.d(FirestorePlugin.TAG, "Processing queries");
+        FirestoreLog.d(FirestorePlugin.TAG, "Processing queries");
 
         int length = queries.length();
         for (int i = 0; i < length; i++) {
@@ -38,7 +38,7 @@ public class QueryHelper {
             if (queryHandlers.containsKey(queryType)) {
                 query = queryHandlers.get(queryType).handle(query, queryDefinition.get("value"));
             } else {
-                Log.e(FirestorePlugin.TAG, String.format("Unknown query type %s", queryType));
+                FirestoreLog.e(FirestorePlugin.TAG, String.format("Unknown query type %s", queryType));
             }
         }
 

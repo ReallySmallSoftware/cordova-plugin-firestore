@@ -28,6 +28,7 @@
 - (void)docOfSubCollectionUpdate:(CDVInvokedUrlCommand *)command;
 - (void)docOfSubCollectionDelete:(CDVInvokedUrlCommand *)command;
 - (void)subCollectionGet:(CDVInvokedUrlCommand *)command;
+- (void)setLogLevel:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;

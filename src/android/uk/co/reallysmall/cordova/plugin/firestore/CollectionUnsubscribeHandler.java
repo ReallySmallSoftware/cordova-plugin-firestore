@@ -21,7 +21,7 @@ public class CollectionUnsubscribeHandler implements ActionHandler {
             firestorePlugin.unregister(callbackId);
             callbackContext.success();
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error unsubscribing from collection", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error unsubscribing from collection", e);
             callbackContext.error(e.getMessage());
         }
 

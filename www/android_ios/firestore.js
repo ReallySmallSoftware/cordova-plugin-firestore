@@ -6,6 +6,7 @@ var CollectionReference = require("./CollectionReference"),
   FirestoreTimestamp = require("./FirestoreTimestamp"),
   Transaction = require("./Transaction"),
   __wrap = require("./__wrap"),
+  GeoPoint = require("./GeoPoint"),
   FirestoreOptions = require("./FirestoreOptions");
 
 if (!window.Promise) {
@@ -102,8 +103,14 @@ Firestore.prototype = {
       exec(wrappedResolve, wrappedReject, PLUGIN_NAME, 'runTransaction', args);
     });
   },
-  setLogLevel: function () {
-    throw "Firestore.setLogLevel: Not supported";
+  setLogLevel: function (logLevel) {
+    if (['debug', 'error', 'silent'].indexOf(logLevel) > -1) {
+      return new Promise(function(resolve, reject) {
+        exec(resolve, reject, PLUGIN_NAME, 'setLogLevel', [logLevel]);
+      });
+    } else {
+      return Promise.reject("supported logLevel is one of 'debug', 'error' or 'silent'");
+    }
   },
   settings: function () {
     throw "Firestore.settings: Not supported";
@@ -150,6 +157,9 @@ module.exports = {
       throw new Error("Unexpected error in transaction " + error);
     });
   },
+
+  GeoPoint: GeoPoint,
+
   newTimestamp: function(date) {
     return new FirestoreTimestamp(date.getTime());
   }

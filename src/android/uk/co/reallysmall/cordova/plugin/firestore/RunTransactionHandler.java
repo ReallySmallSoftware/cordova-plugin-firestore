@@ -31,14 +31,14 @@ public class RunTransactionHandler implements ActionHandler {
         try {
             final String transactionId = args.getString(0);
 
-            Log.d(FirestorePlugin.TAG, "Running transaction");
+            FirestoreLog.d(FirestorePlugin.TAG, "Running transaction");
 
             try {
                 firestorePlugin.getDatabase().runTransaction(new Transaction.Function<String>() {
                     @Override
                     public String apply(Transaction transaction) throws FirebaseFirestoreException {
 
-                        Log.d(FirestorePlugin.TAG, String.format("Applying transaction %s", transactionId));
+                        FirestoreLog.d(FirestorePlugin.TAG, String.format("Applying transaction %s", transactionId));
 
                         firestorePlugin.storeTransaction(transactionId, transaction);
                         TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
@@ -97,10 +97,10 @@ public class RunTransactionHandler implements ActionHandler {
                         if (timedOut) {
                             throw new RuntimeException("Transaction timed out");
                         } else {
-                            Log.d(FirestorePlugin.TAG, String.format("Sync result complete for transaction %s", transactionId));
+                            FirestoreLog.d(FirestorePlugin.TAG, String.format("Sync result complete for transaction %s", transactionId));
                         }
 
-                        Log.d(FirestorePlugin.TAG, String.format("Returning transaction %s result %s", transactionId, transactionQueue.results.toString()));
+                        FirestoreLog.d(FirestorePlugin.TAG, String.format("Returning transaction %s result %s", transactionId, transactionQueue.results.toString()));
                         return transactionQueue.results.toString();
                     }
 
@@ -117,23 +117,23 @@ public class RunTransactionHandler implements ActionHandler {
                     @Override
                     public void onSuccess(String result) {
                         callbackContext.success(result);
-                        Log.d(FirestorePlugin.TAG, "Transaction success");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Transaction success");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Transaction failure", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Transaction failure", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
 
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error running transaction", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error running transaction", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error running transaction", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error running transaction", e);
             callbackContext.error(e.getMessage());
         }
 
@@ -142,21 +142,21 @@ public class RunTransactionHandler implements ActionHandler {
 
     public void performDelete(Transaction transaction, TransactionDetails transactionDetails, String transactionId) {
 
-        Log.d(FirestorePlugin.TAG, String.format("Perform transactional document delete for %s", transactionId));
+        FirestoreLog.d(FirestorePlugin.TAG, String.format("Perform transactional document delete for %s", transactionId));
 
         try {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
             transaction.delete(documentRef);
 
         } catch (Exception e) {
-            Log.e(FirestorePlugin.TAG, "Error performing transactional document delete in thread", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error performing transactional document delete in thread", e);
             throw new RuntimeException(e);
         }
     }
 
     public void performSet(Transaction transaction, TransactionDetails transactionDetails, String transactionId) {
 
-        Log.d(FirestorePlugin.TAG, String.format("Perform transactional document set for %s", transactionId));
+        FirestoreLog.d(FirestorePlugin.TAG, String.format("Perform transactional document set for %s", transactionId));
 
         SetOptions setOptions = DocSetOptions.getSetOptions(transactionDetails.options);
 
@@ -170,21 +170,21 @@ public class RunTransactionHandler implements ActionHandler {
             }
 
         } catch (Exception e) {
-            Log.e(FirestorePlugin.TAG, "Error performing transactional document set in thread", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error performing transactional document set in thread", e);
             throw new RuntimeException(e);
         }
     }
 
     public void performUpdate(Transaction transaction, TransactionDetails transactionDetails, String transactionId) {
 
-        Log.d(FirestorePlugin.TAG, String.format("Perform transactional document update for %s", transactionId));
+        FirestoreLog.d(FirestorePlugin.TAG, String.format("Perform transactional document update for %s", transactionId));
 
         try {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
             transaction.update(documentRef, JSONHelper.toSettableMap(transactionDetails.data));
 
         } catch (Exception e) {
-            Log.e(FirestorePlugin.TAG, "Error performing transactional document update in thread", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error performing transactional document update in thread", e);
             throw new RuntimeException(e);
         }
     }

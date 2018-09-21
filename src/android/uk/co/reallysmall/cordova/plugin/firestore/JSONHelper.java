@@ -1,5 +1,6 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
+import com.google.firebase.firestore.GeoPoint;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -25,6 +26,8 @@ public class JSONHelper {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
                 value = new JSONDateWrapper((Date) value);
+            } else if (value instanceof GeoPoint) {
+                value = new JSONGeopointWrapper((GeoPoint) value);
             }
             result.put(entry.getKey(), value);
         }
@@ -42,6 +45,8 @@ public class JSONHelper {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
                 value = new JSONDateWrapper((Date) value);
+            } else if (value instanceof GeoPoint) {
+                value = new JSONGeopointWrapper((GeoPoint) value);
             }
             result.put(value);
         }
@@ -69,7 +74,9 @@ public class JSONHelper {
 
             Object entryValue = entry.getValue();
 
-            if (JSONDateWrapper.isWrappedDate(entryValue)) {
+            if (JSONGeopointWrapper.isWrappedGeoPoint(entryValue)) {
+                entry.setValue(JSONGeopointWrapper.unwrapGeoPoint(entryValue));
+            } else if (JSONDateWrapper.isWrappedDate(entryValue)) {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
             } else if (entryValue instanceof Map) {
                 entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
@@ -88,6 +95,8 @@ public class JSONHelper {
 
             if (JSONDateWrapper.isWrappedDate(entryValue)) {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
+            } else if (JSONGeopointWrapper.isWrappedGeoPoint(entryValue)) {
+                entry.setValue(JSONGeopointWrapper.unwrapGeoPoint(entryValue));
             } else if (entryValue instanceof Map) {
                 entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {

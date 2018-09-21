@@ -29,7 +29,7 @@ public class PluginResultHelper {
         JSONObject querySnapshot = new JSONObject();
         JSONArray array = new JSONArray();
 
-        Log.d(FirestorePlugin.TAG, "Creating query snapshot result");
+        FirestoreLog.d(FirestorePlugin.TAG, "Creating query snapshot result");
 
         for (QueryDocumentSnapshot doc : value) {
             JSONObject document = createDocumentSnapshot(doc);
@@ -50,7 +50,7 @@ public class PluginResultHelper {
     private static JSONObject createDocumentSnapshot(DocumentSnapshot doc) {
         JSONObject documentSnapshot = new JSONObject();
 
-        Log.d(FirestorePlugin.TAG, "Creating document snapshot result");
+        FirestoreLog.d(FirestorePlugin.TAG, "Creating document snapshot result");
 
         try {
             documentSnapshot.put("id", doc.getId());
@@ -62,7 +62,7 @@ public class PluginResultHelper {
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error creating document snapshot result", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error creating document snapshot result", e);
             throw new RuntimeException(e);
         }
 
@@ -72,13 +72,13 @@ public class PluginResultHelper {
     private static JSONObject createDocumentReference(DocumentReference doc) {
         JSONObject documentReference = new JSONObject();
 
-        Log.e(FirestorePlugin.TAG, "Creating document snapshot result");
+        FirestoreLog.e(FirestorePlugin.TAG, "Creating document snapshot result");
 
         try {
             documentReference.put("id", doc.getId());
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error creating document reference result", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error creating document reference result", e);
             throw new RuntimeException(e);
         }
 
