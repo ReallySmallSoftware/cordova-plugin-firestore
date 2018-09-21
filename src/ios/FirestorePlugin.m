@@ -298,6 +298,8 @@
         [settings setPersistenceEnabled:true];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
     }
+  
+    [settings setTimestampsInSnapshotsEnabled:YES];
 
     NSString *datePrefix = options[@"datePrefix"];
 
