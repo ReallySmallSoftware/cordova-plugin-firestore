@@ -24,7 +24,7 @@ public class TransactionDocUpdateHandler implements ActionHandler {
             final String collectionPath = args.getString(2);
             final JSONObject data = args.getJSONObject(3);
 
-            Log.d(FirestorePlugin.TAG, String.format("Transactional document update for %s", transactionId));
+            FirestoreLog.d(FirestorePlugin.TAG, String.format("Transactional document update for %s", transactionId));
 
             TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
@@ -38,7 +38,7 @@ public class TransactionDocUpdateHandler implements ActionHandler {
             callbackContext.success();
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing transactional document update", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document update", e);
             callbackContext.error(e.getMessage());
         }
 

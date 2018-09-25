@@ -14,44 +14,102 @@ This plugin supports the following platforms:
 - Browser
 
 # Installation
-`cordova plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_CORE_VERSION=16.0.0 --variable ANDROID_FIREBASE_FIRESTORE_VERSION=17.0.1 --save`
 
-or
+  - **Step1** Install this plugin
 
-`phonegap plugin add cordova-plugin-firestore --variable ANDROID_FIREBASE_CORE_VERSION=16.0.0 --variable ANDROID_FIREBASE_FIRESTORE_VERSION=17.0.1`
+  ```bash
+  $> cordova plugin add cordova-plugin-firestore --save
+  ```
 
-Omitting `FIREBASE_VERSION` will use a default value.
+  - **Step2** Download `google-services.json`, then put it at `(your_project_dir)/google-services.json`
+    Hint: [Get a config file for your Android App](https://support.google.com/firebase/answer/7015592#android)
 
-## Dependencies
-### Promises
-This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a `Promise` polyfill.
+    Then add the below three lines into `(your_project_dir)/config.xml` file.
 
-## Firebase configuration
-### Android
-You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:
+    ```xml
+    <platform name="android">
+        <resource-file src="google-services.json" target="app/google-services.json" />
+    </platform>
+    ```
 
-```
-<platform name="android">
-    <resource-file src="google-services.json" target="google-services.json" />
-</platform>
-```
+  - **Step3** Download `GoogleService-Info.plist`, then put it at `(your_project_dir)/GoogleService-Info.plist`
+    Hint: [Get a config file for your iOS App](https://support.google.com/firebase/answer/7015592#ios)
 
-#### Dependencies
-##### cordova-support-google-services
+    Then add the below three lines into `(your_project_dir)/config.xml` file.
 
-In order to ensure Firebase initialises correctly on Android this plugin can be used. This is not automatically added as a dependency to allow for the configuration it performs to be done manually if desired.
+    ```xml
+    <platform name="ios">
+        <resource-file src="GoogleService-Info.plist" />
+    </platform>
+    ```
 
-### iOS
-iOS requires `GoogleService-Info.plist` is put in the correct location. Similarly this can be done as follows:
-```
-<platform name="ios">
-    <resource-file src="GoogleService-Info.plist" />
-</platform>
-```
-#### Keychain Sharing Capability
-If using multiple Firebase plugins it may be necessary to enable this.
+  - **Step4** Make sure your Firestore rule
+
+    ```
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /{document=**} {
+          allow read, write : if request.auth != null;  // This is an example.
+        }
+      }
+    }
+    ```
+
+  - **Step5** Write HelloWorld code
+    ```js
+    var options = {
+      "datePrefix": '__DATE:',
+      "fieldValueDelete": "__DELETE",
+      "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
+      "persist": true,
+      "config" : {}
+    };
+
+    if (cordova.platformId === "browser") {
+
+      options.config = {
+        apiKey: "(your api key)",
+        authDomain: "localhost",
+        projectId: "(your project id)"
+      };
+    }
+
+    Firestore.initialise(options).then(function(db) {
+      // Add a second document with a generated ID.
+      db.collection("users").add({
+          first: "Alan",
+          middle: "Mathison",
+          last: "Turing",
+          born: 1912
+      })
+      .then(function(docRef) {
+          console.log("Document written with ID: ", docRef.id);
+      })
+      .catch(function(error) {
+          console.error("Error adding document: ", error);
+      });
+    });
+    ```
+
+  - **Step6** Let's run it!
+    ```
+    $> cordova platform add browser // android, ios
+
+    $> cordova run browser
+    ```
+
+## Install optional variables
+
+  - `Android` **ANDROID_FIREBASE_CORE_VERSION = (16.0.3)**<br>
+    The `com.google.firebase:firebase-core` version.
+    You can find the latest version at [here](https://firebase.google.com/docs/android/setup#available_libraries).
+
+  - `Android` **ANDROID_FIREBASE_FIRESTORE_VERSION = (17.1.0)**<br>
+    The `com.google.firebase:firebase-firestore` version.
+    You can find the latest version at [here](https://firebase.google.com/docs/android/setup#available_libraries).
 
 # What is supported?
+
 ## Firestore
 - collection()
 - runTransaction(updateFunction)
@@ -104,37 +162,10 @@ If using multiple Firebase plugins it may be necessary to enable this.
 - FieldValue.delete()
 - FieldValue.serverTimestamp()
 
-# Initialisation
-The plugin can be initialised as follows:
-
+## GeoPoint
 ```
-      var options = {
-        "datePrefix": '__DATE:',
-        "fieldValueDelete": "__DELETE",
-        "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
-        "persist": true,
-        "timestampsInSnapshots" : false,
-        "config" : {
-
-        }
-      };
-
-      if (cordova.platformId === "browser") {
-
-        options.config = {
-          apiKey: 'my API key',
-          authDomain: 'my domain',
-          projectId: 'my project id',
-        };
-      }
-
-      Firestore.initialise(options).then(function(database) {
-        myDatabaseReference = database;
-      });
-    });
+var point = new Firestore.GeoPoint();
 ```
-
-This is initialised as a promise to allow the Browser implementation to dynamically add a reference to the Firestore Javascript SDK.
 
 ## options.config
 In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
@@ -159,33 +190,7 @@ The client will receive the field as a Javascript Date.
 This conversion also happens when specify a field in a where condition.
 
 ### timestampsInSnapshots
-This option is provided for compatability with upcoming Firestore changes. By default this option is set to `false` but you
-are advised to heed the following if you wish for your app to continue to work in the browser implementation:
-
-```
-The behavior for Date objects stored in Firestore is going to change
-AND YOUR APP MAY BREAK.
-To hide this warning and ensure your app does not break, you need to add the
-following code to your app before calling any other Cloud Firestore methods:
-
-  const firestore = firebase.firestore();
-  const settings = {/* your settings... */ timestampsInSnapshots: true};
-  firestore.settings(settings);
-
-With this change, timestamps stored in Cloud Firestore will be read back as
-Firebase Timestamp objects instead of as system Date objects. So you will also
-need to update code expecting a Date to instead expect a Timestamp. For example:
-
-  // Old:
-  const date = snapshot.get('created_at');
-  // New:
-  const timestamp = snapshot.get('created_at');
-  const date = timestamp.toDate();
-
-Please audit all existing usages of Date when you enable the new behavior. In a
-future release, the behavior will change to the new behavior, so if you do not
-follow these steps, YOUR APP MAY BREAK.
-```
+By default this option is set to `true`.
 
 ## FieldValue constants
 Similar to the situation with dates, there are special values used for `FieldValue` values:
@@ -199,55 +204,4 @@ These values can be changed when initialisation is performed.
 I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
 - When used on Android ensure that at least `com.google.gms:google-services:3.1.1` is used in build dependencies. Earlier versions did not work for me.
-- Yes, I did spell initialise() with an 's' - I am from the UK
-
-# History
-## 1.3.0
-- Merge multi-project config changes
-- Merge sub document changes
-- Update Web SDK reference to 5.2.0
-- Introduce QueryDataSnapshot
-- Implement timestampsInSnapshots option in configuration
-
-## 1.2.0
-- Update Android dependency versions
-- Update iOS dependency versions
-- Update plugin dependencies
-- WARNING: The Android update may require you to update com.google.gms:google-services to 4.0.0, com.android.tools.build:gradle to 3.1.2 and gradle to 4.4.4 (look in platforms/android/cordova/lib/builders/GradleBuilder.js)
-
-## 1.1.0
-- Add support for FieldValue
-- Add experimental support for Transactions. _Please note this is **experimental**!_
-- Add startswith polyfill
-
-## 1.0.10
-- Correct log level when creating results
-
-## 1.0.9
-- Updated Dependencies
-- Remove incorrect Java 7 dependency
-
-## 1.0.8
-- Ensure dates work for queries and nested data
-- Implement delete()
-- Update README
-
-## 1.0.7
-- Remove dependency on cordova-plugin-firebase-hooks
-
-## 1.0.6
-- Correct README History
-- Make browser firebase dependency loading smarter
-
-## 1.0.5
-## 1.0.4
-## 1.0.3
-- Address plugin dependency issues
-
-## 1.0.2
-- Updated version
-- Added firebase hooks dependency
-- Corrected iOS source/header-file config
-
-## 1.0.0
-Initial release
+- Yes, I did spell initialise() with an 's' - The original plugin developer @ReallySmallSoftware is from the UK

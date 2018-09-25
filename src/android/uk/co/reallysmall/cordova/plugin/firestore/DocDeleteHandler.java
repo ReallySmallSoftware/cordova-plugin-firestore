@@ -26,32 +26,32 @@ public class DocDeleteHandler implements ActionHandler {
             final String collectionPath = args.getString(0);
             final String doc = args.getString(1);
 
-            Log.d(FirestorePlugin.TAG, "Deleting document");
+            FirestoreLog.d(FirestorePlugin.TAG, "Deleting document");
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
-                Log.d(FirestorePlugin.TAG, "Get for document " + collectionPath + "/" + doc);
+                FirestoreLog.d(FirestorePlugin.TAG, "Get for document " + collectionPath + "/" + doc);
 
                 documentRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success(0);
-                        Log.d(FirestorePlugin.TAG, "Successfully deleted document");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully deleted document");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error deleting document", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error deleting document", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing document delete in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document delete in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing document delete", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing document delete", e);
             callbackContext.error(e.getMessage());
         }
 

@@ -30,7 +30,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
             final String callbackId = args.getString(3);
 
 
-            Log.d(FirestorePlugin.TAG, "Listening to collection");
+            FirestoreLog.d(FirestorePlugin.TAG, "Listening to collection");
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
@@ -44,11 +44,11 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                                         @Nullable FirebaseFirestoreException e) {
 
                         if (e != null) {
-                            Log.w(FirestorePlugin.TAG, "Collection snapshot listener error", e);
+                            FirestoreLog.w(FirestorePlugin.TAG, "Collection snapshot listener error", e);
                             return;
                         }
 
-                        Log.d(FirestorePlugin.TAG, "Got collection snapshot data");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Got collection snapshot data");
                         callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(value, true));
                     }
                 };
@@ -56,12 +56,12 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                 firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(metadataChanges, eventListener));
 
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing collection snapshot", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection snapshot", e);
             callbackContext.error(e.getMessage());
         }
 
@@ -84,11 +84,11 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                     metadataChanges = MetadataChanges.INCLUDE;
                 }
             } catch (JSONException e) {
-                Log.e(FirestorePlugin.TAG, "Error getting query options", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error getting query options", e);
                 throw new RuntimeException(e);
             }
 
-            Log.d(FirestorePlugin.TAG, "Set document options");
+            FirestoreLog.d(FirestorePlugin.TAG, "Set document options");
         }
 
         return metadataChanges;

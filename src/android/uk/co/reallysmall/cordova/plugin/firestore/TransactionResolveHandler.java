@@ -21,7 +21,7 @@ public class TransactionResolveHandler implements ActionHandler {
             String transactionId = args.getString(0);
             String result = args.getString(1);
 
-            Log.d(FirestorePlugin.TAG, String.format("Transactional resolve for %s", transactionId));
+            FirestoreLog.d(FirestorePlugin.TAG, String.format("Transactional resolve for %s", transactionId));
 
             TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
             transactionQueue.results.append(result);
@@ -32,7 +32,7 @@ public class TransactionResolveHandler implements ActionHandler {
             transactionQueue.queue.add(transactionDetails);
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error resolving transaction", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error resolving transaction", e);
             callbackContext.error(e.getMessage());
         }
 

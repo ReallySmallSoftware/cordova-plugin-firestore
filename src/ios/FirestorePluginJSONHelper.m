@@ -7,11 +7,12 @@
 
 #import "FirestorePluginJSONHelper.h"
 #import "FirestorePlugin.h"
-@import FirebaseFirestore;
+@import Firebase;
 
 @implementation FirestorePluginJSONHelper;
 
 static NSString *datePrefix = @"__DATE:";
+static NSString *geopointPrefix = @"__GEOPOINT:";
 static NSString *fieldValueDelete = @"__DELETE";
 static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
@@ -29,6 +30,13 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
             [dateString appendString:datePrefix];
             [dateString appendString:[NSString stringWithFormat:@"%.0f000",[date timeIntervalSince1970]]];
             value = dateString;
+        } else if ([value isKindOfClass:[FIRGeoPoint class]]) {
+          FIRGeoPoint *point = (FIRGeoPoint *)value;
+          
+          NSMutableString *geopointString = [[NSMutableString alloc] init];
+          [geopointString appendString:geopointPrefix];
+          [geopointString appendString:[NSString stringWithFormat:@"%f,%f", point.latitude, point.longitude]];
+          value = geopointString;
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             value = [self toJSON:value];
         }
@@ -63,6 +71,7 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
         NSString *stringValue = (NSString *)value;
 
         NSUInteger datePrefixLength = (NSUInteger)datePrefix.length;
+        NSUInteger geopointPrefixLength = (NSUInteger)geopointPrefix.length;
 
         if ([stringValue length] > datePrefixLength && [datePrefix isEqualToString:[stringValue substringToIndex:datePrefixLength]]) {
             NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
@@ -71,6 +80,13 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
             value = date;
         }
 
+        if ([stringValue length] > geopointPrefixLength && [geopointPrefix isEqualToString:[stringValue substringToIndex:geopointPrefixLength]]) {
+          NSArray *tmp = [[stringValue substringFromIndex:geopointPrefixLength] componentsSeparatedByString:@","];
+          FIRGeoPoint *geopoint = [[FIRGeoPoint alloc] initWithLatitude:[[tmp objectAtIndex:0] doubleValue] longitude:[[tmp objectAtIndex:1] doubleValue]];
+          value = geopoint;
+        }
+      
+      
         if ([fieldValueDelete isEqualToString:stringValue]) {
             value = FIRFieldValue.fieldValueForDelete;
         }
@@ -85,6 +101,10 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
 + (void)setDatePrefix:(NSString *)newDatePrefix {
     datePrefix = newDatePrefix;
+}
+
++ (void)setGeopointPrefix:(NSString *)newGeopointPrefix {
+    geopointPrefix = newGeopointPrefix;
 }
 
 + (void)setFieldValueDelete:(NSString *)newFieldValueDelete {

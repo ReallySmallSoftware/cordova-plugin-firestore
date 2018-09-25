@@ -8,7 +8,6 @@
 
 @implementation FirestorePlugin
 
-static int logcount = 0;
 
 - (void)pluginInitialize {
     if(![FIRApp defaultApp]) {
@@ -263,20 +262,32 @@ static int logcount = 0;
 
     asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Initialising Firestore...");
     
-    if (config != NULL) {
+    if (config != nil && [config objectForKey:@"googleAppID"]) {
         FIROptions *customOptions = [[FIROptions alloc] initWithGoogleAppID:config[@"googleAppID"] GCMSenderID:config[@"gcmSenderID"]];
-        customOptions.bundleID = config[@"bundleID"];
-        customOptions.APIKey = config[@"apiKey"];
-        customOptions.clientID = config[@"clientID"];
-        customOptions.databaseURL = config[@"databaseURL"];
-        customOptions.storageBucket = config[@"storageBucket"];
-        customOptions.projectID = config[@"projectID"];
-
-        if ([FIRApp appNamed:config[@"apiKey"]] == nil) {
-            [FIRApp configureWithName:config[@"apiKey"] options:customOptions];
+        if ([config objectForKey:@"gcmSenderID"]) {
+          customOptions.bundleID = config[@"bundleID"];
         }
-        FIRApp *customApp = [FIRApp appNamed:config[@"apiKey"]];
-        self.firestore = [FIRFirestore firestoreForApp:customApp];
+        if ([config objectForKey:@"gcmSenderID"]) {
+          customOptions.APIKey = config[@"apiKey"];
+        }
+        if ([config objectForKey:@"clientID"]) {
+          customOptions.clientID = config[@"clientID"];
+        }
+        if ([config objectForKey:@"databaseURL"]) {
+          customOptions.databaseURL = config[@"databaseURL"];
+        }
+        if ([config objectForKey:@"storageBucket"]) {
+          customOptions.storageBucket = config[@"storageBucket"];
+        }
+        if ([config objectForKey:@"projectID"]) {
+          customOptions.projectID = config[@"projectID"];
+        }
+
+        if ([config objectForKey:@"apiKey"] && [FIRApp appNamed:config[@"apiKey"]] == nil) {
+          [FIRApp configureWithName:config[@"apiKey"] options:customOptions];
+          FIRApp *customApp = [FIRApp appNamed:config[@"apiKey"]];
+          self.firestore = [FIRFirestore firestoreForApp:customApp];
+        }
     } else {
         self.firestore = [FIRFirestore firestore];
     }
@@ -287,6 +298,8 @@ static int logcount = 0;
         [settings setPersistenceEnabled:true];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
     }
+  
+    [settings setTimestampsInSnapshotsEnabled:YES];
 
     NSString *datePrefix = options[@"datePrefix"];
 
@@ -953,5 +966,13 @@ static int logcount = 0;
     }];
 }
 
+- (void)setLogLevel:(CDVInvokedUrlCommand *)command {
+  
+  CDVPluginResult *pluginResult = [[CDVPluginResult alloc] init];
+
+  asl_log(NULL, NULL,ASL_LEVEL_DEBUG, "This method is not supported in iOS");
+
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 @end
 

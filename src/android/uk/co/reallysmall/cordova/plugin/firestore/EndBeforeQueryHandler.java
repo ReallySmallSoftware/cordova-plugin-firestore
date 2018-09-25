@@ -8,6 +8,8 @@ public class EndBeforeQueryHandler implements QueryHandler {
 
         if (JSONDateWrapper.isWrappedDate(endBefore)) {
             endBefore = JSONDateWrapper.unwrapDate(endBefore);
+        } else if (JSONGeopointWrapper.isWrappedGeoPoint(endBefore)) {
+            endBefore = JSONGeopointWrapper.unwrapGeoPoint(endBefore);
         }
 
         return query.endBefore(endBefore);

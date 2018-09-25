@@ -1,27 +1,55 @@
-/* global firebase: false, Promise: false */
+ /* global firebase: false, Promise: false */
 
-var PLUGIN_NAME = 'Firestore';
+if (!window.Promise) {
+  window.Promise = require('cordova-plugin-firestore.Promise');
+}
 
-var loadJS = function(url, loaded, implementationCode, location) {
 
-  if (!loaded) {
-    var scriptTag = document.createElement('script');
-    scriptTag.src = url;
+var isInitialized = function(packageName) {
+  var parent = window;
+  var steps = packageName.split(/\./);
+  var results = steps.filter(function(step) {
+    if (step in parent) {
+      parent = parent[step];
+      return true;
+    } else {
+      return false;
+    }
+  });
 
-    scriptTag.onload = implementationCode;
-    scriptTag.onreadystatechange = implementationCode;
-
-    location.appendChild(scriptTag);
-  } else {
-    implementationCode();
-  }
+  return results.length === steps.length;
 };
 
-function Firestore(options, resolve) {
+var loadJs = function(options) {
+  return new Promise(function(resolve, reject) {
 
-  var self = this;
+    if (isInitialized(options.package)) {
+      resolve();
+    } else {
+      var scriptTag = document.createElement('script');
+      scriptTag.src = options.url;
+      scriptTag.onload = function() {
+        var timer = setInterval(function() {
+          if (isInitialized(options.package)) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, 10);
+      };
+      scriptTag.onerror = reject;
+      document.body.appendChild(scriptTag);
+    }
+  });
+};
 
-  var initialise = function() {
+
+function createInstance(options) {
+  Object.defineProperty(EXPORT_OBJECT, 'GeoPoint', {
+    value: firebase.firestore.GeoPoint,
+    writable: false
+  });
+
+  return new Promise(function(resolve, reject) {
 
     var initialised = false;
 
@@ -35,59 +63,55 @@ function Firestore(options, resolve) {
       firebase.initializeApp(options.config);
     }
 
-    var timestampsInSnapshots = false;
-
-    if (options.timestampsInSnapshots !== undefined) {
-      timestampsInSnapshots = options.timestampsInSnapshots;
-    }
-
-    const settings = {timestampsInSnapshots: timestampsInSnapshots};
+    // Default true, because firebase outputs error message
+    var timestampsInSnapshots = 'timestampsInSnapshots' in options ?
+      options.timestampsInSnapshots : true;
 
     var firestore = firebase.firestore();
-    firestore.settings(settings);
+    firestore.settings({
+      'timestampsInSnapshots': timestampsInSnapshots
+    });
 
     if (options.persist) {
-      firestore.enablePersistence().then(function() {
-        self.database = firestore;
-        resolve(self);
-      });
+      firestore
+        .enablePersistence({
+          experimentalTabSynchronization: true
+        })
+        .then(function() {
+          resolve(firestore);
+        })
+        .catch(reject);
     } else {
-      self.database = firestore;
-      resolve(self);
+      resolve(firestore);
     }
-  };
 
-  var firebaseLoaded = "firebase" in window;
-  var firestoreLoaded = false;
-  if (firebaseLoaded) {
-    firestoreLoaded = "firestore" in firebase;
-  }
-
-  loadJS('https://www.gstatic.com/firebasejs/5.2.0/firebase.js', firebaseLoaded, function() {
-    loadJS('https://www.gstatic.com/firebasejs/5.2.0/firebase-firestore.js', firestoreLoaded, initialise, document.body);
-  }, document.body);
-
+  });
 }
 
-Firestore.prototype.get = function() {
-  return this.database;
-};
-
-Object.defineProperties(Firestore.prototype, {
-  FieldValue: {
-    get: function() {
-      return firebase.firestore.FieldValue;
-    }
-  }
-});
-
-module.exports = {
-  initialise: function(options) {
-    return new Promise(function(resolve, reject) {
-      var db = new Firestore(options, resolve);
+function initialise(options) {
+  return loadJs({
+    'url': 'https://www.gstatic.com/firebasejs/5.5.0/firebase-app.js',
+    'package': 'firebase.app'
+  })
+  .then(function() {
+    return loadJs({
+      'url': 'https://www.gstatic.com/firebasejs/5.5.0/firebase-firestore.js',
+      'package': 'firebase.firestore'
     });
-  },
+  })
+  .then(function() {
+    return createInstance(options);
+  });
+}
+
+
+var EXPORT_OBJECT = {
+  initialise: initialise, // original developer name
+  initialize: initialise, // better for common usage
+
   newTimestamp: function(date) {
     return firebase.firestore.Timestamp.fromDate(date);
   }
 };
+
+module.exports = EXPORT_OBJECT;

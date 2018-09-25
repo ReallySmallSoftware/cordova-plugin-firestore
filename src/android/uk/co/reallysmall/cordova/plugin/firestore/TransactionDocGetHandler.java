@@ -26,7 +26,7 @@ public class TransactionDocGetHandler implements ActionHandler {
             final String doc = args.getString(1);
             final String collectionPath = args.getString(2);
 
-            Log.d(FirestorePlugin.TAG, String.format("Transactional document get for %s", transactionId));
+            FirestoreLog.d(FirestorePlugin.TAG, String.format("Transactional document get for %s", transactionId));
 
             TransactionQueue transactionQueue = firestorePlugin.getTransaction(transactionId);
 
@@ -36,12 +36,12 @@ public class TransactionDocGetHandler implements ActionHandler {
                 callbackContext.sendPluginResult(createPluginResult(transactionQueue.transaction.get(documentRef), false));
 
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing transactional document snapshot", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document snapshot", e);
             callbackContext.error(e.getMessage());
         }
 

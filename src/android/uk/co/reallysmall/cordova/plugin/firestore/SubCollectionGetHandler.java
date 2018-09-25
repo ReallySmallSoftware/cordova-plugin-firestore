@@ -29,7 +29,7 @@ public class SubCollectionGetHandler implements ActionHandler {
             final String docId = args.getString(1);
             final String subCollection = args.getString(2);
 
-            Log.d(FirestorePlugin.TAG, "Getting document from sub collection");
+            FirestoreLog.d(FirestorePlugin.TAG, "Getting document from sub collection");
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath).document(docId).collection(subCollection);
@@ -38,22 +38,22 @@ public class SubCollectionGetHandler implements ActionHandler {
                     @Override
                     public void onSuccess(QuerySnapshot querySnapshot) {
                         callbackContext.sendPluginResult(createPluginResult(querySnapshot, false));
-                        Log.d(FirestorePlugin.TAG, "Successfully got sub collection");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully got sub collection");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error getting sub collection", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error getting sub collection", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing sub collection get in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing sub collection get in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing sub collection get", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing sub collection get", e);
             callbackContext.error(e.getMessage());
         }
 

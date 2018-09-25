@@ -30,7 +30,7 @@ public class DocGetHandler implements ActionHandler {
             final String doc = args.getString(1);
 
 
-            Log.d(FirestorePlugin.TAG, "Listening to document");
+            FirestoreLog.d(FirestorePlugin.TAG, "Listening to document");
 
             try {
                 DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
@@ -39,22 +39,22 @@ public class DocGetHandler implements ActionHandler {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         callbackContext.sendPluginResult(createPluginResult(documentSnapshot, false));
-                        Log.d(FirestorePlugin.TAG, "Successfully got document");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully got document");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error getting document", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error getting document", e);
                         callbackContext.error(e.getMessage());
                     }
                 });
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing document get in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document get in thread", e);
                 callbackContext.error(e.getMessage());
             }
 
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing document snapshot", e);
             callbackContext.error(e.getMessage());
         }
 

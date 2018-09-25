@@ -28,30 +28,31 @@ public class FirestorePlugin extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
 
-        handlers.put("collectionOnSnapshot", new CollectionOnSnapshotHandler(this));
-        handlers.put("collectionUnsubscribe", new CollectionUnsubscribeHandler(this));
-        handlers.put("collectionAdd", new CollectionAddHandler(this));
-        handlers.put("collectionGet", new CollectionGetHandler(this));
-        handlers.put("initialise", new InitialiseHandler(webView.getContext().getApplicationContext(), this));
-        handlers.put("docSet", new DocSetHandler(this));
-        handlers.put("docUpdate", new DocUpdateHandler(this));
-        handlers.put("docOnSnapshot", new DocOnSnapshotHandler(this));
-        handlers.put("docUnsubscribe", new DocUnsubscribeHandler(this));
-        handlers.put("docGet", new DocGetHandler(this));
-        handlers.put("docDelete", new DocDeleteHandler(this));
-        handlers.put("runTransaction", new RunTransactionHandler(this));
-        handlers.put("transactionDocGet", new TransactionDocGetHandler(this));
-        handlers.put("transactionDocUpdate", new TransactionDocUpdateHandler(this));
-        handlers.put("transactionDocSet", new TransactionDocSetHandler(this));
-        handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(this));
-        handlers.put("transactionResolve", new TransactionResolveHandler(this));
-        handlers.put("docOfSubCollectionSet", new DocOfSubCollectionSetHandler(this));
-        handlers.put("docOfSubCollectionGet", new DocOfSubCollectionGetHandler(this));
-        handlers.put("docOfSubCollectionUpdate", new DocOfSubCollectionUpdateHandler(this));
-        handlers.put("docOfSubCollectionDelete", new DocOfSubCollectionDeleteHandler(this));
-        handlers.put("subCollectionGet", new SubCollectionGetHandler(this));
-        
-        Log.d(TAG, "Initializing FirestorePlugin");
+        handlers.put("collectionOnSnapshot", new CollectionOnSnapshotHandler(FirestorePlugin.this));
+        handlers.put("collectionUnsubscribe", new CollectionUnsubscribeHandler(FirestorePlugin.this));
+        handlers.put("collectionAdd", new CollectionAddHandler(FirestorePlugin.this));
+        handlers.put("collectionGet", new CollectionGetHandler(FirestorePlugin.this));
+        handlers.put("initialise", new InitialiseHandler(webView.getContext().getApplicationContext(), FirestorePlugin.this));
+        handlers.put("docSet", new DocSetHandler(FirestorePlugin.this));
+        handlers.put("docUpdate", new DocUpdateHandler(FirestorePlugin.this));
+        handlers.put("docOnSnapshot", new DocOnSnapshotHandler(FirestorePlugin.this));
+        handlers.put("docUnsubscribe", new DocUnsubscribeHandler(FirestorePlugin.this));
+        handlers.put("docGet", new DocGetHandler(FirestorePlugin.this));
+        handlers.put("docDelete", new DocDeleteHandler(FirestorePlugin.this));
+        handlers.put("runTransaction", new RunTransactionHandler(FirestorePlugin.this));
+        handlers.put("transactionDocGet", new TransactionDocGetHandler(FirestorePlugin.this));
+        handlers.put("transactionDocUpdate", new TransactionDocUpdateHandler(FirestorePlugin.this));
+        handlers.put("transactionDocSet", new TransactionDocSetHandler(FirestorePlugin.this));
+        handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(FirestorePlugin.this));
+        handlers.put("transactionResolve", new TransactionResolveHandler(FirestorePlugin.this));
+        handlers.put("docOfSubCollectionSet", new DocOfSubCollectionSetHandler(FirestorePlugin.this));
+        handlers.put("docOfSubCollectionGet", new DocOfSubCollectionGetHandler(FirestorePlugin.this));
+        handlers.put("docOfSubCollectionUpdate", new DocOfSubCollectionUpdateHandler(FirestorePlugin.this));
+        handlers.put("docOfSubCollectionDelete", new DocOfSubCollectionDeleteHandler(FirestorePlugin.this));
+        handlers.put("subCollectionGet", new SubCollectionGetHandler(FirestorePlugin.this));
+        handlers.put("setLogLevel", new setLogLevel());
+
+        FirestoreLog.d(TAG, "Initializing FirestorePlugin");
     }
 
     public FirebaseFirestore getDatabase() {
@@ -63,7 +64,7 @@ public class FirestorePlugin extends CordovaPlugin {
     }
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        Log.d(TAG, action);
+        FirestoreLog.d(TAG, action);
 
         if (handlers.containsKey(action)) {
             return handlers.get(action).handle(args, callbackContext);
@@ -74,7 +75,7 @@ public class FirestorePlugin extends CordovaPlugin {
 
     public void addRegistration(String callbackId, ListenerRegistration listenerRegistration) {
         registrations.put(callbackId, listenerRegistration);
-        Log.d(TAG, "Registered subscriber " + callbackId);
+        FirestoreLog.d(TAG, "Registered subscriber " + callbackId);
 
     }
 
@@ -82,7 +83,7 @@ public class FirestorePlugin extends CordovaPlugin {
         if (registrations.containsKey(callbackId)) {
             registrations.get(callbackId).remove();
             registrations.remove(callbackId);
-            Log.d(TAG, "Unregistered subscriber " + callbackId);
+            FirestoreLog.d(TAG, "Unregistered subscriber " + callbackId);
         }
     }
 
@@ -99,4 +100,15 @@ public class FirestorePlugin extends CordovaPlugin {
     public void removeTransaction(String transactionId) {
         transactions.remove(transactionId);
     }
+
+    private class setLogLevel implements ActionHandler {
+
+        @Override
+        public boolean handle(JSONArray args, CallbackContext callbackContext) throws JSONException {
+            FirestoreLog.setLogLevel(args.getString(0));
+            callbackContext.success();
+            return true;
+        }
+    }
+
 }

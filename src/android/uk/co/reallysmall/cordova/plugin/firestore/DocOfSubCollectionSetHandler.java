@@ -42,7 +42,7 @@ public class DocOfSubCollectionSetHandler implements ActionHandler {
 
                 SetOptions setOptions = DocSetOptions.getSetOptions(options);
 
-                Log.d(FirestorePlugin.TAG, "Setting document of sub collection");
+                FirestoreLog.d(FirestorePlugin.TAG, "Setting document of sub collection");
 
                 DocumentReference documentReference = firestorePlugin.getDatabase().collection(collection).document(docId).collection(subCollection).document(docOfSubCollectionId);
 
@@ -50,14 +50,14 @@ public class DocOfSubCollectionSetHandler implements ActionHandler {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success();
-                        Log.d(FirestorePlugin.TAG, "Successfully written document of sub collection");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully written document of sub collection");
                     }
                 };
 
                 OnFailureListener onFailureListener = new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(FirestorePlugin.TAG, "Error writing document of sub collection", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error writing document of sub collection", e);
                         callbackContext.error(e.getMessage());
                     }
                 };
@@ -68,11 +68,11 @@ public class DocOfSubCollectionSetHandler implements ActionHandler {
                     documentReference.set(JSONHelper.toSettableMap(data), setOptions).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
                 }
             } catch (Exception e) {
-                Log.e(FirestorePlugin.TAG, "Error processing document of sub collection set in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document of sub collection set in thread", e);
                 callbackContext.error(e.getMessage());
             }
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error processing document of sub collection set", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error processing document of sub collection set", e);
             callbackContext.error(e.getMessage());
         }
 

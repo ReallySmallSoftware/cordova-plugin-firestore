@@ -18,6 +18,7 @@ public class InitialiseHandler implements ActionHandler {
 
     public static final String PERSIST = "persist";
     public static final String DATE_PREFIX = "datePrefix";
+    public static final String GEOPOINT_PREFIX = "geopointPrefix";
     public static final String FIELDVALUE_DELETE = "fieldValueDelete";
     public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
     public static final String CONFIG = "config";
@@ -34,22 +35,34 @@ public class InitialiseHandler implements ActionHandler {
 
         try {
 
-            Log.d(FirestorePlugin.TAG, "Initialising Firestore...");
+            FirestoreLog.d(FirestorePlugin.TAG, "Initialising Firestore...");
 
             final JSONObject options = args.getJSONObject(0);
 
             FirebaseFirestore.setLoggingEnabled(true);
             if (options.has(CONFIG)) {
                 JSONObject config = options.getJSONObject(CONFIG);
+                FirebaseOptions.Builder configBuilder = new FirebaseOptions.Builder();
+                if (options.has("applicationId")) {
+                    configBuilder.setApplicationId("applicationId");
+                }
+                if (options.has("gcmSenderID")) {
+                    configBuilder.setGcmSenderId("gcmSenderID");
+                }
+                if (options.has("apiKey")) {
+                    configBuilder.setApiKey("apiKey");
+                }
+                if (options.has("projectID")) {
+                    configBuilder.setProjectId("projectID");
+                }
+                if (options.has("databaseURL")) {
+                    configBuilder.setDatabaseUrl("databaseURL");
+                }
+                if (options.has("storageBucket")) {
+                    configBuilder.setStorageBucket("storageBucket");
+                }
 
-                FirebaseOptions customOptions = new FirebaseOptions.Builder()
-                        .setApplicationId(config.getString("applicationId"))
-                        .setGcmSenderId(config.getString("gcmSenderID"))
-                        .setApiKey(config.getString("apiKey"))
-                        .setProjectId(config.getString("projectID"))
-                        .setDatabaseUrl(config.getString("databaseURL"))
-                        .setStorageBucket(config.getString("storageBucket"))
-                        .build();
+                FirebaseOptions customOptions = configBuilder.build();
 
                 FirebaseApp customApp;
                 try {
@@ -74,6 +87,9 @@ public class InitialiseHandler implements ActionHandler {
             if (options.has(DATE_PREFIX)) {
                 JSONDateWrapper.setDatePrefix(options.getString(DATE_PREFIX));
             }
+            if (options.has(GEOPOINT_PREFIX)) {
+                JSONGeopointWrapper.setGeopointPrefix(options.getString(GEOPOINT_PREFIX));
+            }
 
             if (options.has(FIELDVALUE_DELETE)) {
                 FieldValueHelper.setDeletePrefix(options.getString(FIELDVALUE_DELETE));
@@ -83,16 +99,17 @@ public class InitialiseHandler implements ActionHandler {
                 FieldValueHelper.setServerTimestampPrefix(options.getString(FIELDVALUE_SERVERTIMESTAMP));
             }
 
-            Log.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
+            FirestoreLog.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
 
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(persist)
+                    .setTimestampsInSnapshotsEnabled(true)
                     .build();
             firestorePlugin.getDatabase().setFirestoreSettings(settings);
 
             callbackContext.success();
         } catch (JSONException e) {
-            Log.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
             callbackContext.error(e.getMessage());
         }
 
