@@ -139,6 +139,36 @@ Object.defineProperties(Firestore.prototype, {
 
 function initialise(options) {
   return new Promise(function (resolve, reject) {
+
+    if (options && options.config) {
+      var normalizedOptions = {};
+      normalizedOptions.normalizedOptions = options.config.applicationId || options.config.applicationID;
+      normalizedOptions.apiKey = options.config.apiKey || options.config.apikey;
+      normalizedOptions.clientId = options.config.clientId || options.config.clientID;
+      normalizedOptions.gcmSenderId = options.config.gcmSenderId || options.config.gcmSenderID;
+      normalizedOptions.databaseUrl = options.config.databaseUrl || options.config.databaseURL;
+      normalizedOptions.projectId = options.config.projectId || options.config.projectID;
+      normalizedOptions.storageBucket = options.config.storageBucket;
+      normalizedOptions.authDomain = options.config.authDomain;
+
+      delete options.config;
+      if (cordova.platformId === "android" &&
+          normalizedOptions.applicationId &&
+          normalizedOptions.apiKey) {
+        options.config = normalizedOptions;
+      }
+      if (cordova.platformId === "ios" &&
+          normalizedOptions.googleAppID &&
+          normalizedOptions.gcmSenderId &&
+          normalizedOptions.apiKey) {
+        options.config = normalizedOptions;
+      }
+      if (cordova.platformId === "browser" &&
+          normalizedOptions.projectId &&
+          normalizedOptions.apiKey) {
+        options.config = normalizedOptions;
+      }
+    }
     resolve(new Firestore(options));
   });
 }

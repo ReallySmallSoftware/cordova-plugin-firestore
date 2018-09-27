@@ -46,17 +46,19 @@ public class InitialiseHandler implements ActionHandler {
                 if (options.has("applicationId")) {
                     configBuilder.setApplicationId("applicationId");
                 }
-                if (options.has("gcmSenderID")) {
-                    configBuilder.setGcmSenderId("gcmSenderID");
+                if (options.has("gcmSenderId")) {
+                    configBuilder.setGcmSenderId("gcmSenderId");
                 }
                 if (options.has("apiKey")) {
                     configBuilder.setApiKey("apiKey");
                 }
                 if (options.has("projectID")) {
                     configBuilder.setProjectId("projectID");
+                } else if (options.has("projectId")) {
+                    configBuilder.setProjectId("projectId");
                 }
-                if (options.has("databaseURL")) {
-                    configBuilder.setDatabaseUrl("databaseURL");
+                if (options.has("databaseUrl")) {
+                    configBuilder.setDatabaseUrl("databaseUrl");
                 }
                 if (options.has("storageBucket")) {
                     configBuilder.setStorageBucket("storageBucket");
@@ -109,7 +111,7 @@ public class InitialiseHandler implements ActionHandler {
 
             callbackContext.success();
         } catch (JSONException e) {
-            FirestoreLog.e(FirestorePlugin.TAG, "Error initialising Forestore", e);
+            FirestoreLog.e(FirestorePlugin.TAG, "Error initialising Firestore", e);
             callbackContext.error(e.getMessage());
         }
 
