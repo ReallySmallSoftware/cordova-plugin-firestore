@@ -2,6 +2,7 @@
 
 ## 1.3.1
 - Organize file structure.
+- Normalize initialize options.
 
 ## 1.3.0
 - Merge multi-project config changes

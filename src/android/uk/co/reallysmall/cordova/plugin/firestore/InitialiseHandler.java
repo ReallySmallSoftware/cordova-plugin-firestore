@@ -52,9 +52,7 @@ public class InitialiseHandler implements ActionHandler {
                 if (options.has("apiKey")) {
                     configBuilder.setApiKey("apiKey");
                 }
-                if (options.has("projectID")) {
-                    configBuilder.setProjectId("projectID");
-                } else if (options.has("projectId")) {
+                if (options.has("projectId")) {
                     configBuilder.setProjectId("projectId");
                 }
                 if (options.has("databaseUrl")) {

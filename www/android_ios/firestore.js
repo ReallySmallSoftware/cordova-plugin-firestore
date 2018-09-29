@@ -150,6 +150,7 @@ function initialise(options) {
       normalizedOptions.projectId = options.config.projectId || options.config.projectID;
       normalizedOptions.storageBucket = options.config.storageBucket;
       normalizedOptions.authDomain = options.config.authDomain;
+      normalizedOptions.googleAppId = options.config.googleAppId || options.config.googleAppID;
 
       delete options.config;
       if (cordova.platformId === "android" &&
@@ -158,7 +159,7 @@ function initialise(options) {
         options.config = normalizedOptions;
       }
       if (cordova.platformId === "ios" &&
-          normalizedOptions.googleAppID &&
+          normalizedOptions.googleAppId &&
           normalizedOptions.gcmSenderId &&
           normalizedOptions.apiKey) {
         options.config = normalizedOptions;
