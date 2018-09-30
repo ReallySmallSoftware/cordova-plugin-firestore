@@ -44,6 +44,9 @@ function Firestore(options) {
   if (FirestoreOptions.fieldValueDelete === undefined) {
     this.fieldValueDelete = "__DELETE";
   }
+  if (FirestoreOptions.geopointPrefix === undefined) {
+    this.geopointPrefix = "__GEOPOINT";
+  }
   if (FirestoreOptions.fieldValueServerTimestamp === undefined) {
     this.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }
