@@ -51,7 +51,7 @@ function Firestore(options) {
     this.persist = true;
   }
   if (FirestoreOptions.timestampsInSnapshots === undefined) {
-    this.timestampsInSnapshots = false;
+    this.timestampsInSnapshots = true;
   }
 
   exec(function () { }, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
