@@ -4,7 +4,7 @@ var FirestoreOptions = {
   "fieldValueDelete": "__DELETE",
   "fieldValueServerTimestamp": "__SERVERTIMESTAMP",
   "persist": true,
-  "timestampsInSnapshots": true
+  "timestampsInSnapshots": false
 };
 
 module.exports = FirestoreOptions;

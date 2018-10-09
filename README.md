@@ -14,48 +14,88 @@ This plugin supports the following platforms:
 - Browser
 
 # Installation
+## Install the plugin
 
-  - **Step1** Install this plugin
+```bash
+cordova plugin add cordova-plugin-firestore --save
+```
 
-  ```bash
-  $> cordova plugin add cordova-plugin-firestore --save
-  ```
+or
 
-  - **Step2** Download `google-services.json`, then put it at `(your_project_dir)/google-services.json`
-    Hint: [Get a config file for your Android App](https://support.google.com/firebase/answer/7015592#android)
+```bash
+phonegap plugin add cordova-plugin-firestore
+```
 
-    Then add the below three lines into `(your_project_dir)/config.xml` file.
+### Optional installation variables for Android
 
-    ```xml
-    <platform name="android">
-        <resource-file src="google-services.json" target="app/google-services.json" />
-    </platform>
-    ```
+#### ANDROID_FIREBASE_CORE_VERSION
+Version of `com.google.firebase:firebase-core`. This defaults to `16.0.3`.
 
-  - **Step3** Download `GoogleService-Info.plist`, then put it at `(your_project_dir)/GoogleService-Info.plist`
-    Hint: [Get a config file for your iOS App](https://support.google.com/firebase/answer/7015592#ios)
+#### ANDROID_FIREBASE_FIRESTORE_VERSION
+Version of `com.google.firebase:firebase-firestore`. This defaults to `17.1.0`.
 
-    Then add the below three lines into `(your_project_dir)/config.xml` file.
+You can find the latest versions of these [here](https://firebase.google.com/docs/android/setup#available_libraries).
 
-    ```xml
-    <platform name="ios">
-        <resource-file src="GoogleService-Info.plist" />
-    </platform>
-    ```
+## Android specific installation
+Download `google-services.json` to `(your_project_dir)/google-services.json`
 
-  - **Step4** Make sure your Firestore rule
+Hint: [Get a config file for your Android App](https://support.google.com/firebase/answer/7015592#android)
 
-    ```
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /{document=**} {
-          allow read, write : if request.auth != null;  // This is an example.
-        }
-      }
+You must ensure that `google-services.json` is put in the correct location. This can be achieved using the following in your `config.xml`:
+
+```xml
+<platform name="android">
+    <resource-file src="google-services.json" target="google-services.json" />
+</platform>
+```
+
+### Dependencies
+#### cordova-support-google-services
+
+In order to ensure Firebase initialises correctly on Android this plugin can be used. This is not automatically added as a dependency to allow for the configuration it performs to be done manually if desired.
+
+## iOS specific installation
+
+Download `GoogleService-Info.plist` to `(your_project_dir)/GoogleService-Info.plist`
+
+Hint: [Get a config file for your iOS App](https://support.google.com/firebase/answer/7015592#ios)
+
+You must ensure that `GoogleService-Info.plist` is put in the correct location. This can be done as follows:
+
+```xml
+<platform name="ios">
+    <resource-file src="GoogleService-Info.plist" />
+</platform>
+```
+
+#### Keychain Sharing Capability
+If using multiple Firebase plugins it may be necessary to enable this.
+
+## Firestore configuration
+It is good practice to make sure your Firestore database is only accessible for authorised users, at least for write operations. It is recommended you take time to understand [Firestore rules](https://firebase.google.com/docs/firestore/security/get-started).
+
+An example that only allows access for authorised users is shown below:
+
+```json
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write : if request.auth != null;
     }
-    ```
+  }
+}
+```
 
-  - **Step5** Write HelloWorld code
+Authenticating users is beyond the scope of this plugin, but the `cordova-plugin-firebaseui-auth` is one such plugin you can use to achieve this which will work alongside this plugin.
+
+## Dependencies
+### Promises
+This plugin uses Promises. A `Promise` polyfill is included as part of this project with thanks to Forbes Lindesay.
+
+
+# Example
+A simple example is shown below which sets up the necessary options, initialises the database and then adds a document to a `users` collection:
+
     ```js
     var options = {
       "datePrefix": '__DATE:',
@@ -91,22 +131,8 @@ This plugin supports the following platforms:
     });
     ```
 
-  - **Step6** Let's run it!
-    ```
-    $> cordova platform add browser // android, ios
-
-    $> cordova run browser
-    ```
-
-## Install optional variables
-
-  - `Android` **ANDROID_FIREBASE_CORE_VERSION = (16.0.3)**<br>
-    The `com.google.firebase:firebase-core` version.
-    You can find the latest version at [here](https://firebase.google.com/docs/android/setup#available_libraries).
-
-  - `Android` **ANDROID_FIREBASE_FIRESTORE_VERSION = (17.1.0)**<br>
-    The `com.google.firebase:firebase-firestore` version.
-    You can find the latest version at [here](https://firebase.google.com/docs/android/setup#available_libraries).
+## options.config
+In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
 
 # What is supported?
 
@@ -163,12 +189,7 @@ This plugin supports the following platforms:
 - FieldValue.serverTimestamp()
 
 ## GeoPoint
-```
-var point = new Firestore.GeoPoint();
-```
-
-## options.config
-In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
+- Firestore.GeoPoint()
 
 ## Dates
 Because data is transferred to the client as JSON there is extra logic in place to handle the conversion of dates for some operations.
@@ -177,7 +198,7 @@ When initialising the plugin you can set up a prefix that is applied to a string
 
 Therefore, when a date field is retrieved from the database by the native code it will be transferred in the JSON looking similar to the following:
 
-```
+```json
 {
     "dateField" : "__DATE:123456789"
 }
@@ -187,10 +208,37 @@ The number is seconds since epoch.
 
 The client will receive the field as a Javascript Date.
 
-This conversion also happens when specify a field in a where condition.
+This conversion also happens when specifying a field in a where condition.
 
 ### timestampsInSnapshots
-By default this option is set to `true`.
+By default this option is set to `false` to mirror the current default. [This explains the setting](https://firebase.google.com/docs/reference/js/firebase.firestore.Settings).
+
+Not setting this to `true` will result in the following message when running in the browser:
+
+```
+The behavior for Date objects stored in Firestore is going to change
+AND YOUR APP MAY BREAK.
+To hide this warning and ensure your app does not break, you need to add the
+following code to your app before calling any other Cloud Firestore methods:
+
+  const firestore = firebase.firestore();
+  const settings = {/* your settings... */ timestampsInSnapshots: true};
+  firestore.settings(settings);
+
+With this change, timestamps stored in Cloud Firestore will be read back as
+Firebase Timestamp objects instead of as system Date objects. So you will also
+need to update code expecting a Date to instead expect a Timestamp. For example:
+
+  // Old:
+  const date = snapshot.get('created_at');
+  // New:
+  const timestamp = snapshot.get('created_at');
+  const date = timestamp.toDate();
+
+Please audit all existing usages of Date when you enable the new behavior. In a
+future release, the behavior will change to the new behavior, so if you do not
+follow these steps, YOUR APP MAY BREAK.
+```
 
 ## FieldValue constants
 Similar to the situation with dates, there are special values used for `FieldValue` values:

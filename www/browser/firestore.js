@@ -63,7 +63,7 @@ function createInstance(options) {
       firebase.initializeApp(options.config);
     }
 
-    // Default true, because firebase outputs error message
+    // Default false, to maintain backwards compatability
     var timestampsInSnapshots = 'timestampsInSnapshots' in options ?
       options.timestampsInSnapshots : true;
 
