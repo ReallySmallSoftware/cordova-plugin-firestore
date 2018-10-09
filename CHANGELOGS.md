@@ -1,5 +1,9 @@
 # History
 
+## 1.3.2
+- Refactor README
+- Reset some breaking changes
+
 ## 1.3.1
 - Organize file structure.
 - Normalize initialize options.

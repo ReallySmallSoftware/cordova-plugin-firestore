@@ -76,7 +76,7 @@ It is good practice to make sure your Firestore database is only accessible for 
 
 An example that only allows access for authorised users is shown below:
 
-```json
+```
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
@@ -96,40 +96,40 @@ This plugin uses Promises. A `Promise` polyfill is included as part of this proj
 # Example
 A simple example is shown below which sets up the necessary options, initialises the database and then adds a document to a `users` collection:
 
-    ```js
-    var options = {
-      "datePrefix": '__DATE:',
-      "fieldValueDelete": "__DELETE",
-      "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
-      "persist": true,
-      "config" : {}
-    };
+```js
+var options = {
+  "datePrefix": '__DATE:',
+  "fieldValueDelete": "__DELETE",
+  "fieldValueServerTimestamp" : "__SERVERTIMESTAMP",
+  "persist": true,
+  "config" : {}
+};
 
-    if (cordova.platformId === "browser") {
+if (cordova.platformId === "browser") {
 
-      options.config = {
-        apiKey: "(your api key)",
-        authDomain: "localhost",
-        projectId: "(your project id)"
-      };
-    }
+  options.config = {
+    apiKey: "(your api key)",
+    authDomain: "localhost",
+    projectId: "(your project id)"
+  };
+}
 
-    Firestore.initialise(options).then(function(db) {
-      // Add a second document with a generated ID.
-      db.collection("users").add({
-          first: "Alan",
-          middle: "Mathison",
-          last: "Turing",
-          born: 1912
-      })
-      .then(function(docRef) {
-          console.log("Document written with ID: ", docRef.id);
-      })
-      .catch(function(error) {
-          console.error("Error adding document: ", error);
-      });
-    });
-    ```
+Firestore.initialise(options).then(function(db) {
+  // Add a second document with a generated ID.
+  db.collection("users").add({
+      first: "Alan",
+      middle: "Mathison",
+      last: "Turing",
+      born: 1912
+  })
+  .then(function(docRef) {
+      console.log("Document written with ID: ", docRef.id);
+  })
+  .catch(function(error) {
+      console.error("Error adding document: ", error);
+  });
+});
+```
 
 ## options.config
 In the above example this is being used for the browser version, but it can also be used for Android and iOS to specify different databases than the default in the `google-services.json` and `GoogleService-Info.plist` files.
@@ -252,4 +252,4 @@ These values can be changed when initialisation is performed.
 I have learnt a number of things whilst implementing this:
 - The documentation states that the database cannot be initialised in a seperate thread when using persistence. In my experience this should say it cannot be *used* in multiple threads.
 - When used on Android ensure that at least `com.google.gms:google-services:3.1.1` is used in build dependencies. Earlier versions did not work for me.
-- Yes, I did spell initialise() with an 's' - The original plugin developer @ReallySmallSoftware is from the UK
+- Yes, I did spell initialise() with an 's' - Original plugin developer @ReallySmallSoftware is from the UK
