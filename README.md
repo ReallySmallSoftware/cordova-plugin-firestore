@@ -90,7 +90,7 @@ Authenticating users is beyond the scope of this plugin, but the `cordova-plugin
 
 ## Dependencies
 ### Promises
-This plugin uses Promises. A `Promise` polyfill is included as part of this project with thanks to Forbes Lindesay.
+This plugin uses Promises. If you want to use this with Android 4.4 then you will need to include a `Promise` polyfill.
 
 
 # Example

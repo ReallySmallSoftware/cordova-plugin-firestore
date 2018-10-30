@@ -1,9 +1,10 @@
+/* global Promise: false */
 
-var PLUGIN_NAME = 'Firestore',
-  exec = require('cordova/exec'),
-  Query = require("./Query"),
-  DocumentReference = require("./DocumentReference"),
-  __wrap = require("./__wrap");
+var PLUGIN_NAME = 'Firestore';
+var exec = require('cordova/exec');
+var Query = require("./Query");
+var DocumentReference = require("./DocumentReference");
+var __wrap = require("./__wrap");
 
 function CollectionReference(path, id) {
   this._path = path;

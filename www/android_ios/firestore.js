@@ -2,16 +2,12 @@
 
 var exec = require('cordova/exec');
 var utils = require("cordova/utils");
-var CollectionReference = require("./CollectionReference"),
-  FirestoreTimestamp = require("./FirestoreTimestamp"),
-  Transaction = require("./Transaction"),
-  __wrap = require("./__wrap"),
-  GeoPoint = require("./GeoPoint"),
-  FirestoreOptions = require("./FirestoreOptions");
-
-if (!window.Promise) {
-  window.Promise = require('./Promise');
-}
+var CollectionReference = require("./CollectionReference");
+var FirestoreTimestamp = require("./FirestoreTimestamp");
+var Transaction = require("./Transaction");
+var __wrap = require("./__wrap");
+var GeoPoint = require("./GeoPoint");
+var FirestoreOptions = require("./FirestoreOptions");
 
 var PLUGIN_NAME = 'Firestore';
 
@@ -23,7 +19,6 @@ if (!String.prototype.startsWith) {
   };
 }
 
-
 var FieldValue = {
   delete: function () {
     return FirestoreOptions.fieldValueDelete;
@@ -32,8 +27,6 @@ var FieldValue = {
     return FirestoreOptions.fieldValueServerTimestamp;
   }
 };
-
-
 
 function Firestore(options) {
   FirestoreOptions = options;
@@ -54,7 +47,7 @@ function Firestore(options) {
     this.persist = true;
   }
   if (FirestoreOptions.timestampsInSnapshots === undefined) {
-    this.timestampsInSnapshots = true;
+    this.timestampsInSnapshots = false;
   }
 
   exec(function () { }, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
@@ -125,27 +118,20 @@ Object.defineProperties(Firestore.prototype, {
     get: function () {
       return FieldValue;
     }
+  },
+  GeoPoint: {
+    get: function () {
+      return GeoPoint;
+    }
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 function initialise(options) {
   return new Promise(function (resolve, reject) {
 
     if (options && options.config) {
       var normalizedOptions = {};
-      normalizedOptions.normalizedOptions = options.config.applicationId || options.config.applicationID;
+      normalizedOptions.applicationId = options.config.applicationId || options.config.applicationID;
       normalizedOptions.apiKey = options.config.apiKey || options.config.apikey;
       normalizedOptions.clientId = options.config.clientId || options.config.clientID;
       normalizedOptions.gcmSenderId = options.config.gcmSenderId || options.config.gcmSenderID;
@@ -156,22 +142,7 @@ function initialise(options) {
       normalizedOptions.googleAppId = options.config.googleAppId || options.config.googleAppID;
 
       delete options.config;
-      if (cordova.platformId === "android" &&
-          normalizedOptions.applicationId &&
-          normalizedOptions.apiKey) {
-        options.config = normalizedOptions;
-      }
-      if (cordova.platformId === "ios" &&
-          normalizedOptions.googleAppId &&
-          normalizedOptions.gcmSenderId &&
-          normalizedOptions.apiKey) {
-        options.config = normalizedOptions;
-      }
-      if (cordova.platformId === "browser" &&
-          normalizedOptions.projectId &&
-          normalizedOptions.apiKey) {
-        options.config = normalizedOptions;
-      }
+      options.config = normalizedOptions;
     }
     resolve(new Firestore(options));
   });
@@ -191,8 +162,6 @@ module.exports = {
       throw new Error("Unexpected error in transaction " + error);
     });
   },
-
-  GeoPoint: GeoPoint,
 
   newTimestamp: function(date) {
     return new FirestoreTimestamp(date.getTime());

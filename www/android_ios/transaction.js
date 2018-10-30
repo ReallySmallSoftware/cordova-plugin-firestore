@@ -1,7 +1,9 @@
-var PLUGIN_NAME = 'Firestore',
-  exec = require('cordova/exec'),
-  DocumentSnapshot = require("./DocumentSnapshot"),
-  __wrap = require('./__wrap');
+/* global Promise: false */
+
+var PLUGIN_NAME = 'Firestore';
+var exec = require('cordova/exec');
+var DocumentSnapshot = require("./DocumentSnapshot");
+var __wrap = require('./__wrap');
 
 function Transaction(id) {
   this._id = id;

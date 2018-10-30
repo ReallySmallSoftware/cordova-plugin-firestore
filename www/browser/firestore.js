@@ -1,10 +1,5 @@
  /* global firebase: false, Promise: false */
 
-if (!window.Promise) {
-  window.Promise = require('cordova-plugin-firestore.Promise');
-}
-
-
 var isInitialized = function(packageName) {
   var parent = window;
   var steps = packageName.split(/\./);
@@ -42,49 +37,67 @@ var loadJs = function(options) {
   });
 };
 
+function Firestore(options, resolve, reject) {
 
-function createInstance(options) {
-  Object.defineProperty(EXPORT_OBJECT, 'GeoPoint', {
-    value: firebase.firestore.GeoPoint,
-    writable: false
+  var self = this;
+
+  var initialised = false;
+
+  for (var i = 0;i < firebase.apps.length;i++) {
+    if (firebase.apps[i].options.projectId === options.config.projectId) {
+      initialised = true;
+    }
+  }
+
+  if (!initialised) {
+    firebase.initializeApp(options.config);
+  }
+
+  // Default false, to maintain backwards compatability
+  var timestampsInSnapshots = 'timestampsInSnapshots' in options ?
+    options.timestampsInSnapshots : true;
+
+  var firestore = firebase.firestore();
+  firestore.settings({
+    'timestampsInSnapshots': timestampsInSnapshots
   });
 
+  if (options.persist) {
+    firestore
+      .enablePersistence({
+        experimentalTabSynchronization: true
+      })
+      .then(function() {
+        self.database = firestore;
+        resolve(self);
+      })
+      .catch(reject);
+  } else {
+    self.database = firestore;
+    resolve(self);
+  }
+}
+
+Firestore.prototype.get = function() {
+  return this.database;
+};
+
+Object.defineProperties(Firestore.prototype, {
+  FieldValue: {
+    get: function() {
+      return firebase.firestore.FieldValue;
+    }
+  },
+  GeoPoint: {
+    get: function() {
+      return firebase.firestore.GeoPoint;
+    }
+  }
+});
+
+function createInstance(options) {
   return new Promise(function(resolve, reject) {
-
-    var initialised = false;
-
-    for (var i = 0;i < firebase.apps.length;i++) {
-      if (firebase.apps[i].options.projectId === options.config.projectId) {
-        initialised = true;
-      }
-    }
-
-    if (!initialised) {
-      firebase.initializeApp(options.config);
-    }
-
-    // Default false, to maintain backwards compatability
-    var timestampsInSnapshots = 'timestampsInSnapshots' in options ?
-      options.timestampsInSnapshots : true;
-
-    var firestore = firebase.firestore();
-    firestore.settings({
-      'timestampsInSnapshots': timestampsInSnapshots
-    });
-
-    if (options.persist) {
-      firestore
-        .enablePersistence({
-          experimentalTabSynchronization: true
-        })
-        .then(function() {
-          resolve(firestore);
-        })
-        .catch(reject);
-    } else {
-      resolve(firestore);
-    }
-
+    var db = new Firestore(options, resolve, reject);
   });
 }
 
@@ -104,8 +117,7 @@ function initialise(options) {
   });
 }
 
-
-var EXPORT_OBJECT = {
+module.exports = {
   initialise: initialise, // original developer name
   initialize: initialise, // better for common usage
 
@@ -113,5 +125,3 @@ var EXPORT_OBJECT = {
     return firebase.firestore.Timestamp.fromDate(date);
   }
 };
-
-module.exports = EXPORT_OBJECT;

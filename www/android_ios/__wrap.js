@@ -1,7 +1,7 @@
 
 
-var FirestoreOptions = require('./FirestoreOptions'),
-  GeoPoint = require('./GeoPoint');
+var FirestoreOptions = require('./FirestoreOptions');
+var GeoPoint = require('./GeoPoint');
 
 function __wrap(data) {
 

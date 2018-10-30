@@ -299,7 +299,10 @@
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
     }
 
-    [settings setTimestampsInSnapshotsEnabled:YES];
+    if (options[@"timestampsInSnapshots"] != NULL && (int)options[@"timestampsInSnapshots"] == true) {
+        [settings setTimestampsInSnapshotsEnabled:YES];
+        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore timestampsInSnapshots to true");
+    }
 
     NSString *datePrefix = options[@"datePrefix"];
 

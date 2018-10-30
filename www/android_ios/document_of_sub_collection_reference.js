@@ -1,6 +1,8 @@
-var PLUGIN_NAME = 'Firestore',
-  exec = require('cordova/exec'),
-  __wrap = require('./__wrap');
+/* global Promise: false, DocumentSnapshot: false */
+
+var PLUGIN_NAME = 'Firestore';
+var exec = require('cordova/exec');
+var __wrap = require('./__wrap');
 
 function DocumentOfSubCollectionReference(subCollectionReference, id) {
   this._id = id;

@@ -1,3 +1,5 @@
+/* global Promise: false, FirestoreOptions: false, FirestoreTimestamp: false */
+
 function DocumentSnapshot(data) {
   this._data = data;
 

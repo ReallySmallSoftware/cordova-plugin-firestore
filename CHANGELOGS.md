@@ -1,8 +1,8 @@
 # History
-
 ## 1.3.2
 - Refactor README
-- Reset some breaking changes
+- Reset some significant breaking changes
+- Make sure jshint task passes
 
 ## 1.3.1
 - Organize file structure.

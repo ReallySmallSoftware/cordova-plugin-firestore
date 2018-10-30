@@ -6,9 +6,6 @@
   <license>MIT</license>
   <keywords>database, nosql, realtime, cloud</keywords>
 
-  <js-module name="Promise" src="www/Promise.js" />
-  <asset src="www/promise-7.0.4.min.js.map" target="promise-7.0.4.min.js.map" />
-
   <engines>
     <engine name="cordova" version=">=7.0.0" />
     <engine name="cordova-android" version=">=5.0.0" />

@@ -1,8 +1,12 @@
-var PLUGIN_NAME = 'Firestore',
-  exec = require('cordova/exec'),
-  QuerySnapshot = require("./QuerySnapshot"),
-  __wrap = require('./__wrap');
+/* global Promise: false */
 
+var PLUGIN_NAME = 'Firestore';
+var exec = require('cordova/exec');
+var QuerySnapshot = require("./QuerySnapshot");
+var __wrap = require('./__wrap');
+
+var utils = require("cordova/utils");
+  
 function Query(ref, queryType, value) {
   this._ref = ref;
   this._ref._queries.push({
