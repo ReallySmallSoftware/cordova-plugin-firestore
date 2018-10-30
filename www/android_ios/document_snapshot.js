@@ -1,6 +1,7 @@
 /* global Promise: false, Firestore: false, FirestoreTimestamp: false */
 
 var FirestoreTimestamp = require("./FirestoreTimestamp");
+var GeoPoint = require("./GeoPoint");
 
 function DocumentSnapshot(data) {
   this._data = data;
@@ -42,7 +43,17 @@ DocumentSnapshot.prototype = {
         } else {
           data[key] = new FirestoreTimestamp(parseInt(timestamp), 0);
         }
+      } else if (Object.prototype.toString.call(data[key]) === '[object String]' &&
+        data[key].startsWith(Firestore.options().geopointPrefix)) {
+        var length = data[key].length;
+        var prefixLength = Firestore.options().geopointPrefix.length;
 
+        var geopoint = data[key].substr(prefixLength, length - prefixLength);
+
+        if (geopoint.includes("-")) {
+          var geopointParts = geopoint.split("-");
+          data[key] = new GeoPoint(parseFloat(geopointParts[0]), parseFloat(geopointParts[1]));
+        }  
       } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
         data[key] = this._parse(data[key]);
       }

@@ -65,3 +65,5 @@ Transaction.prototype = {
     return this;
   }
 };
+
+module.exports = Transaction;

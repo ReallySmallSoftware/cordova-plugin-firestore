@@ -1,21 +1,23 @@
 function GeoPoint(latitude, longitude) {
+  this._lat = latitude;
+  this._long = longitude;
+
   Object.defineProperty(this, 'latitude', {
-    value: latitude,
-    writable: false
+    get: function() {
+      return this._lat;
+    }
   });
   Object.defineProperty(this, 'longitude', {
-    value: longitude,
-    writable: false
+    get: function() {
+      return this._long;
+    }
   });
 }
 
 GeoPoint.prototype = {
   isEqual: function (other) {
-    return other.latitude === this.latitude &&
-      other.longitude === this.longitude;
-  },
-  toString: function() {
-    return JSON.stringify({ _lat: this.latitude, _long: this.longitude});
+    return other._lat === this._lat &&
+      other._long === this._long;
   }
 };
 
