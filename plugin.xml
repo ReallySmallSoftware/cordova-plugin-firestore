@@ -46,12 +46,11 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.3"/>
-    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="17.1.0"/>
+    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.4"/>
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="17.1.1"/>
     <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
-    <framework src="org.json:json:20171018"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>
 
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/ActionHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
