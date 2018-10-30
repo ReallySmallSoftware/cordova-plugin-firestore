@@ -3,6 +3,7 @@
 - Refactor README
 - Reset some significant breaking changes
 - Make sure jshint task passes
+- Implement Geopoint and Timestamp
 
 ## 1.3.1
 - Organize file structure.

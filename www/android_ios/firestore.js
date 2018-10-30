@@ -7,11 +7,12 @@ var FirestoreTimestamp = require("./FirestoreTimestamp");
 var Transaction = require("./Transaction");
 var __wrap = require("./__wrap");
 var GeoPoint = require("./GeoPoint");
-var FirestoreOptions = require("./FirestoreOptions");
 
 var PLUGIN_NAME = 'Firestore';
 
 var __transactionList = {};
+
+var __firestoreOptions = {};
 
 if (!String.prototype.startsWith) {
   String.prototype.startsWith = function (search, pos) {
@@ -21,36 +22,40 @@ if (!String.prototype.startsWith) {
 
 var FieldValue = {
   delete: function () {
-    return FirestoreOptions.fieldValueDelete;
+    return __firestoreOptions.fieldValueDelete;
   },
   serverTimestamp: function () {
-    return FirestoreOptions.fieldValueServerTimestamp;
+    return __firestoreOptions.fieldValueServerTimestamp;
   }
 };
 
 function Firestore(options) {
-  FirestoreOptions = options;
 
-  if (FirestoreOptions.datePrefix === undefined) {
-    this.datePrefix = "__DATE:";
+  if (options.datePrefix === undefined) {
+    options.datePrefix = "__DATE:";
   }
-  if (FirestoreOptions.fieldValueDelete === undefined) {
-    this.fieldValueDelete = "__DELETE";
+  if (options.timestampPrefix === undefined) {
+    options.timestampPrefix = "__TIMESTAMP:";
   }
-  if (FirestoreOptions.geopointPrefix === undefined) {
-    this.geopointPrefix = "__GEOPOINT";
+  if (options.fieldValueDelete === undefined) {
+    options.fieldValueDelete = "__DELETE";
   }
-  if (FirestoreOptions.fieldValueServerTimestamp === undefined) {
-    this.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
+  if (options.geopointPrefix === undefined) {
+    options.geopointPrefix = "__GEOPOINT:";
   }
-  if (FirestoreOptions.persist === undefined) {
-    this.persist = true;
+  if (options.fieldValueServerTimestamp === undefined) {
+    options.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }
-  if (FirestoreOptions.timestampsInSnapshots === undefined) {
-    this.timestampsInSnapshots = false;
+  if (options.persist === undefined) {
+    options.persist = true;
+  }
+  if (options.timestampsInSnapshots === undefined) {
+    options.timestampsInSnapshots = false;
   }
 
-  exec(function () { }, null, PLUGIN_NAME, 'initialise', [FirestoreOptions]);
+  __firestoreOptions = options;
+
+  exec(function () { }, null, PLUGIN_NAME, 'initialise', [__firestoreOptions]);
 }
 
 Firestore.prototype = {
@@ -164,6 +169,10 @@ module.exports = {
   },
 
   newTimestamp: function(date) {
-    return new FirestoreTimestamp(date.getTime());
+    return new FirestoreTimestamp(date.getTime() / 1000, date.getMilliseconds() * 1000);
+  },
+
+  options: function() {
+    return __firestoreOptions;
   }
 };

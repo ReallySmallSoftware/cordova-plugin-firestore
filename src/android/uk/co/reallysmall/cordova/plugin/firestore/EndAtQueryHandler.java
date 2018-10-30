@@ -8,6 +8,8 @@ public class EndAtQueryHandler implements QueryHandler {
 
         if (JSONDateWrapper.isWrappedDate(endAt)) {
             endAt = JSONDateWrapper.unwrapDate(endAt);
+        } else if (JSONTimestampWrapper.isWrappedTimestamp(endAt)) {
+            endAt = JSONTimestampWrapper.unwrapTimestamp(endAt);
         } else if (JSONGeopointWrapper.isWrappedGeoPoint(endAt)) {
             endAt = JSONGeopointWrapper.unwrapGeoPoint(endAt);
         }

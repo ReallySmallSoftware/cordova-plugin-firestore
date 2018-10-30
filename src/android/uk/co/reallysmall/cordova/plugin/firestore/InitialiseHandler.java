@@ -18,9 +18,11 @@ public class InitialiseHandler implements ActionHandler {
 
     public static final String PERSIST = "persist";
     public static final String DATE_PREFIX = "datePrefix";
+    public static final String TIMESTAMP_PREFIX = "timestampPrefix";
     public static final String GEOPOINT_PREFIX = "geopointPrefix";
     public static final String FIELDVALUE_DELETE = "fieldValueDelete";
     public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
+    public static final String TIMESTAMPSINSNAPSHOTS = "timestampsInSnapshots";
     public static final String CONFIG = "config";
     private FirestorePlugin firestorePlugin;
     private Context context;
@@ -87,6 +89,11 @@ public class InitialiseHandler implements ActionHandler {
             if (options.has(DATE_PREFIX)) {
                 JSONDateWrapper.setDatePrefix(options.getString(DATE_PREFIX));
             }
+
+            if (options.has(TIMESTAMP_PREFIX)) {
+                JSONTimestampWrapper.setTimestampPrefix(options.getString(TIMESTAMP_PREFIX));
+            }
+
             if (options.has(GEOPOINT_PREFIX)) {
                 JSONGeopointWrapper.setGeopointPrefix(options.getString(GEOPOINT_PREFIX));
             }
@@ -101,9 +108,15 @@ public class InitialiseHandler implements ActionHandler {
 
             FirestoreLog.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
 
+            boolean timestampsInSnapshots = false;
+
+            if (options.has(TIMESTAMPSINSNAPSHOTS)) {
+                timestampsInSnapshots = options.getBoolean(TIMESTAMPSINSNAPSHOTS);
+            }
+
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(persist)
-                    .setTimestampsInSnapshotsEnabled(true)
+                    .setTimestampsInSnapshotsEnabled(timestampsInSnapshots)
                     .build();
             firestorePlugin.getDatabase().setFirestoreSettings(settings);
 

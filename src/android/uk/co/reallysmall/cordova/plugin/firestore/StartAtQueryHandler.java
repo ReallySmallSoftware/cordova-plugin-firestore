@@ -8,6 +8,8 @@ public class StartAtQueryHandler implements QueryHandler {
 
         if (JSONDateWrapper.isWrappedDate(startAt)) {
             startAt = JSONDateWrapper.unwrapDate(startAt);
+        } else if (JSONTimestampWrapper.isWrappedTimestamp(startAt)) {
+            startAt = JSONTimestampWrapper.unwrapTimestamp(startAt);
         } else if (JSONGeopointWrapper.isWrappedGeoPoint(startAt)) {
             startAt = JSONGeopointWrapper.unwrapGeoPoint(startAt);
         }

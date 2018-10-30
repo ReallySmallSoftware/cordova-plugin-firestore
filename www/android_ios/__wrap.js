@@ -1,16 +1,15 @@
 
 
-var FirestoreOptions = require('./FirestoreOptions');
 var GeoPoint = require('./GeoPoint');
 
 function __wrap(data) {
 
   if (data instanceof GeoPoint) {
-    return FirestoreOptions.geopointPrefix + data.latitude + "," + data.longitude;
+    return Firestore.options().geopointPrefix + data.latitude + "," + data.longitude;
   }
 
   if (Object.prototype.toString.call(data) === '[object Date]') {
-    return FirestoreOptions.datePrefix + data.getTime();
+    return Firestore.options().datePrefix + data.getTime();
   }
 
   if (Object.prototype.toString.call(data) !== '[object Object]') {
@@ -22,9 +21,15 @@ function __wrap(data) {
     var key = keys[i];
 
     if (data[key] instanceof GeoPoint) {
-      data[key] = FirestoreOptions.geopointPrefix + data[key].latitude + "," + data[key].longitude;
+      data[key] = Firestore.options().geopointPrefix + data[key].latitude + "," + data[key].longitude;
     } else if (Object.prototype.toString.call(data[key]) === '[object Date]') {
-      data[key] = FirestoreOptions.datePrefix + data[key].getTime();
+      if (Firestore.options().timestampsInSnapshots) {
+        var seconds = data[key].getTime() / 1000;
+        var nanoseconds = data[key].getMilliseconds() * 1000;
+        data[key] = Firestore.options().timestampPrefix + seconds + "_" + nanoseconds;
+      } else {
+        data[key] = Firestore.options().datePrefix + data[key].getTime();
+      }
     } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
       data[key] = __wrap(data[key]);
     }

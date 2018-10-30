@@ -1,4 +1,6 @@
-/* global Promise: false, FirestoreOptions: false, FirestoreTimestamp: false */
+/* global Promise: false, Firestore: false, FirestoreTimestamp: false */
+
+var FirestoreTimestamp = require("./FirestoreTimestamp");
 
 function DocumentSnapshot(data) {
   this._data = data;
@@ -16,17 +18,31 @@ DocumentSnapshot.prototype = {
       var key = keys[i];
 
       if (Object.prototype.toString.call(data[key]) === '[object String]' &&
-        data[key].startsWith(FirestoreOptions.datePrefix)) {
+        data[key].startsWith(Firestore.options().datePrefix)) {
         var length = data[key].length;
-        var prefixLength = FirestoreOptions.datePrefix.length;
+        var prefixLength = Firestore.options().datePrefix.length;
+
+        var timestamp = data[key].substr(prefixLength, length - prefixLength);
+        data[key] = new Date(parseInt(timestamp));
+
+      } else if (Object.prototype.toString.call(data[key]) === '[object String]' &&
+        data[key].startsWith(Firestore.options().timestampPrefix)) {
+        var length = data[key].length;
+        var prefixLength = Firestore.options().timestampPrefix.length;
 
         var timestamp = data[key].substr(prefixLength, length - prefixLength);
 
-        if (FirestoreOptions.timestampsInSnapshots) {
-          data[key] = new FirestoreTimestamp(parseInt(timestamp));
+        var seconds = 0;
+        var nanoseconds = 0;
+
+        if (timestamp.includes("_")) {
+          var timestampParts = timestamp.split("_");
+          data[key] = new FirestoreTimestamp(parseInt(timestampParts[0]), parseInt(timestampParts[1]));
+
         } else {
-          data[key] = new Date(parseInt(timestamp));
+          data[key] = new FirestoreTimestamp(parseInt(timestamp), 0);
         }
+
       } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
         data[key] = this._parse(data[key]);
       }

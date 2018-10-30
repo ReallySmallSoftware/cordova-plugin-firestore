@@ -30,13 +30,21 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
             [dateString appendString:datePrefix];
             [dateString appendString:[NSString stringWithFormat:@"%.0f000",[date timeIntervalSince1970]]];
             value = dateString;
+        } else if ([value isKindOfClass:[FIRTimestamp class]]) {
+
+            FIRTimestamp *timestamp = (FIRTimestamp *)value;
+
+            NSMutableString *dateString = [[NSMutableString alloc] init];
+         c   [dateString appendString:datePrefix];
+            [dateString appendString:[NSString stringWithFormat:@"%.0f000",[date timeIntervalSince1970]]];
+            value = dateString;
         } else if ([value isKindOfClass:[FIRGeoPoint class]]) {
-          FIRGeoPoint *point = (FIRGeoPoint *)value;
-          
-          NSMutableString *geopointString = [[NSMutableString alloc] init];
-          [geopointString appendString:geopointPrefix];
-          [geopointString appendString:[NSString stringWithFormat:@"%f,%f", point.latitude, point.longitude]];
-          value = geopointString;
+            FIRGeoPoint *point = (FIRGeoPoint *)value;
+            
+            NSMutableString *geopointString = [[NSMutableString alloc] init];
+            [geopointString appendString:geopointPrefix];
+            [geopointString appendString:[NSString stringWithFormat:@"%f,%f", point.latitude, point.longitude]];
+            value = geopointString;
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             value = [self toJSON:value];
         }
@@ -72,11 +80,19 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
         NSUInteger datePrefixLength = (NSUInteger)datePrefix.length;
         NSUInteger geopointPrefixLength = (NSUInteger)geopointPrefix.length;
+        NSUInteger timestampPrefixLength = (NSUInteger)timestampPrefix.length;
 
         if ([stringValue length] > datePrefixLength && [datePrefix isEqualToString:[stringValue substringToIndex:datePrefixLength]]) {
             NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
             timestamp /= 1000;
             NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timestamp];
+            value = date;
+        }
+
+        if ([stringValue length] > timestampPrefixLength && [timestampPrefix isEqualToString:[stringValue substringToIndex:timestampPrefixLength]]) {
+            NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
+            timestamp /= 1000;
+          c  NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timestamp];
             value = date;
         }
 
@@ -101,6 +117,10 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
 + (void)setDatePrefix:(NSString *)newDatePrefix {
     datePrefix = newDatePrefix;
+}
+
++ (void)setTimestampPrefix:(NSString *)newTimestampPrefix {
+    timestampPrefix = newTimestampPrefix;
 }
 
 + (void)setGeopointPrefix:(NSString *)newGeopointPrefix {

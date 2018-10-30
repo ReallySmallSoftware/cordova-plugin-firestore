@@ -1,5 +1,6 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,6 +27,8 @@ public class JSONHelper {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
                 value = new JSONDateWrapper((Date) value);
+            } else if (value instanceof Timestamp) {
+                value = new JSONTimestampWrapper((Timestamp) value);
             } else if (value instanceof GeoPoint) {
                 value = new JSONGeopointWrapper((GeoPoint) value);
             }
@@ -45,6 +48,8 @@ public class JSONHelper {
                 value = toJSONArray((List) value);
             } else if (value instanceof Date) {
                 value = new JSONDateWrapper((Date) value);
+            } else if (value instanceof Timestamp) {
+                value = new JSONTimestampWrapper((Timestamp) value);
             } else if (value instanceof GeoPoint) {
                 value = new JSONGeopointWrapper((GeoPoint) value);
             }
@@ -78,6 +83,8 @@ public class JSONHelper {
                 entry.setValue(JSONGeopointWrapper.unwrapGeoPoint(entryValue));
             } else if (JSONDateWrapper.isWrappedDate(entryValue)) {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
+            } else if (JSONTimestampWrapper.isWrappedTimestamp(value)) {
+                entry.setValue(JSONTimestampWrapper.unwrapTimestamp(value));
             } else if (entryValue instanceof Map) {
                 entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
@@ -97,6 +104,8 @@ public class JSONHelper {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
             } else if (JSONGeopointWrapper.isWrappedGeoPoint(entryValue)) {
                 entry.setValue(JSONGeopointWrapper.unwrapGeoPoint(entryValue));
+            } else if (JSONTimestampWrapper.isWrappedTimestamp(value)) {
+                entry.setValue(JSONTimestampWrapper.unwrapTimestamp(value));
             } else if (entryValue instanceof Map) {
                 entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {

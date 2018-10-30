@@ -44,6 +44,8 @@ public class WhereQueryHandler implements QueryHandler {
 
         if (JSONDateWrapper.isWrappedDate(value)) {
             return JSONDateWrapper.unwrapDate(value);
+        } else if (JSONTimestampWrapper.isWrappedTimestamp(value)) {
+            return JSONTimestampWrapper.unwrapTimestamp(value);
         } else if (JSONGeopointWrapper.isWrappedGeoPoint(value)) {
             return JSONGeopointWrapper.unwrapGeoPoint(value);
         }

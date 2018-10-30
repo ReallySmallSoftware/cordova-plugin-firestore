@@ -310,6 +310,18 @@
         [FirestorePluginJSONHelper setDatePrefix:datePrefix];
     }
 
+    NSString *geopointPrefix = options[@"geopointPrefix"];
+
+    if (geopointPrefix != NULL) {
+        [FirestorePluginJSONHelper setGeopointPrefix:geopointPrefix];
+    }
+
+    NSString *timestampPrefix = options[@"timestampPrefix"];
+
+    if (timestampPrefix != NULL) {
+        [FirestorePluginJSONHelper setTimestampPrefix:timestampPrefix];
+    }
+
     NSString *fieldValueDelete = options[@"fieldValueDelete"];
 
     if (fieldValueDelete != NULL) {
