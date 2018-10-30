@@ -174,5 +174,13 @@ module.exports = {
 
   options: function() {
     return __firestoreOptions;
+  },
+
+  Timestamp: function(seconds, nanoseconds) {
+    return new FirestoreTimestamp(seconds, nanoseconds);
+  },
+
+  GeoPoint: function(latitude, longitude) {
+    return new GeoPoint(latitude, longitude);
   }
 };

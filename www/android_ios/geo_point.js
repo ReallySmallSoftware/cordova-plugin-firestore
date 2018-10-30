@@ -13,6 +13,9 @@ GeoPoint.prototype = {
   isEqual: function (other) {
     return other.latitude === this.latitude &&
       other.longitude === this.longitude;
+  },
+  toString: function() {
+    return JSON.stringify({ _lat: this.latitude, _long: this.longitude});
   }
 };
 

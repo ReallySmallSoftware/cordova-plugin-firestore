@@ -6,6 +6,9 @@ function FirestoreTimestamp(seconds, nanoseconds) {
 FirestoreTimestamp.prototype = {
   toDate: function() {
     return new Date((this._seconds * 1000) + (this._nanoseconds / 1000));
+  },
+  toString: function() {
+    return JSON.stringify({ seconds: this.seconds, nanoseconds: this.nanoseconds});
   }
 };
 

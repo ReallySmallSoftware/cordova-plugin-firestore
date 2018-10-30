@@ -189,7 +189,10 @@ In the above example this is being used for the browser version, but it can also
 - FieldValue.serverTimestamp()
 
 ## GeoPoint
-- Firestore.GeoPoint()
+- Firestore.GeoPoint(latitude, longitude)
+
+## Timestamp
+- Firestore.Timestamp(seconds, nanoseconds)
 
 ## Dates
 Because data is transferred to the client as JSON there is extra logic in place to handle the conversion of dates for some operations.

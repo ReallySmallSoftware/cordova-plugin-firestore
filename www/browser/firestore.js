@@ -123,5 +123,13 @@ module.exports = {
 
   newTimestamp: function(date) {
     return firebase.firestore.Timestamp.fromDate(date);
+  },
+
+  Timestamp: function(seconds, nanoseconds) {
+    return new firebase.firestore.Timestamp(seconds, nanoseconds);
+  },
+
+  GeoPoint: function(latitude, longitude) {
+    return new firebase.firestore.GeoPoint(latitude, longitude);
   }
 };
