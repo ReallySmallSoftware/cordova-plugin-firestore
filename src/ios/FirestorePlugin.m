@@ -296,14 +296,14 @@
 
     
     if (options[@"persist"] != NULL) {
-        bool persist = [options valueForKey:@"persist"];
+        bool persist = [[options valueForKey:@"persist"] boolValue];
         
         [settings setPersistenceEnabled:persist];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
     }
 
     if (options[@"timestampsInSnapshots"] != NULL) {
-        bool timestampsInSnapshots = [options valueForKey:@"timestampsInSnapshots"];
+        bool timestampsInSnapshots = [[options valueForKey:@"timestampsInSnapshots"] boolValue];
 
         [settings setTimestampsInSnapshotsEnabled:timestampsInSnapshots];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore timestampsInSnapshots to true");
