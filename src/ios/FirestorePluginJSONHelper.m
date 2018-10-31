@@ -12,6 +12,7 @@
 @implementation FirestorePluginJSONHelper;
 
 static NSString *datePrefix = @"__DATE:";
+static NSString *timestampPrefix = @"__TIMESTAMP:";
 static NSString *geopointPrefix = @"__GEOPOINT:";
 static NSString *fieldValueDelete = @"__DELETE";
 static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
@@ -34,10 +35,10 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
             FIRTimestamp *timestamp = (FIRTimestamp *)value;
 
-            NSMutableString *dateString = [[NSMutableString alloc] init];
-         c   [dateString appendString:datePrefix];
-            [dateString appendString:[NSString stringWithFormat:@"%.0f000",[date timeIntervalSince1970]]];
-            value = dateString;
+            NSMutableString *timestampString = [[NSMutableString alloc] init];
+            [timestampString appendString:timestampPrefix];
+            [timestampString appendString:[NSString stringWithFormat:@"%lld_%d",[timestamp seconds], [timestamp nanoseconds]]];
+            value = timestampString;
         } else if ([value isKindOfClass:[FIRGeoPoint class]]) {
             FIRGeoPoint *point = (FIRGeoPoint *)value;
             
@@ -90,16 +91,15 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
         }
 
         if ([stringValue length] > timestampPrefixLength && [timestampPrefix isEqualToString:[stringValue substringToIndex:timestampPrefixLength]]) {
-            NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
-            timestamp /= 1000;
-          c  NSDate *date = [[NSDate alloc] initWithTimeIntervalSince1970:timestamp];
-            value = date;
+            NSArray *tmp = [[stringValue substringFromIndex:timestampPrefixLength] componentsSeparatedByString:@"_"];
+            FIRTimestamp *timestamp = [[FIRTimestamp alloc] initWithSeconds:[[tmp objectAtIndex:0] longLongValue] nanoseconds:[[tmp objectAtIndex:1] intValue]];
+            value = timestamp;
         }
 
         if ([stringValue length] > geopointPrefixLength && [geopointPrefix isEqualToString:[stringValue substringToIndex:geopointPrefixLength]]) {
-          NSArray *tmp = [[stringValue substringFromIndex:geopointPrefixLength] componentsSeparatedByString:@","];
-          FIRGeoPoint *geopoint = [[FIRGeoPoint alloc] initWithLatitude:[[tmp objectAtIndex:0] doubleValue] longitude:[[tmp objectAtIndex:1] doubleValue]];
-          value = geopoint;
+            NSArray *tmp = [[stringValue substringFromIndex:geopointPrefixLength] componentsSeparatedByString:@","];
+            FIRGeoPoint *geopoint = [[FIRGeoPoint alloc] initWithLatitude:[[tmp objectAtIndex:0] doubleValue] longitude:[[tmp objectAtIndex:1] doubleValue]];
+            value = geopoint;
         }
       
       

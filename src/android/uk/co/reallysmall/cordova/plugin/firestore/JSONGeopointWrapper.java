@@ -36,6 +36,6 @@ public class JSONGeopointWrapper extends GeoPoint {
 
     @Override
     public String toString() {
-        return this.geopointPrefix + this.getLatitude() + "-" + this.getLongitude();
+        return this.geopointPrefix + this.getLatitude() + "," + this.getLongitude();
     }
 }

@@ -294,13 +294,18 @@
 
     FIRFirestoreSettings *settings = self.firestore.settings;
 
-    if (options[@"persist"] != NULL && (int)options[@"persist"] == true) {
-        [settings setPersistenceEnabled:true];
+    
+    if (options[@"persist"] != NULL) {
+        bool persist = [options valueForKey:@"persist"];
+        
+        [settings setPersistenceEnabled:persist];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
     }
 
-    if (options[@"timestampsInSnapshots"] != NULL && (int)options[@"timestampsInSnapshots"] == true) {
-        [settings setTimestampsInSnapshotsEnabled:YES];
+    if (options[@"timestampsInSnapshots"] != NULL) {
+        bool timestampsInSnapshots = [options valueForKey:@"timestampsInSnapshots"];
+
+        [settings setTimestampsInSnapshotsEnabled:timestampsInSnapshots];
         asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore timestampsInSnapshots to true");
     }
 

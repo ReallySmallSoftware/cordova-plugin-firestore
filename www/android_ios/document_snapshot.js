@@ -50,8 +50,8 @@ DocumentSnapshot.prototype = {
 
         var geopoint = data[key].substr(prefixLength, length - prefixLength);
 
-        if (geopoint.includes("-")) {
-          var geopointParts = geopoint.split("-");
+        if (geopoint.includes(",")) {
+          var geopointParts = geopoint.split(",");
           data[key] = new GeoPoint(parseFloat(geopointParts[0]), parseFloat(geopointParts[1]));
         }  
       } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
