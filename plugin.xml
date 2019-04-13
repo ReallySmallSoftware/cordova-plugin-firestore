@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.3.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.5.0">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -24,8 +24,6 @@
       <clobbers target="Firestore"/>
     </js-module>
     <js-module src="www/android_ios/collection_reference.js" name="CollectionReference"/>
-    <js-module src="www/android_ios/document_of_sub_collection_reference.js" name="DocumentOfSubCollectionReference"/>
-    <js-module src="www/android_ios/sub_collection_reference.js" name="SubCollectionReference"/>
     <js-module src="www/android_ios/query.js" name="Query"/>
     <js-module src="www/android_ios/document_reference.js" name="DocumentReference"/>
     <js-module src="www/android_ios/document_snapshot.js" name="DocumentSnapshot"/>
@@ -33,7 +31,7 @@
     <js-module src="www/android_ios/query_document_snapshot.js" name="QueryDocumentSnapshot"/>
     <js-module src="www/android_ios/firestore_timestamp.js" name="FirestoreTimestamp"/>
     <js-module src="www/android_ios/transaction.js" name="Transaction"/>
-    <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
+    <js-module src="www/android_ios/utilities.js" name="Utilities"/>
     <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="Firestore">
@@ -42,8 +40,8 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.4"/>
-    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="17.1.1"/>
+    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.8"/>
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="18.2.0"/>
     <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
@@ -87,11 +85,6 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocSetOptions.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionSetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionUpdateHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/SubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestoreLog.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
 
   </platform>
@@ -101,8 +94,6 @@
       <clobbers target="Firestore"/>
     </js-module>
     <js-module src="www/android_ios/collection_reference.js" name="CollectionReference"/>
-    <js-module src="www/android_ios/document_of_sub_collection_reference.js" name="DocumentOfSubCollectionReference"/>
-    <js-module src="www/android_ios/sub_collection_reference.js" name="SubCollectionReference"/>
     <js-module src="www/android_ios/query.js" name="Query"/>
     <js-module src="www/android_ios/document_reference.js" name="DocumentReference"/>
     <js-module src="www/android_ios/document_snapshot.js" name="DocumentSnapshot"/>
@@ -110,7 +101,7 @@
     <js-module src="www/android_ios/query_document_snapshot.js" name="QueryDocumentSnapshot"/>
     <js-module src="www/android_ios/firestore_timestamp.js" name="FirestoreTimestamp"/>
     <js-module src="www/android_ios/transaction.js" name="Transaction"/>
-    <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
+    <js-module src="www/android_ios/utilities.js" name="Utilities"/>
     <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
 
     <config-file target="config.xml" parent="/*">
@@ -119,7 +110,7 @@
       </feature>
     </config-file>
 
-    <framework src="Firebase/Firestore" type="podspec" spec=""/>
+    <framework src="Firebase/Firestore" type="podspec"/>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>

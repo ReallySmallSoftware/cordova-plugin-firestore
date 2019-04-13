@@ -2,13 +2,14 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var SubCollectionReference = require('./SubCollectionReference');
-var __wrap = require('./__wrap');
+var Utilities = require('./Utilities');
 var utils = require("cordova/utils");
 var DocumentSnapshot = require("./DocumentSnapshot");
 
-function DocumentReference(collectionReference, id) {
-  this._id = id;
+function DocumentReference(collectionReference, path) {
+  console.log("DocumentReference" + path);
+  this._path = Utilities.stripLeaf(path);
+  this._id = Utilities.leaf(path);
   this._collectionReference = collectionReference;
 }
 
@@ -18,10 +19,10 @@ DocumentReference.prototype = {
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
   },
   collection: function (collectionPath) {
-    return new SubCollectionReference(this, collectionPath);
+    return this._collectionReference.newInstance(this, Utilities.combinePath(this._path, this._id, collectionPath));
   },
   delete: function () {
-    var args = [this._collectionReference._path, this._id];
+    var args = [this._path, this._id];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docDelete', args);
@@ -30,7 +31,7 @@ DocumentReference.prototype = {
     });
   },
   get: function () {
-    var args = [this._collectionReference._path, this._id];
+    var args = [this._path, this._id];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docGet', args);
@@ -42,7 +43,7 @@ DocumentReference.prototype = {
 
     var callbackId = utils.createUUID();
 
-    var args = [this._collectionReference._path, this._id, callbackId];
+    var args = [this._path, this._id, callbackId];
 
     if (!this._isFunction(optionsOrObserverOrOnNext)) {
       args.push(optionsOrObserverOrOnNext);
@@ -73,7 +74,7 @@ DocumentReference.prototype = {
   },
   set: function (data, options) {
 
-    var args = [this._collectionReference._path, this._id, __wrap(data), options];
+    var args = [this._path, this._id, Utilities.wrap(data), options];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
@@ -81,7 +82,7 @@ DocumentReference.prototype = {
   },
   update: function (data) {
 
-    var args = [this._collectionReference._path, this._id, __wrap(data)];
+    var args = [this._path, this._id, Utilities.wrap(data)];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docUpdate', args);
@@ -103,6 +104,11 @@ Object.defineProperties(DocumentReference.prototype, {
   parent: {
     get: function () {
       return this._collectionReference;
+    }
+  },
+  path: {
+    get: function () {
+      return this._path;
     }
   }
 });

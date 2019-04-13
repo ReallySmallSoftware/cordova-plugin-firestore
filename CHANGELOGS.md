@@ -1,4 +1,10 @@
 # History
+## 1.5.0
+- Updated README
+- Updated Android dependencies
+- Subsollection
+- Doc
+
 ## 1.3.2
 - Refactor README
 - Reset some significant breaking changes

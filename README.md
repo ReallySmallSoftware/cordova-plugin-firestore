@@ -45,7 +45,7 @@ You must ensure that `google-services.json` is put in the correct location. This
 
 ```xml
 <platform name="android">
-    <resource-file src="google-services.json" target="google-services.json" />
+    <resource-file src="google-services.json" target="app/google-services.json" />
 </platform>
 ```
 
@@ -116,7 +116,7 @@ if (cordova.platformId === "browser") {
 
 Firestore.initialise(options).then(function(db) {
   // Add a second document with a generated ID.
-  db.collection("users").add({
+  db.get().collection("users").add({
       first: "Alan",
       middle: "Mathison",
       last: "Turing",
@@ -177,6 +177,7 @@ In the above example this is being used for the browser version, but it can also
 - add(data)
 - id
 - doc(id)
+- parent
 
 ## Transaction
 - get()

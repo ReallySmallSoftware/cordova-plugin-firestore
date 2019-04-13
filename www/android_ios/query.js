@@ -3,7 +3,7 @@
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
 var QuerySnapshot = require("./QuerySnapshot");
-var __wrap = require('./__wrap');
+var Utilities = require('./Utilities');
 
 var utils = require("cordova/utils");
   
@@ -17,10 +17,10 @@ function Query(ref, queryType, value) {
 
 Query.prototype = {
   endAt: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "endAt", __wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "endAt", Utilities.wrap(snapshotOrVarArgs));
   },
   endBefore: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "endBefore", __wrap(snapshotOrVarArgs, true));
+    return new Query(this._ref, "endBefore", Utilities.wrap(snapshotOrVarArgs, true));
   },
   limit: function (limit) {
     return new Query(this._ref, "limit", limit);
@@ -64,13 +64,13 @@ Query.prototype = {
     };
   },
   startAfter: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAfter", __wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAfter", Utilities.wrap(snapshotOrVarArgs));
   },
   startAt: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAt", __wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAt", Utilities.wrap(snapshotOrVarArgs));
   },
   where: function (fieldPath, opStr, passedValue) {
-    var value = __wrap(passedValue);
+    var value = Utilities.wrap(passedValue);
 
     var whereField = {
       "fieldPath": fieldPath,

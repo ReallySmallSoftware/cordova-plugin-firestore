@@ -5,8 +5,9 @@ var utils = require("cordova/utils");
 var CollectionReference = require("./CollectionReference");
 var FirestoreTimestamp = require("./FirestoreTimestamp");
 var Transaction = require("./Transaction");
-var __wrap = require("./__wrap");
+var Utilities = require("./Utilities");
 var GeoPoint = require("./GeoPoint");
+var DocumentReference = require("./DocumentReference");
 
 var PLUGIN_NAME = 'Firestore';
 
@@ -66,13 +67,15 @@ Firestore.prototype = {
     throw "Firestore.batch: Not supported";
   },
   collection: function (path) {
-    return new CollectionReference(path);
+    return new CollectionReference(null, path);
   },
   disableNetwork: function () {
     throw "Firestore.disableNetwork: Not supported";
   },
-  doc: function () {
-    throw "Firestore.doc: Not supported";
+  doc: function (path) {
+    var collectionReference = new CollectionReference(null, "");
+    var documentReference = new DocumentReference(collectionReference, path);
+    return documentReference;
   },
   enableNetwork: function () {
     throw "Firestore.enableNetwork: Not supported";
@@ -161,7 +164,7 @@ module.exports = {
     var result;
 
     __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function (result) {
-      var args = [transactionId, __wrap(result)];
+      var args = [transactionId, Utilities.wrap(result)];
       exec(function () { }, function () { }, PLUGIN_NAME, 'transactionResolve', args);
     }).catch(function (error) {
       throw new Error("Unexpected error in transaction " + error);

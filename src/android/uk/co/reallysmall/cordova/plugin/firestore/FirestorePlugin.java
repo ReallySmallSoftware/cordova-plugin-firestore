@@ -45,11 +45,6 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("transactionDocSet", new TransactionDocSetHandler(FirestorePlugin.this));
         handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(FirestorePlugin.this));
         handlers.put("transactionResolve", new TransactionResolveHandler(FirestorePlugin.this));
-        handlers.put("docOfSubCollectionSet", new DocOfSubCollectionSetHandler(FirestorePlugin.this));
-        handlers.put("docOfSubCollectionGet", new DocOfSubCollectionGetHandler(FirestorePlugin.this));
-        handlers.put("docOfSubCollectionUpdate", new DocOfSubCollectionUpdateHandler(FirestorePlugin.this));
-        handlers.put("docOfSubCollectionDelete", new DocOfSubCollectionDeleteHandler(FirestorePlugin.this));
-        handlers.put("subCollectionGet", new SubCollectionGetHandler(FirestorePlugin.this));
         handlers.put("setLogLevel", new setLogLevel());
 
         FirestoreLog.d(TAG, "Initializing FirestorePlugin");

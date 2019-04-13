@@ -4,13 +4,16 @@ var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
 var Query = require("./Query");
 var DocumentReference = require("./DocumentReference");
-var __wrap = require("./__wrap");
+var Utilities = require("./Utilities");
 
-function CollectionReference(path, id) {
+function CollectionReference(documentReference, path) {
+  console.log("CollectionReference" + path);
+
   this._path = path;
-  this._id = id;
+  this._id = Utilities.leaf(path);
   this._ref = this;
   this._queries = [];
+  this._documentReference = documentReference;
 }
 
 CollectionReference.prototype = Object.create(Query.prototype, {
@@ -26,21 +29,30 @@ CollectionReference.prototype = Object.create(Query.prototype, {
   },
   parent: {
     get: function () {
-      throw "CollectionReference.parent: Not supported";
+      return this._documentReference;
     }
-  }
+  },
+  path: {
+    get: function () {
+      return this._path;
+    }
+  },
 });
 
 CollectionReference.prototype.add = function (data) {
-  var args = [this._path, __wrap(data)];
+  var args = [this._path, Utilities.wrap(data)];
 
   return new Promise(function (resolve, reject) {
     exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
   });
 };
 
-CollectionReference.prototype.doc = function (id) {
-  return new DocumentReference(this, id);
+CollectionReference.prototype.doc = function (path) {
+  return new DocumentReference(this, Utilities.combinePath(this._path, path));
 };
+
+CollectionReference.prototype.newInstance = function(documentReference, path) {
+  return new CollectionReference(documentReference, path);
+}
 
 module.exports = CollectionReference;
