@@ -1,9 +1,10 @@
 # History
-## 1.5.0
+## 2.0.0
 - Updated README
 - Updated Android dependencies
-- Subsollection
-- Doc
+- Added full nested collection implementation - may break backwards compatibility
+- Added doc() support to Firestore class
+- Add parent to DocumentReference and CollectionReference
 
 ## 1.3.2
 - Refactor README
