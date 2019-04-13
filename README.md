@@ -29,10 +29,10 @@ phonegap plugin add cordova-plugin-firestore
 ### Optional installation variables for Android
 
 #### ANDROID_FIREBASE_CORE_VERSION
-Version of `com.google.firebase:firebase-core`. This defaults to `16.0.3`.
+Version of `com.google.firebase:firebase-core`. This defaults to `16.0.8`.
 
 #### ANDROID_FIREBASE_FIRESTORE_VERSION
-Version of `com.google.firebase:firebase-firestore`. This defaults to `17.1.0`.
+Version of `com.google.firebase:firebase-firestore`. This defaults to `18.2.0`.
 
 You can find the latest versions of these [here](https://firebase.google.com/docs/android/setup#available_libraries).
 
@@ -137,8 +137,9 @@ In the above example this is being used for the browser version, but it can also
 # What is supported?
 
 ## Firestore
-- collection()
+- collection(collectionPath)
 - runTransaction(updateFunction)
+- doc(id)
 
 ## DocumentSnapshot and QueryDataSnapshot
 - data()
@@ -251,6 +252,16 @@ Similar to the situation with dates, there are special values used for `FieldVal
 - FieldValue.serverTimestamp() equates to `__SERVERTIMESTAMP`
 
 These values can be changed when initialisation is performed.
+
+## Nested collections
+Nested collections are supported. This can take either form as follows:
+
+```
+db.get().collection("mycollection").doc("mydoc").collection("mysubcollection");
+db.get().collection("mycollection/mydoc/mysubcollection");
+```
+
+Note that the second form is slightly more efficient as it results in less objects being instantiated.
 
 ## Learnings and notes
 I have learnt a number of things whilst implementing this:
