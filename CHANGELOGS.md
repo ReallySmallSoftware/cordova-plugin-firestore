@@ -5,6 +5,7 @@
 - Added full nested collection implementation - may break backwards compatibility
 - Added doc() support to Firestore class
 - Add parent to DocumentReference and CollectionReference
+- Fix podspec for cordova-ios 5
 
 ## 1.3.2
 - Refactor README

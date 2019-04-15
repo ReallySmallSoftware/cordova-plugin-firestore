@@ -8,9 +8,9 @@
 
   <engines>
     <engine name="cordova" version=">=7.0.0" />
-    <engine name="cordova-android" version=">=5.0.0" />
+    <engine name="cordova-android" version=">=8.0.0" />
     <engine name="cordova-plugman" version=">=4.2.0" />
-    <engine name="cordova-ios" version=">=4.0.0" />
+    <engine name="cordova-ios" version=">=5.0.0" />
   </engines>
 
   <platform name="browser">
@@ -110,7 +110,14 @@
       </feature>
     </config-file>
 
-    <framework src="Firebase/Firestore" type="podspec"/>
+    <podspec>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
+      <pods use-frameworks="true">
+        <pod name="FirebaseFirestore" />
+      </pods>
+    </podspec>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>
