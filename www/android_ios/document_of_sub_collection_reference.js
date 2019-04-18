@@ -3,7 +3,7 @@
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
 var __wrap = require('./__wrap');
-var DocumentSnapshot = require("./DocumentSnapshot");
+var DocumentSnapshot = require("./document_snapshot");
 
 function DocumentOfSubCollectionReference(subCollectionReference, id) {
   this._id = id;

@@ -1,6 +1,6 @@
 
 
-var GeoPoint = require('./GeoPoint');
+var GeoPoint = require('./geo_point');
 
 function __wrap(data) {
 

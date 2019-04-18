@@ -343,8 +343,8 @@
 }
 
 - (void)docSet:(CDVInvokedUrlCommand *)command {
-    NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
-    NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
+    NSString *collection = [command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
+    NSString *docId = [command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
     NSDictionary *options = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
 
@@ -352,7 +352,7 @@
 
     BOOL merge = [self getMerge:options];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document");
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
 
@@ -397,7 +397,7 @@
 
     NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Updating document");
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Updating document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
 

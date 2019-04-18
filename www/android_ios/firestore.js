@@ -2,11 +2,11 @@
 
 var exec = require('cordova/exec');
 var utils = require("cordova/utils");
-var CollectionReference = require("./CollectionReference");
-var FirestoreTimestamp = require("./FirestoreTimestamp");
-var Transaction = require("./Transaction");
+var CollectionReference = require("./collection_reference");
+var FirestoreTimestamp = require("./firestore_timestamp");
+var Transaction = require("./transaction");
 var __wrap = require("./__wrap");
-var GeoPoint = require("./GeoPoint");
+var GeoPoint = require("./geo_point");
 
 var PLUGIN_NAME = 'Firestore';
 

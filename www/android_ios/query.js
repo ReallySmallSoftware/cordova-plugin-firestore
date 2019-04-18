@@ -2,7 +2,7 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var QuerySnapshot = require("./QuerySnapshot");
+var QuerySnapshot = require("./query_snapshot");
 var __wrap = require('./__wrap');
 
 var utils = require("cordova/utils");
@@ -37,7 +37,7 @@ Query.prototype = {
     return new Query(this._ref, "orderBy", orderByField);
   },
   get: function () {
-    var args = [this._ref._path, this._ref._queries];
+    var args = [this._ref.path, this._ref._queries];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
@@ -48,7 +48,7 @@ Query.prototype = {
   onSnapshot: function (callback, options) {
 
     var callbackId = utils.createUUID();
-    var args = [this._ref._path, this._ref._queries, options, callbackId];
+    var args = [this._ref.path, this._ref._queries, options, callbackId];
 
     var callbackWrapper = function (data) {
       callback(new QuerySnapshot(data));
