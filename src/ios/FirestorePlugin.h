@@ -23,11 +23,6 @@
 - (void)transactionDocDelete:(CDVInvokedUrlCommand *)command;
 - (void)runTransaction:(CDVInvokedUrlCommand *)command;
 - (void)transactionResolve:(CDVInvokedUrlCommand *)command;
-- (void)docOfSubCollectionSet:(CDVInvokedUrlCommand *)command;
-- (void)docOfSubCollectionGet:(CDVInvokedUrlCommand *)command;
-- (void)docOfSubCollectionUpdate:(CDVInvokedUrlCommand *)command;
-- (void)docOfSubCollectionDelete:(CDVInvokedUrlCommand *)command;
-- (void)subCollectionGet:(CDVInvokedUrlCommand *)command;
 - (void)setLogLevel:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;

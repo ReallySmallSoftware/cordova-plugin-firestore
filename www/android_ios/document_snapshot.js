@@ -33,9 +33,6 @@ DocumentSnapshot.prototype = {
 
         var timestamp = data[key].substr(prefixLength, length - prefixLength);
 
-        var seconds = 0;
-        var nanoseconds = 0;
-
         if (timestamp.includes("_")) {
           var timestampParts = timestamp.split("_");
           data[key] = new FirestoreTimestamp(parseInt(timestampParts[0]), parseInt(timestampParts[1]));

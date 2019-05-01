@@ -1,9 +1,8 @@
-
+/* global Firestore */
 
 var GeoPoint = require('./geo_point');
 
-function __wrap(data) {
-
+var wrap = function (data) {
   if (data instanceof GeoPoint) {
     return Firestore.options().geopointPrefix + data.latitude + "," + data.longitude;
   }
@@ -31,10 +30,12 @@ function __wrap(data) {
         data[key] = Firestore.options().datePrefix + data[key].getTime();
       }
     } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
-      data[key] = __wrap(data[key]);
+      data[key] = wrap(data[key]);
     }
   }
   return data;
-}
+};
 
-module.exports = __wrap;
+module.exports = {
+  wrap: wrap
+};

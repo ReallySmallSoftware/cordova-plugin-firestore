@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.3.2">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.5.0">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -8,9 +8,9 @@
 
   <engines>
     <engine name="cordova" version=">=7.0.0" />
-    <engine name="cordova-android" version=">=5.0.0" />
+    <engine name="cordova-android" version=">=8.0.0" />
     <engine name="cordova-plugman" version=">=4.2.0" />
-    <engine name="cordova-ios" version=">=4.0.0" />
+    <engine name="cordova-ios" version=">=5.0.0" />
   </engines>
 
   <platform name="browser">
@@ -33,7 +33,7 @@
     <js-module src="www/android_ios/query_document_snapshot.js" name="query_document_snapshot"/>
     <js-module src="www/android_ios/firestore_timestamp.js" name="firestore_timestamp"/>
     <js-module src="www/android_ios/transaction.js" name="transaction"/>
-    <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
+    <js-module src="www/android_ios/utilities" name="utilities"/>
     <js-module src="www/android_ios/geo_point.js" name="geo_point" />
     <js-module src="www/android_ios/path.js" name="path" />
     <js-module src="www/android_ios/utils.js" name="utils" />
@@ -44,8 +44,8 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.4"/>
-    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="17.1.1"/>
+    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="16.0.8"/>
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="18.2.0"/>
     <framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
@@ -89,11 +89,6 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocSetOptions.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionSetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionDeleteHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/DocOfSubCollectionUpdateHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
-    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/SubCollectionGetHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestoreLog.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
 
   </platform>
@@ -112,7 +107,7 @@
     <js-module src="www/android_ios/query_document_snapshot.js" name="query_document_snapshot"/>
     <js-module src="www/android_ios/firestore_timestamp.js" name="firestore_timestamp"/>
     <js-module src="www/android_ios/transaction.js" name="transaction"/>
-    <js-module src="www/android_ios/__wrap.js" name="__wrap"/>
+    <js-module src="www/android_ios/utilities.js" name="utilities"/>
     <js-module src="www/android_ios/geo_point.js" name="geo_point" />
     <js-module src="www/android_ios/path.js" name="path" />
     <js-module src="www/android_ios/utils.js" name="utils" />
@@ -123,7 +118,14 @@
       </feature>
     </config-file>
 
-    <framework src="Firebase/Firestore" type="podspec" spec=""/>
+    <podspec>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
+      <pods use-frameworks="true">
+        <pod name="FirebaseFirestore" />
+      </pods>
+    </podspec>
 
     <header-file src="src/ios/FirestorePlugin.h"/>
     <source-file src="src/ios/FirestorePlugin.m"/>

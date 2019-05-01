@@ -1,12 +1,10 @@
-/* global Promise: false, DocumentSnapshot: false, DocumentSnapshot: false */
-
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
 var CollectionReference = require('./collection_reference');
-var __wrap = require('./__wrap');
-var utils = require("cordova/utils");
+var Utilities = require('./utilities');
+var cordovaUtils = require("cordova/utils");
 var DocumentSnapshot = require("./document_snapshot");
-var Path = require('./path');
+// var Path = require('./path');
 var utils = require('./utils');
 
 function DocumentReference(collectionReference, id) {
@@ -42,7 +40,7 @@ DocumentReference.prototype = {
   },
   onSnapshot: function (optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
 
-    var callbackId = utils.createUUID();
+    var callbackId = cordovaUtils.createUUID();
 
     var args = [this._collectionReference.path, this._id, callbackId];
 
@@ -75,7 +73,7 @@ DocumentReference.prototype = {
   },
   set: function (data, options) {
 
-    var args = [this._collectionReference.path, this._id, __wrap(data), options];
+    var args = [this._collectionReference.path, this._id, Utilities.wrap(data), options];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docSet', args);
@@ -83,7 +81,7 @@ DocumentReference.prototype = {
   },
   update: function (data) {
 
-    var args = [this._collectionReference.path, this._id, __wrap(data)];
+    var args = [this._collectionReference.path, this._id, Utilities.wrap(data)];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'docUpdate', args);
@@ -114,5 +112,4 @@ Object.defineProperties(DocumentReference.prototype, {
   }
 });
 
-console.log('what is DocumentReference at export', DocumentReference);
 module.exports = DocumentReference;

@@ -4,7 +4,7 @@ var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
 var Query = require("./query");
 var DocumentReference = require("./document_reference");
-var __wrap = require("./__wrap");
+var Utilities = require("./utilities");
 const CollectionReference = require('./collection_reference');
 
 const mockParent = {};

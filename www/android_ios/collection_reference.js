@@ -2,16 +2,17 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var Query = require("./query");
 var DocumentReference;
-var __wrap = require("./__wrap");
+var Utilities = require("./utilities");
 var Path = require('./path');
-
-console.log('What is document_reference at import', typeof DocumentReference);
+var Query = require("./query");
 
 function CollectionReference(path, parent) {
-  // Weird, in tests if DocumentReference is imported at the top of the file
-  // it is an empty object and not a function
+
+  /*
+   * weird, in tests if DocumentReference is imported at the top of the file
+   * it is an empty object and not a function
+   */
   if (DocumentReference === undefined) {
     DocumentReference = require('./document_reference');
   }
@@ -22,6 +23,8 @@ function CollectionReference(path, parent) {
   this._parent = parent || null;
 }
 
+console.log('Query', typeof Query.prototype, Query.prototype);
+console.log('Path', typeof Path.prototype, Path.prototype);
 CollectionReference.prototype = Object.create(Query.prototype, {
   firestore: {
     get: function () {
@@ -46,7 +49,7 @@ CollectionReference.prototype = Object.create(Query.prototype, {
 });
 
 CollectionReference.prototype.add = function (data) {
-  var args = [this._path.cleanPath, __wrap(data)];
+  var args = [this._path.cleanPath, Utilities.wrap(data)];
 
   return new Promise(function (resolve, reject) {
     exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
@@ -55,6 +58,10 @@ CollectionReference.prototype.add = function (data) {
 
 CollectionReference.prototype.doc = function (id) {
   return new DocumentReference(this, id);
+};
+
+CollectionReference.prototype.newInstance = function(documentReference, path) {
+  return new CollectionReference(path, documentReference);
 };
 
 module.exports = CollectionReference;
