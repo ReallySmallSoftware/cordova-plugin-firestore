@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-firestore",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "cordova": {
     "id": "cordova-plugin-firestore",
     "platforms": [
@@ -20,8 +20,9 @@
   },
   "description": "A Google Firebase Firestore plugin",
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-jshint": "^1.1.0"
+    "grunt": "^1.0.4",
+    "grunt-contrib-jshint": "^1.1.0",
+    "jest": "^24.7.1"
   },
   "repository": {
     "type": "git",
@@ -38,5 +39,8 @@
     "cordova-android",
     "cordova-ios",
     "cordova-browser"
-  ]
+  ],
+  "scripts": {
+    "test": "jest"
+  }
 }

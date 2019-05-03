@@ -30,7 +30,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
             final String callbackId = args.getString(3);
 
 
-            FirestoreLog.d(FirestorePlugin.TAG, "Listening to collection");
+            FirestoreLog.d(FirestorePlugin.TAG, "Listening to collection " + collection);
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
@@ -44,11 +44,11 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                                         @Nullable FirebaseFirestoreException e) {
 
                         if (e != null) {
-                            FirestoreLog.w(FirestorePlugin.TAG, "Collection snapshot listener error", e);
+                            FirestoreLog.w(FirestorePlugin.TAG, "Collection snapshot listener error " + collection, e);
                             return;
                         }
 
-                        FirestoreLog.d(FirestorePlugin.TAG, "Got collection snapshot data");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Got collection snapshot data " + collection);
                         callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(value, true));
                     }
                 };
@@ -56,7 +56,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                 firestorePlugin.addRegistration(callbackId, query.addSnapshotListener(metadataChanges, eventListener));
 
             } catch (Exception e) {
-                FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing collection snapshot in thread " + collection, e);
                 callbackContext.error(e.getMessage());
             }
 

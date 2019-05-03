@@ -26,6 +26,7 @@ public class DocSetHandler implements ActionHandler {
         try {
             final String collection = args.getString(0);
             final String docId = args.getString(1);
+            final String docPath = collection + "/" + docId;
             final JSONObject data = args.getJSONObject(2);
 
             final JSONObject options;
@@ -40,7 +41,7 @@ public class DocSetHandler implements ActionHandler {
 
                 SetOptions setOptions = DocSetOptions.getSetOptions(options);
 
-                FirestoreLog.d(FirestorePlugin.TAG, "Setting document");
+                FirestoreLog.d(FirestorePlugin.TAG, "Setting document " + docPath);
 
                 DocumentReference documentReference = firestorePlugin.getDatabase().collection(collection).document(docId);
 
@@ -48,14 +49,14 @@ public class DocSetHandler implements ActionHandler {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success();
-                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully written document");
+                        FirestoreLog.d(FirestorePlugin.TAG, "Successfully written document " + docPath);
                     }
                 };
 
                 OnFailureListener onFailureListener = new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        FirestoreLog.w(FirestorePlugin.TAG, "Error writing document", e);
+                        FirestoreLog.w(FirestorePlugin.TAG, "Error writing document " + docPath, e);
                         callbackContext.error(e.getMessage());
                     }
                 };
@@ -66,7 +67,7 @@ public class DocSetHandler implements ActionHandler {
                     documentReference.set(JSONHelper.toSettableMap(data), setOptions).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
                 }
             } catch (Exception e) {
-                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document set in thread", e);
+                FirestoreLog.e(FirestorePlugin.TAG, "Error processing document set " + docPath, e);
                 callbackContext.error(e.getMessage());
             }
         } catch (JSONException e) {

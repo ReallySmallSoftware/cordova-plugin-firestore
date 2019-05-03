@@ -1,7 +1,7 @@
 /* global Promise: false, Firestore: false, FirestoreTimestamp: false */
 
-var FirestoreTimestamp = require("./FirestoreTimestamp");
-var GeoPoint = require("./GeoPoint");
+var FirestoreTimestamp = require("./firestore_timestamp");
+var GeoPoint = require("./geo_point");
 
 function DocumentSnapshot(data) {
   this._data = data;

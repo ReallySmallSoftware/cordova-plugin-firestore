@@ -2,10 +2,10 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var QuerySnapshot = require("./QuerySnapshot");
-var Utilities = require('./Utilities');
+var QuerySnapshot = require("./query_snapshot");
+var utilities = require('./utilities');
 
-var utils = require("cordova/utils");
+var cordovaUtils = require("cordova/utils");
   
 function Query(ref, queryType, value) {
   this._ref = ref;
@@ -15,12 +15,12 @@ function Query(ref, queryType, value) {
   });
 }
 
-Query.prototype = {
+Query.prototype = Object.create({
   endAt: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "endAt", Utilities.wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "endAt", utilities.wrap(snapshotOrVarArgs));
   },
   endBefore: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "endBefore", Utilities.wrap(snapshotOrVarArgs, true));
+    return new Query(this._ref, "endBefore", utilities.wrap(snapshotOrVarArgs, true));
   },
   limit: function (limit) {
     return new Query(this._ref, "limit", limit);
@@ -37,7 +37,7 @@ Query.prototype = {
     return new Query(this._ref, "orderBy", orderByField);
   },
   get: function () {
-    var args = [this._ref._path, this._ref._queries];
+    var args = [this._ref.path, this._ref._queries];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'collectionGet', args);
@@ -47,30 +47,30 @@ Query.prototype = {
   },
   onSnapshot: function (callback, options) {
 
-    var callbackId = utils.createUUID();
-    var args = [this._ref._path, this._ref._queries, options, callbackId];
+    var callbackId = cordovaUtils.createUUID();
+    var args = [this._ref.path, this._ref._queries, options, callbackId];
 
     var callbackWrapper = function (data) {
       callback(new QuerySnapshot(data));
     };
-    exec(callbackWrapper, function () {
-      throw new Error("Undefined error in collectionOnSnapshot");
+    exec(callbackWrapper, function (e) {
+      throw new Error("Undefined error in collectionOnSnapshot", e);
     }, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
     return function () {
-      exec(function () { }, function () {
-        throw new Error("Undefined error in collectionUnsubscribe");
+      exec(function () { }, function (e) {
+        throw new Error("Undefined error in collectionUnsubscribe", e);
       }, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
     };
   },
   startAfter: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAfter", Utilities.wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAfter", utilities.wrap(snapshotOrVarArgs));
   },
   startAt: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAt", Utilities.wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAt", utilities.wrap(snapshotOrVarArgs));
   },
   where: function (fieldPath, opStr, passedValue) {
-    var value = Utilities.wrap(passedValue);
+    var value = utilities.wrap(passedValue);
 
     var whereField = {
       "fieldPath": fieldPath,
@@ -79,6 +79,6 @@ Query.prototype = {
     };
     return new Query(this._ref, "where", whereField);
   }
-};
+});
 
 module.exports = Query;

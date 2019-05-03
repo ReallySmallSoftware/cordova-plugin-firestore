@@ -2,18 +2,25 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var Query = require("./Query");
-var DocumentReference = require("./DocumentReference");
-var Utilities = require("./Utilities");
+var DocumentReference;
+var Utilities = require("./utilities");
+var Path = require('./path');
+var Query = require("./query");
 
-function CollectionReference(documentReference, path) {
-  console.log("CollectionReference" + path);
+function CollectionReference(path, parent) {
 
-  this._path = path;
-  this._id = Utilities.leaf(path);
+  /*
+   * weird, in tests if DocumentReference is imported at the top of the file
+   * it is an empty object and not a function
+   */
+  if (DocumentReference === undefined) {
+    DocumentReference = require('./document_reference');
+  }
+  this._path = new Path(path);
+  this._id = this._path.id;
   this._ref = this;
   this._queries = [];
-  this._documentReference = documentReference;
+  this._parent = parent || null;
 }
 
 CollectionReference.prototype = Object.create(Query.prototype, {
@@ -29,30 +36,30 @@ CollectionReference.prototype = Object.create(Query.prototype, {
   },
   parent: {
     get: function () {
-      return this._documentReference;
+      return this._parent;
     }
   },
   path: {
-    get: function () {
-      return this._path;
+    get: function() {
+      return this._path.cleanPath;
     }
-  },
+  }
 });
 
 CollectionReference.prototype.add = function (data) {
-  var args = [this._path, Utilities.wrap(data)];
+  var args = [this._path.cleanPath, Utilities.wrap(data)];
 
   return new Promise(function (resolve, reject) {
     exec(resolve, reject, PLUGIN_NAME, 'collectionAdd', args);
   });
 };
 
-CollectionReference.prototype.doc = function (path) {
-  return new DocumentReference(this, Utilities.combinePath(this._path, path));
+CollectionReference.prototype.doc = function (id) {
+  return new DocumentReference(this, id);
 };
 
 CollectionReference.prototype.newInstance = function(documentReference, path) {
-  return new CollectionReference(documentReference, path);
-}
+  return new CollectionReference(path, documentReference);
+};
 
 module.exports = CollectionReference;

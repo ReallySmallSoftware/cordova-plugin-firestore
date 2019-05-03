@@ -2,8 +2,8 @@
 
 var PLUGIN_NAME = 'Firestore';
 var exec = require('cordova/exec');
-var DocumentSnapshot = require("./DocumentSnapshot");
-var Utilities = require('./Utilities');
+var DocumentSnapshot = require("./document_snapshot");
+var Utilities = require('./utilities');
 
 function Transaction(id) {
   this._id = id;
@@ -11,7 +11,7 @@ function Transaction(id) {
 
 Transaction.prototype = {
   delete: function (documentReference) {
-    var args = [this._id, documentReference._id, documentReference._collectionReference._path];
+    var args = [this._id, documentReference.id, documentReference._collectionReference.path];
 
     var success = function () {
     };
@@ -25,7 +25,7 @@ Transaction.prototype = {
     return this;
   },
   get: function (documentReference) {
-    var args = [this._id, documentReference._id, documentReference._collectionReference._path];
+    var args = [this._id, documentReference.id, documentReference._collectionReference.path];
 
     return new Promise(function (resolve, reject) {
       exec(resolve, reject, PLUGIN_NAME, 'transactionDocGet', args);
@@ -36,7 +36,7 @@ Transaction.prototype = {
   },
   set: function (documentReference, data, options) {
 
-    var args = [this._id, documentReference._id, documentReference._collectionReference._path, Utilities.wrap(data), options];
+    var args = [this._id, documentReference.id, documentReference._collectionReference.path, Utilities.wrap(data), options];
 
     var success = function () {
     };
@@ -51,7 +51,7 @@ Transaction.prototype = {
   },
   update: function (documentReference, data) {
 
-    var args = [this._id, documentReference._id, documentReference._collectionReference._path, Utilities.wrap(data)];
+    var args = [this._id, documentReference.id, documentReference._collectionReference.path, Utilities.wrap(data)];
 
     var success = function () {
     };

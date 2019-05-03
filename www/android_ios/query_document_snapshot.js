@@ -1,4 +1,4 @@
-var DocumentSnapshot = require("./DocumentSnapshot");
+var DocumentSnapshot = require("./document_snapshot");
 
 function QueryDocumentSnapshot(data) {
   DocumentSnapshot.call(this, data);

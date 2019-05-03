@@ -2,12 +2,13 @@
 
 var exec = require('cordova/exec');
 var utils = require("cordova/utils");
-var CollectionReference = require("./CollectionReference");
-var FirestoreTimestamp = require("./FirestoreTimestamp");
-var Transaction = require("./Transaction");
-var Utilities = require("./Utilities");
-var GeoPoint = require("./GeoPoint");
-var DocumentReference = require("./DocumentReference");
+var Path = require("./path");
+var DocumentReference = require("./document_reference");
+var CollectionReference = require("./collection_reference");
+var FirestoreTimestamp = require("./firestore_timestamp");
+var Transaction = require("./transaction");
+var GeoPoint = require("./geo_point");
+var Utilities = require("./utilities");
 
 var PLUGIN_NAME = 'Firestore';
 
@@ -67,15 +68,18 @@ Firestore.prototype = {
     throw "Firestore.batch: Not supported";
   },
   collection: function (path) {
-    return new CollectionReference(null, path);
+    return new CollectionReference(path);
   },
   disableNetwork: function () {
     throw "Firestore.disableNetwork: Not supported";
   },
   doc: function (path) {
-    var collectionReference = new CollectionReference(null, "");
-    var documentReference = new DocumentReference(collectionReference, path);
-    return documentReference;
+    // TODO firestore.doc not implemented properly, should allow getting
+    // .parent all the way down when nested path is passed
+
+    var path = new Path(path);
+    var collectionReference = new CollectionReference(path.parent);
+    return collectionReference.doc(path.id);
   },
   enableNetwork: function () {
     throw "Firestore.enableNetwork: Not supported";
@@ -135,7 +139,7 @@ Object.defineProperties(Firestore.prototype, {
 });
 
 function initialise(options) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
 
     if (options && options.config) {
       var normalizedOptions = {};
@@ -161,8 +165,6 @@ module.exports = {
   initialize: initialise, // better for common usage
 
   __executeTransaction: function (transactionId) {
-    var result;
-
     __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function (result) {
       var args = [transactionId, Utilities.wrap(result)];
       exec(function () { }, function () { }, PLUGIN_NAME, 'transactionResolve', args);

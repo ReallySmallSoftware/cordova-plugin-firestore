@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="1.5.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-firestore" version="3.0.0">
   <name>Cordova Firestore Plugin</name>
   <description>Google Firebase Firestore</description>
   <license>MIT</license>
@@ -8,9 +8,9 @@
 
   <engines>
     <engine name="cordova" version=">=7.0.0" />
-    <engine name="cordova-android" version=">=8.0.0" />
+    <engine name="cordova-android" version=">=7.0.0" />
     <engine name="cordova-plugman" version=">=4.2.0" />
-    <engine name="cordova-ios" version=">=5.0.0" />
+    <engine name="cordova-ios" version=">=4.5.0" />
   </engines>
 
   <platform name="browser">
@@ -23,16 +23,18 @@
     <js-module src="www/android_ios/firestore.js" name="Firestore">
       <clobbers target="Firestore"/>
     </js-module>
-    <js-module src="www/android_ios/collection_reference.js" name="CollectionReference"/>
-    <js-module src="www/android_ios/query.js" name="Query"/>
-    <js-module src="www/android_ios/document_reference.js" name="DocumentReference"/>
-    <js-module src="www/android_ios/document_snapshot.js" name="DocumentSnapshot"/>
-    <js-module src="www/android_ios/query_snapshot.js" name="QuerySnapshot"/>
-    <js-module src="www/android_ios/query_document_snapshot.js" name="QueryDocumentSnapshot"/>
-    <js-module src="www/android_ios/firestore_timestamp.js" name="FirestoreTimestamp"/>
-    <js-module src="www/android_ios/transaction.js" name="Transaction"/>
-    <js-module src="www/android_ios/utilities.js" name="Utilities"/>
-    <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
+    <js-module src="www/android_ios/collection_reference.js" name="collection_reference"/>
+    <js-module src="www/android_ios/query.js" name="query"/>
+    <js-module src="www/android_ios/document_reference.js" name="document_reference"/>
+    <js-module src="www/android_ios/document_snapshot.js" name="document_snapshot"/>
+    <js-module src="www/android_ios/query_snapshot.js" name="query_snapshot"/>
+    <js-module src="www/android_ios/query_document_snapshot.js" name="query_document_snapshot"/>
+    <js-module src="www/android_ios/firestore_timestamp.js" name="firestore_timestamp"/>
+    <js-module src="www/android_ios/transaction.js" name="transaction"/>
+    <js-module src="www/android_ios/utilities.js" name="utilities"/>
+    <js-module src="www/android_ios/geo_point.js" name="geo_point" />
+    <js-module src="www/android_ios/path.js" name="path" />
+    <js-module src="www/android_ios/utils.js" name="utils" />
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="Firestore">
         <param name="android-package" value="uk.co.reallysmall.cordova.plugin.firestore.FirestorePlugin"/>
@@ -93,16 +95,18 @@
     <js-module src="www/android_ios/firestore.js" name="Firestore">
       <clobbers target="Firestore"/>
     </js-module>
-    <js-module src="www/android_ios/collection_reference.js" name="CollectionReference"/>
-    <js-module src="www/android_ios/query.js" name="Query"/>
-    <js-module src="www/android_ios/document_reference.js" name="DocumentReference"/>
-    <js-module src="www/android_ios/document_snapshot.js" name="DocumentSnapshot"/>
-    <js-module src="www/android_ios/query_snapshot.js" name="QuerySnapshot"/>
-    <js-module src="www/android_ios/query_document_snapshot.js" name="QueryDocumentSnapshot"/>
-    <js-module src="www/android_ios/firestore_timestamp.js" name="FirestoreTimestamp"/>
-    <js-module src="www/android_ios/transaction.js" name="Transaction"/>
-    <js-module src="www/android_ios/utilities.js" name="Utilities"/>
-    <js-module src="www/android_ios/geo_point.js" name="GeoPoint" />
+    <js-module src="www/android_ios/collection_reference.js" name="collection_reference"/>
+    <js-module src="www/android_ios/query.js" name="query"/>
+    <js-module src="www/android_ios/document_reference.js" name="document_reference"/>
+    <js-module src="www/android_ios/document_snapshot.js" name="document_snapshot"/>
+    <js-module src="www/android_ios/query_snapshot.js" name="query_snapshot"/>
+    <js-module src="www/android_ios/query_document_snapshot.js" name="query_document_snapshot"/>
+    <js-module src="www/android_ios/firestore_timestamp.js" name="firestore_timestamp"/>
+    <js-module src="www/android_ios/transaction.js" name="transaction"/>
+    <js-module src="www/android_ios/utilities.js" name="utilities"/>
+    <js-module src="www/android_ios/geo_point.js" name="geo_point" />
+    <js-module src="www/android_ios/path.js" name="path" />
+    <js-module src="www/android_ios/utils.js" name="utils" />
 
     <config-file target="config.xml" parent="/*">
       <feature name="Firestore">

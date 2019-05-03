@@ -1,4 +1,17 @@
 # History
+## 3.0.0
+### User-facing improvements
+- Breaking change: QuerySnapshot.docs() now wraps documents in QueryDocumentSnapshots like firebase-js-sdk
+- Revert minimum cordova-ios to 4.5.0 and cordova-android to 7.0.0
+- Firestore.doc() improvement, can now call .parent correctly on first-level documents
+- CollectionReference.doc() supports id generation when no argument is passed
+- Native logs improvement
+
+### Technical improvements
+- Rename javascript imports to be consistent with file names, this allows running
+  the JavaScript when running tests
+- Add tests for the new features and refactoring
+
 ## 2.0.0
 - Updated README
 - Updated Android dependencies

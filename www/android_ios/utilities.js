@@ -1,57 +1,8 @@
-var GeoPoint = require('./GeoPoint');
+/* global Firestore */
 
-function Utilities() {
-}
+var GeoPoint = require('./geo_point');
 
-Utilities.combinePath = function () {
-
-  var args = Array.prototype.slice.call(arguments);
-
-  var combinePath = args.join("/");
-
-  return combinePath;
-}
-
-Utilities.leaf = function (path) {
-
-  var leaf;
-
-  if (path === null || path === undefined || path === "") {
-
-    leaf = path;
-
-  } else {
-
-    var pathArray = path.split("/");
-    leaf = pathArray[pathArray.length - 1];
-
-  }
-
-  return leaf;
-}
-
-Utilities.stripLeaf = function (path) {
-
-  var stripLeaf;
-
-  if (path === null || path === undefined || path === "") {
-    stripLeaf = path;
-  } else {
-
-    var pathArray = path.split("/");
-
-    if (pathArray.length === 1) {
-      stripLeaf = path;
-    } else {
-      stripLeaf = pathArray.slice(0, pathArray.length - 1).join("/");
-    }
-  }
-
-  return stripLeaf;
-}
-
-Utilities.wrap = function (data) {
-
+var wrap = function (data) {
   if (data instanceof GeoPoint) {
     return Firestore.options().geopointPrefix + data.latitude + "," + data.longitude;
   }
@@ -79,10 +30,12 @@ Utilities.wrap = function (data) {
         data[key] = Firestore.options().datePrefix + data[key].getTime();
       }
     } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
-      data[key] = Utilities.wrap(data[key]);
+      data[key] = wrap(data[key]);
     }
   }
   return data;
-}
+};
 
-module.exports = Utilities;
+module.exports = {
+  wrap: wrap
+};

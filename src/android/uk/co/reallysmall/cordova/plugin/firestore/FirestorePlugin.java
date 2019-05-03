@@ -26,6 +26,7 @@ public class FirestorePlugin extends CordovaPlugin {
     private Map<String, TransactionQueue> transactions = new Hashtable<String, TransactionQueue>();
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        FirestoreLog.d(TAG, "Initializing FirestorePlugin");
         super.initialize(cordova, webView);
 
         handlers.put("collectionOnSnapshot", new CollectionOnSnapshotHandler(FirestorePlugin.this));
@@ -47,7 +48,7 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("transactionResolve", new TransactionResolveHandler(FirestorePlugin.this));
         handlers.put("setLogLevel", new setLogLevel());
 
-        FirestoreLog.d(TAG, "Initializing FirestorePlugin");
+        FirestoreLog.d(TAG, "Done Initializing FirestorePlugin");
     }
 
     public FirebaseFirestore getDatabase() {
