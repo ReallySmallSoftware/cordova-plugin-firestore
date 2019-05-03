@@ -26,7 +26,7 @@ public class DocSetHandler implements ActionHandler {
         try {
             final String collection = args.getString(0);
             final String docId = args.getString(1);
-            final String docPath = collectionPath + "/" + docId;
+            final String docPath = collection + "/" + docId;
             final JSONObject data = args.getJSONObject(2);
 
             final JSONObject options;
