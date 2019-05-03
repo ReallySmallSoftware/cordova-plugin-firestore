@@ -26,7 +26,8 @@ public class DocOnSnapshotHandler implements ActionHandler {
     public boolean handle(JSONArray args, final CallbackContext callbackContext) {
         try {
             final String collectionPath = args.getString(0);
-            final String doc = args.getString(1);
+            final String docId = args.getString(1);
+            final String docPath = collectionPath + "/" + docId;
             final String callbackId = args.getString(2);
 
             final JSONObject options;
@@ -37,11 +38,11 @@ public class DocOnSnapshotHandler implements ActionHandler {
                 options = null;
             }
 
-            FirestoreLog.d(FirestorePlugin.TAG, "Listening to document");
 
-            DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(doc);
+            DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(docId);
             MetadataChanges metadataChanges = getMetadataChanges(options);
-            FirestoreLog.d(FirestorePlugin.TAG, "SS for document " + collectionPath + "/" + doc);
+
+            FirestoreLog.d(FirestorePlugin.TAG, "Launching onSnapshot handler for document " + docPath);
 
             EventListener eventListener = new EventListener<DocumentSnapshot>() {
                 @Override

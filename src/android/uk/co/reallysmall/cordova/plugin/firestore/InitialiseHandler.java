@@ -40,6 +40,7 @@ public class InitialiseHandler implements ActionHandler {
             FirestoreLog.d(FirestorePlugin.TAG, "Initialising Firestore...");
 
             final JSONObject options = args.getJSONObject(0);
+            FirestoreLog.d(FirestorePlugin.TAG, "Options : " + options.toString());
 
             FirebaseFirestore.setLoggingEnabled(true);
             if (options.has(CONFIG)) {
