@@ -1,5 +1,4 @@
 function Path(path) {
-  console.log('building path' + path);
   this._original = path;
   this.segments = path.split('/').filter(function(segment) {
    return segment.length > 0; 
