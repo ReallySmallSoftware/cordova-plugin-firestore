@@ -53,24 +53,24 @@ Query.prototype = Object.create({
     var callbackWrapper = function (data) {
       callback(new QuerySnapshot(data));
     };
-    exec(callbackWrapper, function () {
-      throw new Error("Undefined error in collectionOnSnapshot");
+    exec(callbackWrapper, function (e) {
+      throw new Error("Undefined error in collectionOnSnapshot", e);
     }, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
     return function () {
-      exec(function () { }, function () {
-        throw new Error("Undefined error in collectionUnsubscribe");
+      exec(function () { }, function (e) {
+        throw new Error("Undefined error in collectionUnsubscribe", e);
       }, PLUGIN_NAME, 'collectionUnsubscribe', [callbackId]);
     };
   },
   startAfter: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAfter", Utilities.wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAfter", utilities.wrap(snapshotOrVarArgs));
   },
   startAt: function (snapshotOrVarArgs) {
-    return new Query(this._ref, "startAt", Utilities.wrap(snapshotOrVarArgs));
+    return new Query(this._ref, "startAt", utilities.wrap(snapshotOrVarArgs));
   },
   where: function (fieldPath, opStr, passedValue) {
-    var value = Utilities.wrap(passedValue);
+    var value = utilities.wrap(passedValue);
 
     var whereField = {
       "fieldPath": fieldPath,

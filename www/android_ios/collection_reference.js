@@ -23,8 +23,6 @@ function CollectionReference(path, parent) {
   this._parent = parent || null;
 }
 
-console.log('Query', typeof Query.prototype, Query.prototype);
-console.log('Path', typeof Path.prototype, Path.prototype);
 CollectionReference.prototype = Object.create(Query.prototype, {
   firestore: {
     get: function () {

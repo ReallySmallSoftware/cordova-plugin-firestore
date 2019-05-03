@@ -2,6 +2,7 @@
 
 var exec = require('cordova/exec');
 var utils = require("cordova/utils");
+var Path = require("./path");
 var DocumentReference = require("./document_reference");
 var CollectionReference = require("./collection_reference");
 var FirestoreTimestamp = require("./firestore_timestamp");
@@ -67,15 +68,18 @@ Firestore.prototype = {
     throw "Firestore.batch: Not supported";
   },
   collection: function (path) {
-    return new CollectionReference(null, path);
+    return new CollectionReference(path);
   },
   disableNetwork: function () {
     throw "Firestore.disableNetwork: Not supported";
   },
   doc: function (path) {
-    var collectionReference = new CollectionReference(null, "");
-    var documentReference = new DocumentReference(collectionReference, path);
-    return documentReference;
+    // TODO firestore.doc not implemented properly, should allow getting
+    // .parent all the way down when nested path is passed
+
+    var path = new Path(path);
+    var collectionReference = new CollectionReference(path.parent);
+    return collectionReference.doc(path.id);
   },
   enableNetwork: function () {
     throw "Firestore.enableNetwork: Not supported";
