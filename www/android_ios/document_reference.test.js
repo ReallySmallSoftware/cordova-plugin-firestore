@@ -22,7 +22,6 @@ describe('DocumentReference', () => {
   describe('collection', () => {
     it('should return a CollectionReference with proper path', () => {
 
-      console.log('What is document_reference in test', typeof DocumentReference);
       const subCollectionRef = (parentDocRef).collection(subCollection);
       expect(subCollectionRef).toBeInstanceOf(CollectionReference);
       expect(subCollectionRef.path).toBe('root/parent/sub');
