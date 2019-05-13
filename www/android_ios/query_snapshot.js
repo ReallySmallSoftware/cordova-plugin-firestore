@@ -1,7 +1,6 @@
 var QueryDocumentSnapshot = require('./query_document_snapshot');
 
 function QuerySnapshot(data) {
-  console.log('building query_snapshot', data);
   this._data = data;
 }
 

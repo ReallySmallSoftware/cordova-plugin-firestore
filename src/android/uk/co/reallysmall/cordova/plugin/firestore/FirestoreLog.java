@@ -20,33 +20,35 @@ public class FirestoreLog {
         _logLevel = Log.WARN;
         break;
       default:
-        FirestoreLog.w(FirestorePlugin.TAG, "New logLevel unknown, leaving previous setting : " + _logLevel);
+        FirestoreLog.e(FirestorePlugin.TAG, "New logLevel unknown, leaving previous setting : " + _logLevel);
         break;
     }
+
+    FirestoreLog.d(FirestorePlugin.TAG, "New logLevel : " + _logLevel);
   }
 
   public static void d(String TAG, String message) {
-    if (_logLevel >= Log.DEBUG) {
+    if (_logLevel <= Log.DEBUG) {
       Log.d(TAG, message);
     }
   }
   public static void w(String TAG, String message) {
-    if (_logLevel >= Log.WARN) {
+    if (_logLevel <= Log.WARN) {
       Log.w(TAG, message);
     }
   }
   public static void w(String TAG, String message, Exception e) {
-    if (_logLevel >= Log.WARN) {
+    if (_logLevel <= Log.WARN) {
       Log.w(TAG, message, e);
     }
   }
   public static void e(String TAG, String message) {
-    if (_logLevel >= Log.ERROR) {
+    if (_logLevel <= Log.ERROR) {
       Log.e(TAG, message);
     }
   }
   public static void e(String TAG, String message, Exception e) {
-    if (_logLevel >= Log.ERROR) {
+    if (_logLevel <= Log.ERROR) {
       Log.e(TAG, message, e);
     }
   }
