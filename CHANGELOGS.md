@@ -1,4 +1,7 @@
 # History
+## 3.1.0
+- Added type definitions
+
 ## 3.0.0
 ### User-facing improvements
 - Breaking change: QuerySnapshot.docs() now wraps documents in QueryDocumentSnapshots like firebase-js-sdk
