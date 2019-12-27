@@ -1,5 +1,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
+import com.google.firebase.firestore.DocumentReference;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.gson.Gson;
@@ -31,6 +33,8 @@ public class JSONHelper {
                 value = new JSONTimestampWrapper((Timestamp) value);
             } else if (value instanceof GeoPoint) {
                 value = new JSONGeopointWrapper((GeoPoint) value);
+            } else if (value instanceof DocumentReference) {
+                value = new JSONReferenceWrapper((DocumentReference) value);
             }
             result.put(entry.getKey(), value);
         }
@@ -52,6 +56,8 @@ public class JSONHelper {
                 value = new JSONTimestampWrapper((Timestamp) value);
             } else if (value instanceof GeoPoint) {
                 value = new JSONGeopointWrapper((GeoPoint) value);
+            } else if (value instanceof DocumentReference) {
+                value = new JSONReferenceWrapper((DocumentReference) value);
             }
             result.put(value);
         }
@@ -70,7 +76,7 @@ public class JSONHelper {
         return result;
     }
 
-    static Map<String, Object> toSettableMap(JSONObject rawValue) {
+    static Map<String, Object> toSettableMap(FirestorePlugin firestorePlugin,JSONObject rawValue) {
         Type type = new TypeToken<Map<String, Object>>() {
         }.getType();
         Map<String, Object> value = new Gson().fromJson(rawValue.toString(), type);
@@ -85,8 +91,10 @@ public class JSONHelper {
                 entry.setValue(JSONDateWrapper.unwrapDate(entryValue));
             } else if (JSONTimestampWrapper.isWrappedTimestamp(value)) {
                 entry.setValue(JSONTimestampWrapper.unwrapTimestamp(value));
+            } else if (JSONReferenceWrapper.isWrappedReference(value)) {
+                entry.setValue(JSONReferenceWrapper.unwrapReference(firestorePlugin,value));
             } else if (entryValue instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
+                entry.setValue(toSettableMapInternal(firestorePlugin,(Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
                 entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }
@@ -94,7 +102,7 @@ public class JSONHelper {
         return value;
     }
 
-    static Map<Object, Object> toSettableMapInternal(Map<Object, Object> value) {
+    static Map<Object, Object> toSettableMapInternal(FirestorePlugin firestorePlugin,Map<Object, Object> value) {
 
         for (Map.Entry<Object, Object> entry : value.entrySet()) {
 
@@ -106,8 +114,10 @@ public class JSONHelper {
                 entry.setValue(JSONGeopointWrapper.unwrapGeoPoint(entryValue));
             } else if (JSONTimestampWrapper.isWrappedTimestamp(value)) {
                 entry.setValue(JSONTimestampWrapper.unwrapTimestamp(value));
+            } else if (JSONReferenceWrapper.isWrappedReference(value)) {
+                entry.setValue(JSONReferenceWrapper.unwrapReference(firestorePlugin,value));
             } else if (entryValue instanceof Map) {
-                entry.setValue(toSettableMapInternal((Map<Object, Object>) entryValue));
+                entry.setValue(toSettableMapInternal(firestorePlugin,(Map<Object, Object>) entryValue));
             } else if (FieldValueHelper.isWrappedFieldValue(entryValue)) {
                 entry.setValue(FieldValueHelper.unwrapFieldValue(entry.getValue()));
             }

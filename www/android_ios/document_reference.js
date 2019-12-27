@@ -4,7 +4,6 @@ var CollectionReference = require('./collection_reference');
 var Utilities = require('./utilities');
 var cordovaUtils = require("cordova/utils");
 var DocumentSnapshot = require("./document_snapshot");
-// var Path = require('./path');
 var utils = require('./utils');
 
 function DocumentReference(collectionReference, id) {
@@ -18,7 +17,7 @@ DocumentReference.prototype = {
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
   },
   collection: function (collectionPath) {
-    return new CollectionReference([this.path, collectionPath].join('/'), this);
+    return new CollectionReference([collectionPath].join('/'), this);
   },
   delete: function () {
     var args = [this._collectionReference.path, this._id];
@@ -61,9 +60,17 @@ DocumentReference.prototype = {
       wrappedCallback = function (documentSnapshot) { };
     }
 
-    exec(wrappedCallback, function () {
-      throw new Error("Undefined error in docOnSnapshot");
-    }, PLUGIN_NAME, 'docOnSnapshot', args);
+    var wrappedError;
+
+    if (this._isFunction(onError)) {
+      wrappedError = onError;
+    } else {
+      wrappedError = function () {
+        throw new Error("Undefined error in docOnSnapshot");
+      };
+    }
+
+    exec(wrappedCallback, wrappedError, PLUGIN_NAME, 'docOnSnapshot', args);
 
     return function () {
       exec(function () { }, function () {
@@ -106,7 +113,7 @@ Object.defineProperties(DocumentReference.prototype, {
     }
   },
   path: {
-    get: function() {
+    get: function () {
       return this._collectionReference.path + '/' + this.id;
     }
   }

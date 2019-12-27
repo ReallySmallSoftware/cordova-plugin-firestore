@@ -12,6 +12,7 @@
 
 + (NSDictionary *)toJSON:(NSDictionary *)values;
 + (NSDictionary *)fromJSON:(NSDictionary *)values;
++ (void)setReferencePrefix:(NSString *)referencePrefix;
 + (void)setGeopointPrefix:(NSString *)geopointPrefix;
 + (void)setDatePrefix:(NSString *)datePrefix;
 + (void)setTimestampPrefix:(NSString *)timestampPrefix;

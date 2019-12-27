@@ -20,6 +20,7 @@ public class InitialiseHandler implements ActionHandler {
     public static final String DATE_PREFIX = "datePrefix";
     public static final String TIMESTAMP_PREFIX = "timestampPrefix";
     public static final String GEOPOINT_PREFIX = "geopointPrefix";
+    public static final String REFERENCE_PREFIX = "referencePrefix";
     public static final String FIELDVALUE_DELETE = "fieldValueDelete";
     public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
     public static final String TIMESTAMPSINSNAPSHOTS = "timestampsInSnapshots";
@@ -47,22 +48,22 @@ public class InitialiseHandler implements ActionHandler {
                 JSONObject config = options.getJSONObject(CONFIG);
                 FirebaseOptions.Builder configBuilder = new FirebaseOptions.Builder();
                 if (options.has("applicationId")) {
-                    configBuilder.setApplicationId("applicationId");
+                    configBuilder.setApplicationId(options.getString("applicationId"));
                 }
                 if (options.has("gcmSenderId")) {
-                    configBuilder.setGcmSenderId("gcmSenderId");
+                    configBuilder.setGcmSenderId(options.getString("gcmSenderId"));
                 }
                 if (options.has("apiKey")) {
-                    configBuilder.setApiKey("apiKey");
+                    configBuilder.setApiKey(options.getString("apiKey"));
                 }
                 if (options.has("projectId")) {
-                    configBuilder.setProjectId("projectId");
+                    configBuilder.setProjectId(options.getString("projectId"));
                 }
                 if (options.has("databaseUrl")) {
-                    configBuilder.setDatabaseUrl("databaseUrl");
+                    configBuilder.setDatabaseUrl(options.getString("databaseUrl"));
                 }
                 if (options.has("storageBucket")) {
-                    configBuilder.setStorageBucket("storageBucket");
+                    configBuilder.setStorageBucket(options.getString("storageBucket"));
                 }
 
                 FirebaseOptions customOptions = configBuilder.build();
@@ -97,6 +98,10 @@ public class InitialiseHandler implements ActionHandler {
 
             if (options.has(GEOPOINT_PREFIX)) {
                 JSONGeopointWrapper.setGeopointPrefix(options.getString(GEOPOINT_PREFIX));
+            }
+
+            if (options.has(REFERENCE_PREFIX)) {
+                JSONReferenceWrapper.setReferencePrefix(options.getString(REFERENCE_PREFIX));
             }
 
             if (options.has(FIELDVALUE_DELETE)) {

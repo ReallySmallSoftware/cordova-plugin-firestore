@@ -1,6 +1,7 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,7 +31,7 @@ public class DocUpdateHandler implements ActionHandler {
             FirestoreLog.d(FirestorePlugin.TAG, "Updating document");
 
             try {
-                firestorePlugin.getDatabase().collection(collection).document(docId).update(JSONHelper.toSettableMap(data)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                firestorePlugin.getDatabase().collection(collection).document(docId).update(JSONHelper.toSettableMap(this.firestorePlugin, data)).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success();

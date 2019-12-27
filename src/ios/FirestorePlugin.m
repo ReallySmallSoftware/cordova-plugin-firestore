@@ -321,6 +321,12 @@
         [FirestorePluginJSONHelper setGeopointPrefix:geopointPrefix];
     }
 
+    NSString *referencePrefix = options[@"referencePrefix"];
+
+    if (referencePrefix != NULL) {
+        [FirestorePluginJSONHelper setReferencePrefix:referencePrefix];
+    }
+
     NSString *timestampPrefix = options[@"timestampPrefix"];
 
     if (timestampPrefix != NULL) {

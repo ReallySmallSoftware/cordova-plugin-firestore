@@ -1,6 +1,8 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,7 +31,7 @@ public class CollectionAddHandler implements ActionHandler {
             FirestoreLog.d(FirestorePlugin.TAG, "Writing document to collection");
 
             try {
-                firestorePlugin.getDatabase().collection(collectionPath).add(JSONHelper.toSettableMap(data)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                firestorePlugin.getDatabase().collection(collectionPath).add(JSONHelper.toSettableMap(this.firestorePlugin, data)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentReference, false));

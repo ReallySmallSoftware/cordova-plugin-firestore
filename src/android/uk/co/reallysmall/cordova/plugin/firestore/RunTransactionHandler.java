@@ -1,7 +1,9 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
@@ -164,9 +166,9 @@ public class RunTransactionHandler implements ActionHandler {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
 
             if (setOptions == null) {
-                transaction.set(documentRef, JSONHelper.toSettableMap(transactionDetails.data));
+                transaction.set(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data));
             } else {
-                transaction.set(documentRef, JSONHelper.toSettableMap(transactionDetails.data), setOptions);
+                transaction.set(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data), setOptions);
             }
 
         } catch (Exception e) {
@@ -181,7 +183,7 @@ public class RunTransactionHandler implements ActionHandler {
 
         try {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
-            transaction.update(documentRef, JSONHelper.toSettableMap(transactionDetails.data));
+            transaction.update(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data));
 
         } catch (Exception e) {
             FirestoreLog.e(FirestorePlugin.TAG, "Error performing transactional document update in thread", e);

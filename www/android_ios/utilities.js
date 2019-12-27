@@ -11,6 +11,10 @@ var wrap = function (data) {
     return Firestore.options().datePrefix + data.getTime();
   }
 
+  if (Object.prototype.toString.call(data) === '[object DocumentReference]') {
+    return Firestore.options().referencePrefix + data.path;
+  }
+
   if (Object.prototype.toString.call(data) !== '[object Object]') {
     return data;
   }

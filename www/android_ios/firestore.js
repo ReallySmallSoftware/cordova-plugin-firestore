@@ -45,6 +45,9 @@ function Firestore(options) {
   if (options.geopointPrefix === undefined) {
     options.geopointPrefix = "__GEOPOINT:";
   }
+  if (options.referencePrefix === undefined) {
+    options.referencePrefix = "__REFERENCE:";
+  }
   if (options.fieldValueServerTimestamp === undefined) {
     options.fieldValueServerTimestamp = "__SERVERTIMESTAMP";
   }

@@ -169,7 +169,7 @@ In the above example this is being used for the browser version, but it can also
 - limit(limit)
 - orderBy(field, direction)
 - get()
-- onSnapshot(callback, options)
+- onSnapshot(optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError)
 - startAfter(snapshotOrVarArgs)
 - startAt(snapshotOrVarArgs)
 - where(fieldPath, opStr, passedValue)
@@ -262,6 +262,25 @@ db.get().collection("mycollection/mydoc/mysubcollection");
 ```
 
 Note that the second form is slightly more efficient as it results in less objects being instantiated.
+
+## Typescript
+Support is now included for typescript. Use the following to reference the typescript definitions:
+
+```
+/// <reference types="cordova-plugin-firestore" />
+e
+private static crashlytics: FirebaseCrashlytics = FirebaseCrashlyticsPlugin.initialise();
+crashlytics.logException("my message");
+```
+
+You may also need to add an external to webpack.config.ls:
+
+```
+  externals: {
+    'cordova-plugin-firebase-crashlytics': "cordova-plugin-firebase-crashlytics"
+    '/exec':"cordova/exec"
+  },
+```
 
 ## Learnings and notes
 I have learnt a number of things whilst implementing this:

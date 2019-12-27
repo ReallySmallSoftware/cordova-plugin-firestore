@@ -14,6 +14,7 @@
 static NSString *datePrefix = @"__DATE:";
 static NSString *timestampPrefix = @"__TIMESTAMP:";
 static NSString *geopointPrefix = @"__GEOPOINT:";
+static NSString *referencePrefix = @"__REFERENCE:";
 static NSString *fieldValueDelete = @"__DELETE";
 static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
@@ -45,6 +46,13 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
             NSMutableString *geopointString = [[NSMutableString alloc] init];
             [geopointString appendString:geopointPrefix];
             [geopointString appendString:[NSString stringWithFormat:@"%f,%f", point.latitude, point.longitude]];
+            value = geopointString;
+        } else if ([value isKindOfClass:[FIRDocumentReference class]]) {
+            FIRDocumentReference *reference = (FIRDocumentReference *)value;
+            
+            NSMutableString *referenceString = [[NSMutableString alloc] init];
+            [referenceString appendString:referencePrefix];
+            [referenceString appendString:[NSString stringWithFormat:@"%s,%s", reference.path, reference.id]];
             value = geopointString;
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             value = [self toJSON:value];
@@ -82,6 +90,7 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
         NSUInteger datePrefixLength = (NSUInteger)datePrefix.length;
         NSUInteger geopointPrefixLength = (NSUInteger)geopointPrefix.length;
         NSUInteger timestampPrefixLength = (NSUInteger)timestampPrefix.length;
+        NSUInteger referencePrefixLength = (NSUInteger)referencePrefix.length;
 
         if ([stringValue length] > datePrefixLength && [datePrefix isEqualToString:[stringValue substringToIndex:datePrefixLength]]) {
             NSTimeInterval timestamp = [[stringValue substringFromIndex:datePrefixLength] doubleValue];
@@ -102,7 +111,12 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
             value = geopoint;
         }
       
-      
+        if ([stringValue length] > referencePrefixLength && [referencePrefix isEqualToString:[stringValue substringToIndex:referencePrefixLength]]) {
+            NSArray *tmp = [[stringValue substringFromIndex:referencePrefixLength] componentsSeparatedByString:@","];
+            FIRDocumentReference *reference = [[FIRDocumentReference alloc] initWithLatitude:[[tmp objectAtIndex:0] doubleValue] longitude:[[tmp objectAtIndex:1] doubleValue]];
+            value = reference;
+        }
+
         if ([fieldValueDelete isEqualToString:stringValue]) {
             value = FIRFieldValue.fieldValueForDelete;
         }

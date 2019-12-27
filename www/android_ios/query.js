@@ -16,6 +16,10 @@ function Query(ref, queryType, value) {
 }
 
 Query.prototype = Object.create({
+  _isFunction: function (functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+  },
   endAt: function (snapshotOrVarArgs) {
     return new Query(this._ref, "endAt", utilities.wrap(snapshotOrVarArgs));
   },
@@ -45,17 +49,43 @@ Query.prototype = Object.create({
       return new QuerySnapshot(data);
     });
   },
-  onSnapshot: function (callback, options) {
+  onSnapshot: function (optionsOrObserverOrOnNext, observerOrOnNextOrOnError, onError) {
 
     var callbackId = cordovaUtils.createUUID();
+
+    var options = undefined;
+
+    if (!this._isFunction(optionsOrObserverOrOnNext)) {
+      options = optionsOrObserverOrOnNext;
+    }
+
+    var wrappedCallback;
+
+    if (this._isFunction(optionsOrObserverOrOnNext)) {
+      wrappedCallback = function (querySnapshot) {
+        optionsOrObserverOrOnNext(new QuerySnapshot(querySnapshot));
+      };
+    } else if (this._isFunction(observerOrOnNextOrOnError)) {
+      wrappedCallback = function (querySnapshot) {
+        observerOrOnNextOrOnError(new QuerySnapshot(querySnapshot));
+      };
+    } else {
+      wrappedCallback = function (querySnapshot) { };
+    }
+
     var args = [this._ref.path, this._ref._queries, options, callbackId];
 
-    var callbackWrapper = function (data) {
-      callback(new QuerySnapshot(data));
-    };
-    exec(callbackWrapper, function (e) {
-      throw new Error("Undefined error in collectionOnSnapshot", e);
-    }, PLUGIN_NAME, 'collectionOnSnapshot', args);
+    var wrappedError;
+
+    if (this._isFunction(onError)) {
+      wrappedError = onError;
+    } else {
+      wrappedError = function () {
+        throw new Error("Undefined error in collectionOnSnapshot");
+      };
+    }
+
+    exec(wrappedCallback, wrappedError, PLUGIN_NAME, 'collectionOnSnapshot', args);
 
     return function () {
       exec(function () { }, function (e) {

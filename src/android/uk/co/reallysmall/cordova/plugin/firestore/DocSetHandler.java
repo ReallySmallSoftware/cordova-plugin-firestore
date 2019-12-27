@@ -1,6 +1,8 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.support.annotation.NonNull;
+//import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -62,9 +64,9 @@ public class DocSetHandler implements ActionHandler {
                 };
 
                 if (setOptions == null) {
-                    documentReference.set(JSONHelper.toSettableMap(data)).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+                    documentReference.set(JSONHelper.toSettableMap(this.firestorePlugin, data)).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
                 } else {
-                    documentReference.set(JSONHelper.toSettableMap(data), setOptions).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+                    documentReference.set(JSONHelper.toSettableMap(this.firestorePlugin, data), setOptions).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
                 }
             } catch (Exception e) {
                 FirestoreLog.e(FirestorePlugin.TAG, "Error processing document set " + docPath, e);

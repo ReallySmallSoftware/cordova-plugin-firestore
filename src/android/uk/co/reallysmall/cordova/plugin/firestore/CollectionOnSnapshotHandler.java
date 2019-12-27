@@ -1,6 +1,6 @@
 package uk.co.reallysmall.cordova.plugin.firestore;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.firestore.CollectionReference;

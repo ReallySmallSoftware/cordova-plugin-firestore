@@ -2,8 +2,12 @@
 
 var FirestoreTimestamp = require("./firestore_timestamp");
 var GeoPoint = require("./geo_point");
+var DocumentReference;
+var CollectionReference;
+var Path = require("./path");
 
 function DocumentSnapshot(data) {
+
   this._data = data;
 
   if (data.exists) {
@@ -12,46 +16,70 @@ function DocumentSnapshot(data) {
 }
 
 DocumentSnapshot.prototype = {
+  _newDocumentReference: function(documentPath) {
+    if (DocumentReference === undefined) {
+      DocumentReference = require('./document_reference');
+    }
+  
+    if (CollectionReference === undefined) {
+      CollectionReference = require('./collection_reference');
+    }
+
+    var path = new Path(documentPath);
+    return new DocumentReference(new CollectionReference(path.parent), path.id);
+  },
   _parse: function (data) {
     var keys = Object.keys(data);
 
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
 
-      if (Object.prototype.toString.call(data[key]) === '[object String]' &&
-        data[key].startsWith(Firestore.options().datePrefix)) {
-        var length = data[key].length;
-        var prefixLength = Firestore.options().datePrefix.length;
+      if (Object.prototype.toString.call(data[key]) === '[object String]') {
 
-        var timestamp = data[key].substr(prefixLength, length - prefixLength);
-        data[key] = new Date(parseInt(timestamp));
+        if (data[key].startsWith(Firestore.options().datePrefix)) {
+          var length = data[key].length;
+          var prefixLength = Firestore.options().datePrefix.length;
 
-      } else if (Object.prototype.toString.call(data[key]) === '[object String]' &&
-        data[key].startsWith(Firestore.options().timestampPrefix)) {
-        var length = data[key].length;
-        var prefixLength = Firestore.options().timestampPrefix.length;
+          var timestamp = data[key].substr(prefixLength, length - prefixLength);
+          data[key] = new Date(parseInt(timestamp));
 
-        var timestamp = data[key].substr(prefixLength, length - prefixLength);
+        } else if (data[key].startsWith(Firestore.options().timestampPrefix)) {
+          var length = data[key].length;
+          var prefixLength = Firestore.options().timestampPrefix.length;
 
-        if (timestamp.includes("_")) {
-          var timestampParts = timestamp.split("_");
-          data[key] = new FirestoreTimestamp(parseInt(timestampParts[0]), parseInt(timestampParts[1]));
+          var timestamp = data[key].substr(prefixLength, length - prefixLength);
 
-        } else {
-          data[key] = new FirestoreTimestamp(parseInt(timestamp), 0);
+          if (timestamp.includes("_")) {
+            var timestampParts = timestamp.split("_");
+            data[key] = new FirestoreTimestamp(parseInt(timestampParts[0]), parseInt(timestampParts[1]));
+
+          } else {
+            data[key] = new FirestoreTimestamp(parseInt(timestamp), 0);
+          }
+        } else if (data[key].startsWith(Firestore.options().geopointPrefix)) {
+          var length = data[key].length;
+          var prefixLength = Firestore.options().geopointPrefix.length;
+
+          var geopoint = data[key].substr(prefixLength, length - prefixLength);
+
+          if (geopoint.includes(",")) {
+            var geopointParts = geopoint.split(",");
+            data[key] = new GeoPoint(parseFloat(geopointParts[0]), parseFloat(geopointParts[1]));
+          }
+        } else if (data[key].startsWith(Firestore.options().referencePrefix)) {
+          var length = data[key].length;
+          var prefixLength = Firestore.options().referencePrefix.length;
+
+          var reference = data[key].substr(prefixLength, length - prefixLength);
+
+          console.log("create doc ref");
+          data[key] = this._newDocumentReference(reference);
+          
+        } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
+          data[key] = this._parse(data[key]);
         }
-      } else if (Object.prototype.toString.call(data[key]) === '[object String]' &&
-        data[key].startsWith(Firestore.options().geopointPrefix)) {
-        var length = data[key].length;
-        var prefixLength = Firestore.options().geopointPrefix.length;
+      } else if (Array.isArray(data[key])) {
 
-        var geopoint = data[key].substr(prefixLength, length - prefixLength);
-
-        if (geopoint.includes(",")) {
-          var geopointParts = geopoint.split(",");
-          data[key] = new GeoPoint(parseFloat(geopointParts[0]), parseFloat(geopointParts[1]));
-        }  
-      } else if (Object.prototype.toString.call(data[key]) === '[object Object]') {
         data[key] = this._parse(data[key]);
       }
     }

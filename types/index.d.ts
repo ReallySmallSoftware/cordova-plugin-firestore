@@ -4,9 +4,11 @@ declare namespace Firestore {
         datePrefix?: string;
         fieldValueDelete?: string;
         geopointPrefix?: string;
+        referencePrefix?:string;
         fieldValueServerTimestamp?: string;
         persist?: boolean;
         timestampsInSnapshots?: boolean;
+        config?: any;
     }
 
     export interface FieldValue {
@@ -37,14 +39,18 @@ declare namespace Firestore {
         merge: boolean;
     }
 
+    export interface Unsubscribe {
+        (): void;
+    }
+
     export interface DocumentReference {
         collection(collectionPath: string): CollectionReference;
         delete(): Promise<void>;
         get(): Promise<DocumentSnapshot>;
         onSnapshot(optionsOrObserverOrOnNext: object | SnapshotListenOptions | DocumentSnapshotCallback,
             observerOrOnNextOrOnError?: object | DocumentSnapshotCallback | DocumentErrorCallback,
-            onError?: DocumentErrorCallback): void;
-        set(data: DocumentData, options?: SetOptions): void;
+            onError?: DocumentErrorCallback): Unsubscribe;
+        set(data: DocumentData, options?: SetOptions): Promise<DocumentReference>;
         update(data: UpdateData): Promise<any>;
 
         firestore: Firestore;
@@ -71,18 +77,18 @@ declare namespace Firestore {
     }
 
     export interface FirestoreTimestamp {
-        new (seconds: number, nanoseconds: number): FirestoreTimestamp;
-        toDate():Date;
+        new(seconds: number, nanoseconds: number): FirestoreTimestamp;
+        toDate(): Date;
     }
 
     export interface GeoPoint {
-        new (latitude: number, longitude: number): GeoPoint;
+        new(latitude: number, longitude: number): GeoPoint;
         latitude: number;
         longitude: number;
     }
 
     export interface Path {
-        new (path:string): GeoPoint;
+        new(path: string): GeoPoint;
     }
 
     export interface QuerySnapshot {
@@ -98,14 +104,20 @@ declare namespace Firestore {
         (snapshot: QuerySnapshot): void;
     }
 
+    export interface QueryErrorCallback {
+        (error: Error): void;
+    }
+
     export interface Query {
-        endAt(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
-        endBefore(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
+        endAt(snapshotOrFieldValues: QuerySnapshot | any[]): Query;
+        endBefore(snapshotOrFieldValues: QuerySnapshot | any[]): Query;
         limit(limit: number): Query;
         orderBy(fieldPath: string, direction: string): Query;
 
-        get(): QuerySnapshot;
-        onSnapshot(callback: Function, options: SnapshotListenOptions): void;
+        get(): Promise<QuerySnapshot>;
+        onSnapshot(optionsOrObserverOrOnNext: object | SnapshotListenOptions | QuerySnapshotCallback,
+            observerOrOnNextOrOnError?: object | QuerySnapshotCallback | QueryErrorCallback,
+            onError?: QueryErrorCallback): Unsubscribe;
         startAfter(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
         startAt(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
         where(fieldPath: string, opStr: string, value: any): Query;
@@ -119,10 +131,6 @@ declare namespace Firestore {
 
         add(data: any): Promise<DocumentReference>;
         doc(id?: string): DocumentReference;
-    }
-
-    export interface Document {
-
     }
 
     export interface Transaction {
@@ -139,9 +147,9 @@ declare namespace Firestore {
     export interface Firestore {
         get(): Firestore;
         batch(): void;
-        collection(): CollectionReference;
+        collection(collectionPath: string): CollectionReference;
         disableNetwork(): Promise<void>;
-        doc(documentPath: string): Document;
+        doc(documentPath: string): DocumentReference;
         enableNetwork(): void;
         enablePersistence(): void;
         runTransation(callback: RunTransactionUpdateFunction): Promise<any>;

@@ -1,4 +1,10 @@
 # History
+## 4.0.0
+- Amended typescript support
+- Updated android firebase dependencies
+- Migrate to androidx
+- BREAKING CHANGE: DocumentReference.onSnapshot mimics native Javascritp SDK more accurately
+
 ## 3.1.0
 - Added type definitions
 
