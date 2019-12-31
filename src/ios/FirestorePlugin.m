@@ -126,7 +126,7 @@
 
 - (FIRQuery *)processQueryWhere:(FIRQuery *)query ForValue:(NSObject *)whereObject {
 
-    NSString *fieldPath = [whereObject valueForKey:@"fieldPath"];
+    NSObject *fieldPath = [self unwrapFieldPath:[whereObject valueForKey:@"fieldPath"]];
     NSString *opStr = [whereObject valueForKey:@"opStr"];
     NSObject *value = [self parseWhereValue:[whereObject valueForKey:@"value"]];
 
@@ -140,7 +140,13 @@
         return [query queryWhereField:fieldPath isLessThan:value];
     } else if ([opStr isEqualToString:@"<="]) {
         return [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
-    } else {
+    } else if ([opStr isEqualToString:@"in"]) {
+        return [query queryWhereField:fieldPath isIn:value];
+    }else if ([opStr isEqualToString:@"array-contains"]) {
+        return [query queryWhereField:fieldPath arrayContains:value];
+    }else if ([opStr isEqualToString:@"array-contains-any"]) {
+        return [query queryWhereField:fieldPath arrayContainsAny:value];
+    }else {
         NSLog(@"Unknown operator type %s", [self convertString:opStr]);
     }
 
@@ -164,30 +170,30 @@
 }
 
 - (NSObject *)parseWhereValue:(NSObject *)value {
-    return [FirestorePluginJSONHelper parseSpecial:value];
+    return [FirestorePluginJSONHelper fromJSON:value];
 }
 
 - (FIRQuery *)processQueryStartAfter:(FIRQuery *)query ForValue:(NSObject *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
     return [query queryStartingAfterValues:array];
 }
 
 - (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSObject *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
     return [query queryStartingAtValues:array];
 }
 
 - (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSObject *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
     return [query queryEndingAtValues:array];
 }
 
 - (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSObject *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper parseSpecial:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
     return [query queryEndingBeforeValues:array];
 }
 
@@ -343,6 +349,12 @@
 
     if (fieldValueServerTimestamp != NULL) {
         [FirestorePluginJSONHelper setFieldValueServerTimestamp:fieldValueServerTimestamp];
+    }
+
+    NSString *fieldPathDocumentId = options[@"fieldPathDocumentId"];
+
+    if (fieldPathDocumentId != NULL) {
+        self.fieldPathDocumentIdPrefix = fieldPathDocumentId;
     }
 
     [self.firestore setSettings:settings];

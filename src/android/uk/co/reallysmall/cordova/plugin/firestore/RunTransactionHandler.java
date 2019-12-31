@@ -19,6 +19,8 @@ import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Map;
+
 public class RunTransactionHandler implements ActionHandler {
 
     public static final int TRANSACTION_TIMEOUT = 30000;
@@ -166,9 +168,9 @@ public class RunTransactionHandler implements ActionHandler {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
 
             if (setOptions == null) {
-                transaction.set(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data));
+                transaction.set(documentRef, JSONHelper.fromJSON(transactionDetails.data));
             } else {
-                transaction.set(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data), setOptions);
+                transaction.set(documentRef, JSONHelper.fromJSON(transactionDetails.data), setOptions);
             }
 
         } catch (Exception e) {
@@ -183,7 +185,7 @@ public class RunTransactionHandler implements ActionHandler {
 
         try {
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(transactionDetails.collectionPath).document(transactionDetails.docId);
-            transaction.update(documentRef, JSONHelper.toSettableMap(this.firestorePlugin, transactionDetails.data));
+            transaction.update(documentRef,(Map<String, Object>)JSONHelper.fromJSON(transactionDetails.data));
 
         } catch (Exception e) {
             FirestoreLog.e(FirestorePlugin.TAG, "Error performing transactional document update in thread", e);

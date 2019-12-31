@@ -64,25 +64,7 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
     return result;
 }
 
-+ (NSDictionary *)fromJSON:(NSDictionary *)values {
-    NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithCapacity:[values count]];
-
-    for (id key in values) {
-        id value = [values objectForKey:key];
-
-        if ([value isKindOfClass:[NSDictionary class]]) {
-            value = [self fromJSON:value];
-        } else {
-            value = [self parseSpecial:value];
-        }
-
-        [result setObject:value forKey:key];
-    }
-
-    return result;
-}
-
-+ (NSObject *)parseSpecial:(NSObject *)value {
++ (NSObject *)fromJSON:(NSObject *)value {
 
     if ([value isKindOfClass:[NSString class]]) {
         NSString *stringValue = (NSString *)value;
@@ -124,9 +106,37 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
         if ([fieldValueServerTimestamp isEqualToString:stringValue]) {
             value = FIRFieldValue.fieldValueForServerTimestamp;
         }
+    } else if ([value isKindOfClass:[NSDictionary class]]) {
+        value = [self toSettableDictionaryInternal:value];
+    } else if ([value isKindOfClass:[NSArray class]]) {
+        value = [self toSettableArrayInternal:value];
     }
 
     return value;
+}
+
++ (NSObject *)toSettableDictionaryInternal:(NSDictionary *)values {
+    NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithCapacity:[values count]];
+
+    for (id key in values) {
+        id value = [values objectForKey:key];
+        value = [self fromJSON:value];
+        [result setObject:value forKey:key];
+    }
+
+    return result;
+}
+
++ (NSObject *)toSettableArrayInternal:(NSArray *)values {
+    NSMutableArray *result = [[NSMutableArray alloc]initWithCapacity:[values count]];
+
+    for (id key in values) {
+        id value = [values objectForKey:key];
+        value = [self fromJSON:value];
+        [result setObject:value forKey:key];
+    }
+
+    return result;
 }
 
 + (void)setDatePrefix:(NSString *)newDatePrefix {

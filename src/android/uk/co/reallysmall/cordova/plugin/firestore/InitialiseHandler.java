@@ -112,6 +112,8 @@ public class InitialiseHandler implements ActionHandler {
                 FieldValueHelper.setServerTimestampPrefix(options.getString(FIELDVALUE_SERVERTIMESTAMP));
             }
 
+            JSONHelper.setPlugin(this.firestorePlugin);
+
             FirestoreLog.d(FirestorePlugin.TAG, "Setting Firestore persistance to " + persist);
 
             boolean timestampsInSnapshots = false;

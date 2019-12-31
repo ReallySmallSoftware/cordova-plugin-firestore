@@ -35,7 +35,7 @@ public class CollectionGetHandler implements ActionHandler {
 
             try {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collectionPath);
-                Query query = QueryHelper.processQueries(queries, collectionRef);
+                Query query = QueryHelper.processQueries(queries, collectionRef, this.firestorePlugin);
 
                 query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override

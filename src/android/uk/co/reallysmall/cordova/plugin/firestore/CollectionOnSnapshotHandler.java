@@ -36,7 +36,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
                 CollectionReference collectionRef = firestorePlugin.getDatabase().collection(collection);
                 MetadataChanges metadataChanges = getMetadataChanges(options);
 
-                Query query = QueryHelper.processQueries(queries, collectionRef);
+                Query query = QueryHelper.processQueries(queries, collectionRef, this.firestorePlugin);
 
                 EventListener eventListener = new EventListener<QuerySnapshot>() {
                     @Override

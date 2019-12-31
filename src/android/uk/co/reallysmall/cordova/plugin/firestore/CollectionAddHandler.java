@@ -31,7 +31,7 @@ public class CollectionAddHandler implements ActionHandler {
             FirestoreLog.d(FirestorePlugin.TAG, "Writing document to collection");
 
             try {
-                firestorePlugin.getDatabase().collection(collectionPath).add(JSONHelper.toSettableMap(this.firestorePlugin, data)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                firestorePlugin.getDatabase().collection(collectionPath).add(JSONHelper.fromJSON(data)).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         callbackContext.sendPluginResult(PluginResultHelper.createPluginResult(documentReference, false));

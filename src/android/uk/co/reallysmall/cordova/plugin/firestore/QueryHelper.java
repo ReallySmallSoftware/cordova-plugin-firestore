@@ -25,7 +25,7 @@ public class QueryHelper {
     }
 
 
-    public static Query processQueries(JSONArray queries, Query query) throws JSONException {
+    public static Query processQueries(JSONArray queries, Query query, FirestorePlugin firestorePlugin) throws JSONException {
 
         FirestoreLog.d(FirestorePlugin.TAG, "Processing queries");
 

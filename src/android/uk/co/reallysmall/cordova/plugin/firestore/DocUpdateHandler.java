@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 
 public class DocUpdateHandler implements ActionHandler {
     private FirestorePlugin firestorePlugin;
@@ -31,7 +33,7 @@ public class DocUpdateHandler implements ActionHandler {
             FirestoreLog.d(FirestorePlugin.TAG, "Updating document");
 
             try {
-                firestorePlugin.getDatabase().collection(collection).document(docId).update(JSONHelper.toSettableMap(this.firestorePlugin, data)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                firestorePlugin.getDatabase().collection(collection).document(docId).update((Map<String,Object>)JSONHelper.fromJSON(data)).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         callbackContext.success();

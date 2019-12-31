@@ -42,7 +42,7 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="18.2.0"/>
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.3.1"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>
@@ -87,6 +87,7 @@
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionDetails.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/TransactionOperationType.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FirestoreLog.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
+    <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/FieldPathHelper.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
 
   </platform>
 

@@ -16,6 +16,10 @@ declare namespace Firestore {
         serverTimestamp(): string;
     }
 
+    export interface FieldPath {
+        documentId(): string;
+    }
+
     export interface DocumentData {
         [field: string]: any;
     }
@@ -144,7 +148,7 @@ declare namespace Firestore {
         (transaction: Transaction): Promise<any>;
     }
 
-    export interface Firestore {
+    export abstract class Firestore {
         get(): Firestore;
         batch(): void;
         collection(collectionPath: string): CollectionReference;
@@ -156,8 +160,9 @@ declare namespace Firestore {
         setLogLevel(logLevel: string): void;
         settings(settings: any): void;
 
-        FieldValue: string;
-        GeoPoint: string;
+        static FieldValue: FieldValue;
+        static FieldPath: FieldPath;
+        static GeoPoint: GeoPoint;
     }
 
     export function initialise(options: FirestoreOptions): Promise<Firestore>;

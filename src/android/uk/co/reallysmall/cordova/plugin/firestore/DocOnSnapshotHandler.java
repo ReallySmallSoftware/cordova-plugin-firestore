@@ -37,8 +37,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
             } else {
                 options = null;
             }
-
-
+            
             DocumentReference documentRef = firestorePlugin.getDatabase().collection(collectionPath).document(docId);
             MetadataChanges metadataChanges = getMetadataChanges(options);
 

@@ -31,6 +31,12 @@ var FieldValue = {
   }
 };
 
+var FieldPath = {
+  id: function () {
+    return __firestoreOptions.fieldPathId;
+  }
+};
+
 function Firestore(options) {
 
   if (options.datePrefix === undefined) {
@@ -41,6 +47,9 @@ function Firestore(options) {
   }
   if (options.fieldValueDelete === undefined) {
     options.fieldValueDelete = "__DELETE";
+  }
+  if (options.fieldPathId === undefined) {
+    options.fieldPathId = "__ID";
   }
   if (options.geopointPrefix === undefined) {
     options.geopointPrefix = "__GEOPOINT:";
@@ -116,7 +125,7 @@ Firestore.prototype = {
   },
   setLogLevel: function (logLevel) {
     if (['debug', 'error', 'silent'].indexOf(logLevel) > -1) {
-      return new Promise(function(resolve, reject) {
+      return new Promise(function (resolve, reject) {
         exec(resolve, reject, PLUGIN_NAME, 'setLogLevel', [logLevel]);
       });
     } else {
@@ -128,18 +137,9 @@ Firestore.prototype = {
   }
 };
 
-Object.defineProperties(Firestore.prototype, {
-  FieldValue: {
-    get: function () {
-      return FieldValue;
-    }
-  },
-  GeoPoint: {
-    get: function () {
-      return GeoPoint;
-    }
-  }
-});
+Firestore.FieldValue =  FieldValue;
+Firestore.FieldPath = FieldPath;
+Firestore.GeoPoint = GeoPoint;
 
 function initialise(options) {
   return new Promise(function (resolve) {
@@ -166,6 +166,7 @@ function initialise(options) {
 module.exports = {
   initialise: initialise, // original implementation
   initialize: initialise, // better for common usage
+  Firestore: Firestore,
 
   __executeTransaction: function (transactionId) {
     __transactionList[transactionId].updateFunction(__transactionList[transactionId].transaction).then(function (result) {
@@ -176,19 +177,19 @@ module.exports = {
     });
   },
 
-  newTimestamp: function(date) {
+  newTimestamp: function (date) {
     return new FirestoreTimestamp(date.getTime() / 1000, date.getMilliseconds() * 1000);
   },
 
-  options: function() {
+  options: function () {
     return __firestoreOptions;
   },
 
-  Timestamp: function(seconds, nanoseconds) {
+  Timestamp: function (seconds, nanoseconds) {
     return new FirestoreTimestamp(seconds, nanoseconds);
   },
 
-  GeoPoint: function(latitude, longitude) {
+  GeoPoint: function (latitude, longitude) {
     return new GeoPoint(latitude, longitude);
   }
 };
