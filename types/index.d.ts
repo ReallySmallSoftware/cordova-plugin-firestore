@@ -14,6 +14,9 @@ declare namespace Firestore {
     export interface FieldValue {
         delete(): string;
         serverTimestamp(): string;
+        increment(n:number): string;
+        arrayUnion(...elements:any[]):string;
+        arrayRemove(...elements:any[]):string;
     }
 
     export interface FieldPath {

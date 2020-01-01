@@ -104,6 +104,7 @@ public class JSONHelper {
         return newValue;
     }
 
+
     private static Map<Object, Object> toSettableJSONInternal(JSONObject map) {
         Type type = new TypeToken<Map<String, Object>>() {
         }.getType();

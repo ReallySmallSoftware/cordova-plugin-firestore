@@ -351,6 +351,24 @@
         [FirestorePluginJSONHelper setFieldValueServerTimestamp:fieldValueServerTimestamp];
     }
 
+    NSString *fieldValueIncrement = options[@"fieldValueIncrement"];
+
+    if (fieldValueIncrement != NULL) {
+        [FirestorePluginJSONHelper setFieldValueIncrement:fieldValueIncrement];
+    }
+
+    NSString *fieldValueArrayUnion = options[@"fieldValueArrayUnion"];
+
+    if (fieldValueArrayUnion != NULL) {
+        [FirestorePluginJSONHelper setFieldValueArrayUnion:fieldValueArrayUnion];
+    }
+
+    NSString *fieldValueArrayRemove = options[@"fieldValueArrayRemove"];
+
+    if (fieldValueArrayRemove != NULL) {
+        [FirestorePluginJSONHelper setFieldValueArrayRemove:fieldValueArrayRemove];
+    }
+
     NSString *fieldPathDocumentId = options[@"fieldPathDocumentId"];
 
     if (fieldPathDocumentId != NULL) {

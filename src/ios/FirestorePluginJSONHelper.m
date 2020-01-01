@@ -17,6 +17,9 @@ static NSString *geopointPrefix = @"__GEOPOINT:";
 static NSString *referencePrefix = @"__REFERENCE:";
 static NSString *fieldValueDelete = @"__DELETE";
 static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
+static NSString *fieldValueIncrement = @"__INCREMENT";
+static NSString *fieldValueArrayRemove = @"__ARRAYREMOVE";
+static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
 
 + (NSDictionary *)toJSON:(NSDictionary *)values {
     NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithCapacity:[values count]];
@@ -106,6 +109,20 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
         if ([fieldValueServerTimestamp isEqualToString:stringValue]) {
             value = FIRFieldValue.fieldValueForServerTimestamp;
         }
+
+beings with and extract value
+        if ([fieldValueIncrement isEqualToString:stringValue]) {
+            value = FIRFieldValue.fieldValueForIncrement;
+        }
+
+        if ([fieldValueArrayUnion isEqualToString:stringValue]) {
+            value = FIRFieldValue.fieldValueForArrayUnion;
+        }
+
+        if ([fieldValueRemove isEqualToString:stringValue]) {
+            value = FIRFieldValue.fieldValueForArrayRemove;
+        }
+
     } else if ([value isKindOfClass:[NSDictionary class]]) {
         value = [self toSettableDictionaryInternal:value];
     } else if ([value isKindOfClass:[NSArray class]]) {
@@ -157,5 +174,17 @@ static NSString *fieldValueServerTimestamp = @"__SERVERTIMESTAMP";
 
 + (void)setFieldValueServerTimestamp:(NSString *)newFieldValueServerTimestamp {
     fieldValueServerTimestamp = newFieldValueServerTimestamp;
+}
+
++ (void)setFieldValueIncrement:(NSString *)newFieldValueIncrement {
+    fieldValueIncrement = newFieldValueIncrement;
+}
+
++ (void)setFieldValueArrayUnion:(NSString *)newFieldValueArrayUnion {
+    fieldValueArrayUnion = newFieldValueArrayUnion;
+}
+
++ (void)setFieldValueArrayRemove:(NSString *)newFieldValueArrayRemove {
+    fieldValueArrayRemove = newFieldValueArrayRemove;
 }
 @end

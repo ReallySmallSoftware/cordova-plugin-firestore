@@ -18,6 +18,9 @@
 + (void)setTimestampPrefix:(NSString *)timestampPrefix;
 + (void)setFieldValueDelete:(NSString *)fieldValueDelete;
 + (void)setFieldValueServerTimestamp:(NSString *)fieldValueServerTimestamp;
++ (void)setFieldValueIncrement:(NSString *)fieldValueIncrement;
++ (void)setFieldValueArrayUnion:(NSString *)fieldValueArrayUnion;
++ (void)setFieldValueArrayRemove:(NSString *)fieldValueArrayRemove;
 + (NSObject *)parseSpecial:(NSObject *)value;
 
 @end

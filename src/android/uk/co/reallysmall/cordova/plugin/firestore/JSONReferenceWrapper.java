@@ -30,7 +30,7 @@ public class JSONReferenceWrapper {
     public static DocumentReference unwrapReference(FirestorePlugin firestorePlugin, Object value) {
         String stringValue = (String) value;
         int prefixLength = referencePrefix.length();
-        String reference = stringValue.substring(prefixLength).substring(0, stringValue.length() - prefixLength);
+        String reference = stringValue.substring(prefixLength + 1);
         return firestorePlugin.getDatabase().document(reference);
     }
 

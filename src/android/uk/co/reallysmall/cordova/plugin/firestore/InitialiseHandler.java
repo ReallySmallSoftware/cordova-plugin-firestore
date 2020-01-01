@@ -23,6 +23,9 @@ public class InitialiseHandler implements ActionHandler {
     public static final String REFERENCE_PREFIX = "referencePrefix";
     public static final String FIELDVALUE_DELETE = "fieldValueDelete";
     public static final String FIELDVALUE_SERVERTIMESTAMP = "fieldValueServerTimestamp";
+    public static final String FIELDVALUE_ARRAYREMOVE = "fieldValueArrayRemove";
+    public static final String FIELDVALUE_ARRAYUNION = "fieldValueArrayUnion";
+    public static final String FIELDVALUE_INCREMENT = "fieldValueIncrement";
     public static final String TIMESTAMPSINSNAPSHOTS = "timestampsInSnapshots";
     public static final String CONFIG = "config";
     private FirestorePlugin firestorePlugin;
@@ -110,6 +113,18 @@ public class InitialiseHandler implements ActionHandler {
 
             if (options.has(FIELDVALUE_SERVERTIMESTAMP)) {
                 FieldValueHelper.setServerTimestampPrefix(options.getString(FIELDVALUE_SERVERTIMESTAMP));
+            }
+
+            if (options.has(FIELDVALUE_ARRAYREMOVE)) {
+                FieldValueHelper.setArrayRemovePrefix(options.getString(FIELDVALUE_ARRAYREMOVE));
+            }
+
+            if (options.has(FIELDVALUE_ARRAYUNION)) {
+                FieldValueHelper.setArrayUnionPrefix(options.getString(FIELDVALUE_ARRAYUNION));
+            }
+
+            if (options.has(FIELDVALUE_INCREMENT)) {
+                FieldValueHelper.setIncrementPrefix(options.getString(FIELDVALUE_INCREMENT));
             }
 
             JSONHelper.setPlugin(this.firestorePlugin);

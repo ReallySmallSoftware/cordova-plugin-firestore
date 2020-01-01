@@ -28,6 +28,15 @@ var FieldValue = {
   },
   serverTimestamp: function () {
     return __firestoreOptions.fieldValueServerTimestamp;
+  },
+  increment: function(n) {
+    return  __firestoreOptions.fieldValueIncrement + ":" + n;
+  },
+  arrayUnion: function(elements) {
+    return  __firestoreOptions.fieldValueArrayUnion + ":" + JSON.stringify(Object.values(arguments));
+  },
+  arrayRemove: function(elements) {
+    return  __firestoreOptions.fieldValueArrayRemove + ":" + JSON.stringify(Object.values(arguments));
   }
 };
 
@@ -47,6 +56,15 @@ function Firestore(options) {
   }
   if (options.fieldValueDelete === undefined) {
     options.fieldValueDelete = "__DELETE";
+  }
+  if (options.fieldValueIncrement === undefined) {
+    options.fieldValueIncrement = "__INCREMENT";
+  }
+  if (options.fieldValueArrayUnion === undefined) {
+    options.fieldValueArrayUnion = "__ARRAYUNION";
+  }
+  if (options.fieldValueArrayRemove === undefined) {
+    options.fieldValueArrayRemove = "__ARRAYREMOVE";
   }
   if (options.fieldPathId === undefined) {
     options.fieldPathId = "__ID";

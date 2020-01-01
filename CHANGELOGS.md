@@ -5,6 +5,7 @@
 - Migrate to androidx
 - Added in, array-contains and array-contains-any to where method
 - Updated Javascript version from 5.5.0 to 7.6.0
+- Implemented FieldValue.increment(n), FieldValue.arrayRemove(elements), FieldValue.arrayUnion(elements)
 - BREAKING CHANGE: DocumentReference.onSnapshot mimics native Javascritp SDK more accurately
 
 ## 3.1.0
