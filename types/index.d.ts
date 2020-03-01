@@ -116,8 +116,8 @@ declare namespace Firestore {
     }
 
     export interface Query {
-        endAt(snapshotOrFieldValues: QuerySnapshot | any[]): Query;
-        endBefore(snapshotOrFieldValues: QuerySnapshot | any[]): Query;
+        endAt(snapshotOrFieldValues: DocumentSnapshot | any): Query;
+        endBefore(snapshotOrFieldValues: DocumentSnapshot | any): Query;
         limit(limit: number): Query;
         orderBy(fieldPath: string, direction: string): Query;
 
@@ -125,8 +125,8 @@ declare namespace Firestore {
         onSnapshot(optionsOrObserverOrOnNext: object | SnapshotListenOptions | QuerySnapshotCallback,
             observerOrOnNextOrOnError?: object | QuerySnapshotCallback | QueryErrorCallback,
             onError?: QueryErrorCallback): Unsubscribe;
-        startAfter(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
-        startAt(snapshotOrFieldValues: DocumentSnapshot | any[]): Query;
+        startAfter(snapshotOrFieldValues: DocumentSnapshot | any): Query;
+        startAt(snapshotOrFieldValues: DocumentSnapshot | any): Query;
         where(fieldPath: string, opStr: string, value: any): Query;
     }
 
@@ -151,15 +151,22 @@ declare namespace Firestore {
         (transaction: Transaction): Promise<any>;
     }
 
+    export interface WriteBatch {
+        delete(documentRef: DocumentReference): WriteBatch;
+        set(documentRef: DocumentReference, data: DocumentData, options?: SetOptions): WriteBatch;
+        update(documentRef: DocumentReference, data: UpdateData): WriteBatch;
+        commit():Promise<void>
+    }
+
     export abstract class Firestore {
         get(): Firestore;
-        batch(): void;
+        batch(): WriteBatch;
         collection(collectionPath: string): CollectionReference;
         disableNetwork(): Promise<void>;
         doc(documentPath: string): DocumentReference;
         enableNetwork(): void;
         enablePersistence(): void;
-        runTransation(callback: RunTransactionUpdateFunction): Promise<any>;
+        runTransaction(callback: RunTransactionUpdateFunction): Promise<any>;
         setLogLevel(logLevel: string): void;
         settings(settings: any): void;
 
@@ -169,4 +176,5 @@ declare namespace Firestore {
     }
 
     export function initialise(options: FirestoreOptions): Promise<Firestore>;
+    export function totalReads(): number;
 }

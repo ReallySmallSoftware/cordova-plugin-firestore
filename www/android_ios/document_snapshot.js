@@ -11,9 +11,12 @@ function DocumentSnapshot(data) {
   this._data = data;
 
   if (data.exists) {
+    DocumentSnapshot._reads++;
     this._data._data = this._parse(this._data._data);
   }
 }
+
+DocumentSnapshot._reads = 0;
 
 DocumentSnapshot.prototype = {
   _newDocumentReference: function(documentPath) {

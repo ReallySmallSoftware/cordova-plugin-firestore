@@ -125,5 +125,9 @@ module.exports = {
 
   GeoPoint: function (latitude, longitude) {
     return new firebase.firestore.GeoPoint(latitude, longitude);
-  }
+  },
+
+  totalReads: function() {
+    return -1;
+  }  
 };

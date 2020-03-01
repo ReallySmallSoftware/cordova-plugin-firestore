@@ -24,6 +24,11 @@
 - (void)runTransaction:(CDVInvokedUrlCommand *)command;
 - (void)transactionResolve:(CDVInvokedUrlCommand *)command;
 - (void)setLogLevel:(CDVInvokedUrlCommand *)command;
+- (void)batchDocSet:(CDVInvokedUrlCommand *)command;
+- (void)batchDocUpdate:(CDVInvokedUrlCommand *)command;
+- (void)batchDoc:(CDVInvokedUrlCommand *)command;
+- (void)batchDocDelete:(CDVInvokedUrlCommand *)command;
+- (void)batchCommit:(CDVInvokedUrlCommand *)command;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;

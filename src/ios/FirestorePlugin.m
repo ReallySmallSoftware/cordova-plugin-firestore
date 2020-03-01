@@ -854,6 +854,26 @@
     }
 }
 
+- (void)batchDocDelete:(CDVInvokedUrlCommand *)command {
+
+}
+
+- (void)batchDocUpdate:(CDVInvokedUrlCommand *)command {
+
+}
+
+- (void)batchDocSet:(CDVInvokedUrlCommand *)command {
+
+}
+
+- (void)batchDoc:(CDVInvokedUrlCommand *)command {
+
+}
+
+- (void)batchCommit:(CDVInvokedUrlCommand *)command {
+
+}
+
 - (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script {
     __block NSString *resultString = nil;
 

@@ -9,6 +9,7 @@ var FirestoreTimestamp = require("./firestore_timestamp");
 var Transaction = require("./transaction");
 var GeoPoint = require("./geo_point");
 var Utilities = require("./utilities");
+var DocumentSnapshot = require("./document_snapshot");
 
 var PLUGIN_NAME = 'Firestore';
 
@@ -95,7 +96,19 @@ Firestore.prototype = {
     return this;
   },
   batch: function () {
-    throw "Firestore.batch: Not supported";
+    var batchId = utils.createUUID();
+    var batch = new WriteBatch(batchId);
+
+    var success = function () {
+    };
+
+    var failure = function () {
+      throw new Error("Undefined error in batch");
+    };
+
+    exec(success, failure, PLUGIN_NAME, 'batch', args);
+
+    return batch;
   },
   collection: function (path) {
     return new CollectionReference(path);
@@ -209,5 +222,9 @@ module.exports = {
 
   GeoPoint: function (latitude, longitude) {
     return new GeoPoint(latitude, longitude);
+  },
+
+  totalReads: function() {
+    return DocumentSnapshot._reads;
   }
 };

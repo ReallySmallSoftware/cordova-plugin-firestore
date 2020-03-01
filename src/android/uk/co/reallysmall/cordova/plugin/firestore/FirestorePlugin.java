@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Transaction;
+import com.google.firebase.firestore.WriteBatch;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -24,6 +25,7 @@ public class FirestorePlugin extends CordovaPlugin {
     private Map<String, ActionHandler> handlers = new Hashtable<String, ActionHandler>();
     private Map<String, ListenerRegistration> registrations = new Hashtable<String, ListenerRegistration>();
     private Map<String, TransactionQueue> transactions = new Hashtable<String, TransactionQueue>();
+    private Map<String, WriteBatch> batches = new Hashtable<String, WriteBatch>();
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         FirestoreLog.d(TAG, "Initializing FirestorePlugin");
@@ -47,6 +49,11 @@ public class FirestorePlugin extends CordovaPlugin {
         handlers.put("transactionDocDelete", new TransactionDocDeleteHandler(FirestorePlugin.this));
         handlers.put("transactionResolve", new TransactionResolveHandler(FirestorePlugin.this));
         handlers.put("setLogLevel", new setLogLevel());
+        handlers.put("batch", new BatchHandler(FirestorePlugin.this));
+        handlers.put("batchUpdate", new BatchDocUpdateHandler(FirestorePlugin.this));
+        handlers.put("batchSet", new BatchDocSetHandler(FirestorePlugin.this));
+        handlers.put("batchDelete", new BatchDocDeleteHandler(FirestorePlugin.this));
+        handlers.put("batchCommit", new BatchCommitHandler(FirestorePlugin.this));
 
         FirestoreLog.d(TAG, "Done Initializing FirestorePlugin");
     }
@@ -95,6 +102,18 @@ public class FirestorePlugin extends CordovaPlugin {
 
     public void removeTransaction(String transactionId) {
         transactions.remove(transactionId);
+    }
+
+    public void storeBatch(String batchId, WriteBatch batch) {
+        batches.put(batchId, batch);
+    }
+
+    public WriteBatch getBatch(String batchId) {
+        return batches.get(batchId);
+    }
+
+    public void removeBatch(String batchId) {
+        batches.remove(batchId);
     }
 
     private class setLogLevel implements ActionHandler {

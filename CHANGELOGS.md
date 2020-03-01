@@ -7,6 +7,7 @@
 - Updated Javascript version from 5.5.0 to 7.6.0
 - Implemented FieldValue.increment(n), FieldValue.arrayRemove(elements), FieldValue.arrayUnion(elements)
 - BREAKING CHANGE: DocumentReference.onSnapshot mimics native Javascritp SDK more accurately
+- Add Firestore.totalReads() in Android and iOS to help debug usage
 
 ## 3.1.0
 - Added type definitions
