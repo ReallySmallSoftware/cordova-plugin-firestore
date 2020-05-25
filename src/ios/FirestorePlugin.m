@@ -3,8 +3,8 @@
 #import "FirestorePluginJSONHelper.h"
 
 #import <Cordova/CDVAvailability.h>
-#include <asl.h>
 #include <pthread.h>
+#import <os/log.h>
 
 @implementation FirestorePlugin
 
@@ -13,8 +13,6 @@
     if(![FIRApp defaultApp]) {
         [FIRApp configure];
     }
-
-    asl_add_log_file(NULL, STDERR_FILENO);
 
     self.listeners = [NSMutableDictionary new];
     self.transactions = [NSMutableDictionary new];
@@ -26,7 +24,7 @@
     NSDictionary *options = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
     NSString *callbackId = [command argumentAtIndex:3 withDefault:@"" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Listening to collection");
+    os_log_debug(OS_LOG_DEFAULT, "Listening to collection");
 
     FIRCollectionReference *collectionReference = [self.firestore collectionWithPath:collection];
 
@@ -42,7 +40,7 @@
 
         CDVPluginResult *pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :YES];
 
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Got collection snapshot data");
+        os_log_debug(OS_LOG_DEFAULT, "Got collection snapshot data");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -95,7 +93,7 @@
         NSString *queryType = [queryItem valueForKey:@"queryType"];
         NSObject *value = [queryItem valueForKey:@"value"];
 
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Query type %s", [self convertString:queryType]);
+        os_log_debug(OS_LOG_DEFAULT, "Query type %s", [self convertString:queryType]);
 
         if ([queryType isEqualToString:@"limit"]) {
             query = [self processQueryLimit:query ForValue:value];
@@ -126,7 +124,7 @@
 
 - (FIRQuery *)processQueryWhere:(FIRQuery *)query ForValue:(NSObject *)whereObject {
 
-    NSObject *fieldPath = [self unwrapFieldPath:[whereObject valueForKey:@"fieldPath"]];
+    NSString *fieldPath = [self unwrapFieldPath:[whereObject valueForKey:@"fieldPath"]];
     NSString *opStr = [whereObject valueForKey:@"opStr"];
     NSObject *value = [self parseWhereValue:[whereObject valueForKey:@"value"]];
 
@@ -141,7 +139,7 @@
     } else if ([opStr isEqualToString:@"<="]) {
         return [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
     } else if ([opStr isEqualToString:@"in"]) {
-        return [query queryWhereField:fieldPath isIn:value];
+        return [query queryWhereField:fieldPath in:value];
     }else if ([opStr isEqualToString:@"array-contains"]) {
         return [query queryWhereField:fieldPath arrayContains:value];
     }else if ([opStr isEqualToString:@"array-contains-any"]) {
@@ -151,6 +149,16 @@
     }
 
     return query;
+}
+
+- (NSObject *)unwrapFieldPath:(NSObject *)value {
+    NSString *stringValue = value;
+    
+    if ([[stringValue substringToIndex:_fieldPathDocumentIdPrefix.length] isEqualToString:_fieldPathDocumentIdPrefix]) {
+        return [stringValue substringFromIndex:_fieldPathDocumentIdPrefix.length];
+    }
+         
+    return value;
 }
 
 - (FIRQuery *)processQueryOrderBy:(FIRQuery *)query ForValue:(NSObject *)orderByObject {
@@ -164,36 +172,36 @@
       directionBool = true;
     }
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Order by %s + (%s)", [self convertString:field], [self convertString:direction]);
+    os_log_debug(OS_LOG_DEFAULT, "Order by %s + (%s)", [self convertString:field], [self convertString:direction]);
 
     return [query queryOrderedByField:field descending:directionBool];
 }
 
-- (NSObject *)parseWhereValue:(NSObject *)value {
-    return [FirestorePluginJSONHelper fromJSON:value];
+- (NSObject *)parseWhereValue:(NSDictionary *)value {
+    return [FirestorePluginJSONHelper fromJSON:value ForPlugin:self];
 }
 
-- (FIRQuery *)processQueryStartAfter:(FIRQuery *)query ForValue:(NSObject *)value {
+- (FIRQuery *)processQueryStartAfter:(FIRQuery *)query ForValue:(NSDictionary *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value  ForPlugin:self]];
     return [query queryStartingAfterValues:array];
 }
 
-- (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSObject *)value {
+- (FIRQuery *)processQueryStartAt:(FIRQuery *)query ForValue:(NSDictionary *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value ForPlugin:self]];
     return [query queryStartingAtValues:array];
 }
 
-- (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSObject *)value {
+- (FIRQuery *)processQueryEndAt:(FIRQuery *)query ForValue:(NSDictionary *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value ForPlugin:self]];
     return [query queryEndingAtValues:array];
 }
 
-- (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSObject *)value {
+- (FIRQuery *)processQueryEndBefore:(FIRQuery *)query ForValue:(NSDictionary *)value {
     NSMutableArray *array = [[NSMutableArray alloc]init];
-    [array addObject:[FirestorePluginJSONHelper fromJSON:value]];
+    [array addObject:[FirestorePluginJSONHelper fromJSON:value ForPlugin:self]];
     return [query queryEndingBeforeValues:array];
 }
 
@@ -209,9 +217,9 @@
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:1 withDefault:@{} andClass:[NSDictionary class]];
 
-    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data ForPlugin:self];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Writing document to collection");
+    os_log_debug(OS_LOG_DEFAULT, "Writing document to collection");
 
     FIRCollectionReference *collectionReference = [self.firestore collectionWithPath:collection];
 
@@ -230,7 +238,7 @@
         } else {
             pluginResult = [FirestorePluginResultHelper createDocumentReferencePluginResult:ref :NO];
 
-            asl_log(NULL,NULL, ASL_LEVEL_DEBUG, "Successfully written document to collection");
+            os_log_debug(OS_LOG_DEFAULT, "Successfully written document to collection");
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -241,7 +249,7 @@
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSArray *queries = [command argumentAtIndex:1 withDefault:@[] andClass:[NSArray class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Getting document from collection");
+    os_log_debug(OS_LOG_DEFAULT, "Getting document from collection");
 
     FIRCollectionReference *collectionReference = [self.firestore collectionWithPath:collection];
 
@@ -255,7 +263,7 @@
 
         CDVPluginResult *pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :NO];
 
-        asl_log(NULL, NULL,ASL_LEVEL_DEBUG, "Successfully got collection");
+        os_log_debug(OS_LOG_DEFAULT, "Successfully got collection");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -266,7 +274,7 @@
 
     NSDictionary *config = options[@"config"];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Initialising Firestore...");
+    os_log_debug(OS_LOG_DEFAULT, "Initialising Firestore...");
 
     if (config != nil && [config objectForKey:@"googleAppId"]) {
         FIROptions *customOptions = [[FIROptions alloc] initWithGoogleAppID:config[@"googleAppID"] GCMSenderID:config[@"gcmSenderID"]];
@@ -305,14 +313,14 @@
         bool persist = [[options valueForKey:@"persist"] boolValue];
         
         [settings setPersistenceEnabled:persist];
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore persistance to true");
+        os_log_debug(OS_LOG_DEFAULT, "Setting Firestore persistance to true");
     }
 
     if (options[@"timestampsInSnapshots"] != NULL) {
         bool timestampsInSnapshots = [[options valueForKey:@"timestampsInSnapshots"] boolValue];
 
         [settings setTimestampsInSnapshotsEnabled:timestampsInSnapshots];
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting Firestore timestampsInSnapshots to true");
+        os_log_debug(OS_LOG_DEFAULT, "Setting Firestore timestampsInSnapshots to true");
     }
 
     NSString *datePrefix = options[@"datePrefix"];
@@ -384,11 +392,11 @@
     NSDictionary *data = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
     NSDictionary *options = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
 
-    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data ForPlugin:self];
 
     BOOL merge = [self getMerge:options];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Setting document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
+    os_log_debug(OS_LOG_DEFAULT, "Setting document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
 
@@ -407,7 +415,7 @@
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 
-            asl_log(NULL,NULL, ASL_LEVEL_DEBUG, "Successfully written document");
+            os_log_debug(OS_LOG_DEFAULT, "Successfully written document");
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -426,14 +434,18 @@
     return merge;
 }
 
+- (FIRFirestore *)getFirestore {
+    return self.firestore;
+}
+
 - (void)docUpdate:(CDVInvokedUrlCommand *)command {
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:2 withDefault:@{} andClass:[NSDictionary class]];
 
-    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data];
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:data ForPlugin:self];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Updating document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
+    os_log_debug(OS_LOG_DEFAULT, "Updating document. collection: %s, path: %s", [self convertString:collection], [self convertString:docId]);
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:docId];
 
@@ -452,7 +464,7 @@
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 
-            asl_log(NULL,NULL,ASL_LEVEL_DEBUG,"Successfully updated document");
+            os_log_debug(OS_LOG_DEFAULT,"Successfully updated document");
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -470,7 +482,7 @@
         options = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
     }
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Listening to document");
+    os_log_debug(OS_LOG_DEFAULT, "Listening to document");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
 
@@ -484,7 +496,7 @@
 
         CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
 
-        asl_log(NULL,NULL,ASL_LEVEL_DEBUG,"Got document snapshot data");
+        os_log_debug(OS_LOG_DEFAULT,"Got document snapshot data");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -509,7 +521,7 @@
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSString *doc =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Listening to document");
+    os_log_debug(OS_LOG_DEFAULT, "Listening to document");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
 
@@ -521,7 +533,7 @@
 
         CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
 
-        asl_log(NULL,NULL,ASL_LEVEL_DEBUG,"Successfully got document");
+        os_log_debug(OS_LOG_DEFAULT,"Successfully got document");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -533,7 +545,7 @@
     NSString *collection =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSString *doc =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Deleting document");
+    os_log_debug(OS_LOG_DEFAULT, "Deleting document");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
 
@@ -545,7 +557,7 @@
             NSLog(@"Error deleting document %s", [self localError:error]);
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
         } else {
-            asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Successfully deleted document");
+            os_log_debug(OS_LOG_DEFAULT, "Successfully deleted document");
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         }
 
@@ -569,7 +581,7 @@
     NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
     NSDictionary *options = [command argumentAtIndex:4 withDefault:@{} andClass:[NSDictionary class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document set for %s", [self convertString:transactionId]);
+    os_log_debug(OS_LOG_DEFAULT, "Transaction document set for %s", [self convertString:transactionId]);
 
     FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
     FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
@@ -589,11 +601,11 @@
 
 - (void)executeTransactionDocSet:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId {
 
-    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data];
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data ForPlugin:self];
 
     BOOL merge = [self getMerge:firestoreTransaction.options];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document set");
+    os_log_debug(OS_LOG_DEFAULT, "Execute transaction document set");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
 
@@ -607,7 +619,7 @@
     NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
     NSDictionary *data = [command argumentAtIndex:3 withDefault:@{} andClass:[NSDictionary class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document update for %s", [self convertString:transactionId]);
+    os_log_debug(OS_LOG_DEFAULT, "Transaction document update for %s", [self convertString:transactionId]);
 
     FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
     FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
@@ -626,9 +638,9 @@
 
 - (void)executeTransactionDocUpdate:(FIRTransaction *)transaction For:(FirestoreTransaction *)firestoreTransaction WithId:(NSString *)transactionId {
 
-    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data];
+    NSDictionary *parsedData = [FirestorePluginJSONHelper fromJSON:firestoreTransaction.data ForPlugin:self];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document update");
+    os_log_debug(OS_LOG_DEFAULT, "Execute transaction document update");
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
 
@@ -641,7 +653,7 @@
     NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
     NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document delete for %s", [self convertString:transactionId]);
+    os_log_debug(OS_LOG_DEFAULT, "Transaction document delete for %s", [self convertString:transactionId]);
 
     FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
     FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
@@ -661,7 +673,7 @@
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document delete");
+    os_log_debug(OS_LOG_DEFAULT, "Execute transaction document delete");
 
     [transaction deleteDocument:documentReference];
 }
@@ -674,7 +686,7 @@
         NSString *docId =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
         NSString *collectionPath =[command argumentAtIndex:2 withDefault:@"/" andClass:[NSString class]];
 
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction document get for %s", [self convertString:transactionId]);
+        os_log_debug(OS_LOG_DEFAULT, "Transaction document get for %s", [self convertString:transactionId]);
 
         FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
         FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
@@ -718,7 +730,7 @@
 
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:firestoreTransaction.collectionPath] documentWithPath:firestoreTransaction.docId];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Execute transaction document get");
+    os_log_debug(OS_LOG_DEFAULT, "Execute transaction document get");
 
     FIRDocumentSnapshot *snapshot = [transaction getDocument:documentReference error:errorPointer];
 
@@ -736,11 +748,11 @@
 - (void)runTransaction:(CDVInvokedUrlCommand *)command {
     NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Running transaction");
+    os_log_debug(OS_LOG_DEFAULT, "Running transaction");
 
     [self.firestore runTransactionWithBlock:^id _Nullable(FIRTransaction * _Nonnull transaction, NSError *  __autoreleasing * errorPointer) {
 
-        asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Applying transaction %s", [self convertString:transactionId]);
+        os_log_debug(OS_LOG_DEFAULT, "Applying transaction %s", [self convertString:transactionId]);
 
         FirestoreTransactionQueue *firestoreTransactionQueue = [FirestoreTransactionQueue new];
         firestoreTransactionQueue.queue = [NSMutableArray new];
@@ -830,7 +842,7 @@
             NSLog(@"Transaction failure %s", [self localError:error]);
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
-            asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction success");
+            os_log_debug(OS_LOG_DEFAULT, "Transaction success");
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -841,7 +853,7 @@
     NSString *transactionId =[command argumentAtIndex:0 withDefault:@"/" andClass:[NSString class]];
     NSString *result =[command argumentAtIndex:1 withDefault:@"/" andClass:[NSString class]];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Transaction resolve for %s", [self convertString:transactionId]);
+    os_log_debug(OS_LOG_DEFAULT, "Transaction resolve for %s", [self convertString:transactionId]);
 
     FirestoreTransactionQueue *transactionQueue = (FirestoreTransactionQueue *)self.transactions[transactionId];
     FirestoreTransaction *firestoreTransaction = [FirestoreTransaction new];
@@ -897,7 +909,7 @@
 
   CDVPluginResult *pluginResult = [[CDVPluginResult alloc] init];
 
-  asl_log(NULL, NULL,ASL_LEVEL_DEBUG, "This method is not supported in iOS");
+  os_log_debug(OS_LOG_DEFAULT,  "This method is not supported in iOS");
 
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }

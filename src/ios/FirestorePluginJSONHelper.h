@@ -8,10 +8,12 @@
 #ifndef FirestorePluginJSONHelper_h
 #define FirestorePluginJSONHelper_h
 
+#import "FirestorePlugin.h"
+
 @interface FirestorePluginJSONHelper : NSObject
 
 + (NSDictionary *)toJSON:(NSDictionary *)values;
-+ (NSDictionary *)fromJSON:(NSDictionary *)values;
++ (NSDictionary *)fromJSON:(NSDictionary *)values ForPlugin:(FirestorePlugin *)firestorePlugin;
 + (void)setReferencePrefix:(NSString *)referencePrefix;
 + (void)setGeopointPrefix:(NSString *)geopointPrefix;
 + (void)setDatePrefix:(NSString *)datePrefix;

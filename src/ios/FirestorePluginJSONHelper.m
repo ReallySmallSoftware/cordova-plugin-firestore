@@ -55,8 +55,8 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
             
             NSMutableString *referenceString = [[NSMutableString alloc] init];
             [referenceString appendString:referencePrefix];
-            [referenceString appendString:[NSString stringWithFormat:@"%s,%s", reference.path, reference.id]];
-            value = geopointString;
+            [referenceString appendString:[NSString stringWithFormat:@"%s,%s", reference.path, reference.documentID]];
+            value = referenceString;
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             value = [self toJSON:value];
         }
@@ -67,7 +67,7 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
     return result;
 }
 
-+ (NSObject *)fromJSON:(NSObject *)value {
++ (NSObject *)fromJSON:(NSObject *)value ForPlugin:(FirestorePlugin *)firestorePlugin {
 
     if ([value isKindOfClass:[NSString class]]) {
         NSString *stringValue = (NSString *)value;
@@ -98,59 +98,41 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
       
         if ([stringValue length] > referencePrefixLength && [referencePrefix isEqualToString:[stringValue substringToIndex:referencePrefixLength]]) {
             NSArray *tmp = [[stringValue substringFromIndex:referencePrefixLength] componentsSeparatedByString:@","];
-            FIRDocumentReference *reference = [[FIRDocumentReference alloc] initWithLatitude:[[tmp objectAtIndex:0] doubleValue] longitude:[[tmp objectAtIndex:1] doubleValue]];
+            FIRFirestore *firestore = [firestorePlugin getFirestore];
+            FIRDocumentReference *reference = [[firestore collectionWithPath:@""] documentWithPath:[tmp objectAtIndex:0]]; //[[FIRDocumentReference alloc] initWithReference:[[tmp objectAtIndex:0] stringValue]];
             value = reference;
         }
-
-        if ([fieldValueDelete isEqualToString:stringValue]) {
-            value = FIRFieldValue.fieldValueForDelete;
-        }
-
-        if ([fieldValueServerTimestamp isEqualToString:stringValue]) {
-            value = FIRFieldValue.fieldValueForServerTimestamp;
-        }
-
-beings with and extract value
-        if ([fieldValueIncrement isEqualToString:stringValue]) {
-            value = FIRFieldValue.fieldValueForIncrement;
-        }
-
-        if ([fieldValueArrayUnion isEqualToString:stringValue]) {
-            value = FIRFieldValue.fieldValueForArrayUnion;
-        }
-
-        if ([fieldValueRemove isEqualToString:stringValue]) {
-            value = FIRFieldValue.fieldValueForArrayRemove;
+        
+        if ([self isWrappedFieldValue:stringValue]) {
+            value = [self unwrapFieldValue:stringValue];
         }
 
     } else if ([value isKindOfClass:[NSDictionary class]]) {
-        value = [self toSettableDictionaryInternal:value];
+        value = [self toSettableDictionaryInternal:(NSDictionary *)value ForPlugin:firestorePlugin];
     } else if ([value isKindOfClass:[NSArray class]]) {
-        value = [self toSettableArrayInternal:value];
+        value = [self toSettableArrayInternal:(NSArray *)value ForPlugin:firestorePlugin];
     }
 
     return value;
 }
 
-+ (NSObject *)toSettableDictionaryInternal:(NSDictionary *)values {
++ (NSObject *)toSettableDictionaryInternal:(NSDictionary *)values ForPlugin:(FirestorePlugin *)firestorePlugin {
     NSMutableDictionary *result = [[NSMutableDictionary alloc]initWithCapacity:[values count]];
 
     for (id key in values) {
         id value = [values objectForKey:key];
-        value = [self fromJSON:value];
+        value = [self fromJSON:value ForPlugin:firestorePlugin];
         [result setObject:value forKey:key];
     }
 
     return result;
 }
 
-+ (NSObject *)toSettableArrayInternal:(NSArray *)values {
++ (NSObject *)toSettableArrayInternal:(NSArray *)values ForPlugin:(FirestorePlugin *)firestorePlugin {
     NSMutableArray *result = [[NSMutableArray alloc]initWithCapacity:[values count]];
 
     for (id key in values) {
-        id value = [values objectForKey:key];
-        value = [self fromJSON:value];
-        [result setObject:value forKey:key];
+        [result addObject:key];
     }
 
     return result;
@@ -186,5 +168,61 @@ beings with and extract value
 
 + (void)setFieldValueArrayRemove:(NSString *)newFieldValueArrayRemove {
     fieldValueArrayRemove = newFieldValueArrayRemove;
+}
+
++(Boolean)isWrappedFieldValue:(NSString *)value {
+    if ([value isEqualToString:fieldValueDelete]) {
+        return true;
+    }
+    
+    if ([value isEqualToString:fieldValueServerTimestamp]) {
+        return true;
+    }
+    
+    if ([[value substringToIndex:fieldValueIncrement.length] isEqualToString:fieldValueIncrement]) {
+        return true;
+    }
+    
+    if ([[value substringToIndex:fieldValueArrayUnion.length] isEqualToString:fieldValueArrayUnion]) {
+        return true;
+    }
+    
+    if ([[value substringToIndex:fieldValueArrayRemove.length] isEqualToString:fieldValueArrayRemove]) {
+        return true;
+    }
+    
+    return false;
+}
+
++ (NSObject *)unwrapFieldValue:(NSString *)stringValue {
+    if ([fieldValueDelete isEqualToString:stringValue]) {
+        return FIRFieldValue.fieldValueForDelete;
+    }
+
+    if ([fieldValueServerTimestamp isEqualToString:stringValue]) {
+        return FIRFieldValue.fieldValueForServerTimestamp;
+    }
+
+    if ([[stringValue substringToIndex:fieldValueIncrement.length] isEqualToString:fieldValueIncrement]) {
+        return [FIRFieldValue fieldValueForIntegerIncrement:[[self unwrap:stringValue ForPrefix:fieldValueIncrement] longLongValue]];
+    }
+
+    if ([[stringValue substringToIndex:fieldValueArrayUnion.length] isEqualToString:fieldValueArrayUnion]) {
+        NSString *unwrapped =[self unwrap:stringValue ForPrefix:fieldValueArrayUnion];
+        return [FIRFieldValue fieldValueForArrayUnion:[self JSONArrayToArray:unwrapped]];
+    }
+
+    if ([[stringValue substringToIndex:fieldValueArrayRemove.length] isEqualToString:fieldValueArrayRemove]) {
+        NSString *unwrapped =[self unwrap:stringValue ForPrefix:fieldValueArrayRemove];
+        return [FIRFieldValue fieldValueForArrayRemove:[self JSONArrayToArray:unwrapped]];
+    }
+}
+
++ (NSString *)unwrap:(NSString *)stringValue ForPrefix:(NSString *)prefix {
+    return [stringValue substringFromIndex:prefix.length];
+}
+
++ (NSArray *)JSONArrayToArray:(NSString *)array {
+    
 }
 @end

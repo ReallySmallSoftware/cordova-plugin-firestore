@@ -29,6 +29,7 @@
 - (void)batchDoc:(CDVInvokedUrlCommand *)command;
 - (void)batchDocDelete:(CDVInvokedUrlCommand *)command;
 - (void)batchCommit:(CDVInvokedUrlCommand *)command;
+- (FirestorePlugin *)getFirestore;
 
 - (FIRQuery *)processQueries:(NSArray *)queries ForQuery:(FIRQuery *)query;
 - (FIRQuery *)processQueryLimit:(FIRQuery *)query ForValue:(NSObject *)value;
