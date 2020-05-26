@@ -139,11 +139,11 @@
     } else if ([opStr isEqualToString:@"<="]) {
         return [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
     } else if ([opStr isEqualToString:@"in"]) {
-        return [query queryWhereField:fieldPath in:value];
+        return [query queryWhereField:fieldPath in:(NSArray *)value];
     }else if ([opStr isEqualToString:@"array-contains"]) {
         return [query queryWhereField:fieldPath arrayContains:value];
     }else if ([opStr isEqualToString:@"array-contains-any"]) {
-        return [query queryWhereField:fieldPath arrayContainsAny:value];
+        return [query queryWhereField:fieldPath arrayContainsAny:(NSArray *)value];
     }else {
         NSLog(@"Unknown operator type %s", [self convertString:opStr]);
     }
@@ -151,8 +151,8 @@
     return query;
 }
 
-- (NSObject *)unwrapFieldPath:(NSObject *)value {
-    NSString *stringValue = value;
+- (NSString *)unwrapFieldPath:(NSString *)value {
+    NSString *stringValue = (NSString *)value;
     
     if ([[stringValue substringToIndex:_fieldPathDocumentIdPrefix.length] isEqualToString:_fieldPathDocumentIdPrefix]) {
         return [stringValue substringFromIndex:_fieldPathDocumentIdPrefix.length];
