@@ -55,7 +55,7 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
             
             NSMutableString *referenceString = [[NSMutableString alloc] init];
             [referenceString appendString:referencePrefix];
-            [referenceString appendString:[NSString stringWithFormat:@"%s,%s", reference.path, reference.documentID]];
+            [referenceString appendString:[NSString stringWithFormat:@"%s,%s", [reference.path UTF8String], [reference.documentID UTF8String]]];
             value = referenceString;
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             value = [self toJSON:value];
@@ -146,6 +146,10 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
     timestampPrefix = newTimestampPrefix;
 }
 
++ (void)setReferencePrefix:(NSString *)newReferencePrefix {
+    referencePrefix = newReferencePrefix;
+}
+
 + (void)setGeopointPrefix:(NSString *)newGeopointPrefix {
     geopointPrefix = newGeopointPrefix;
 }
@@ -216,6 +220,8 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
         NSString *unwrapped =[self unwrap:stringValue ForPrefix:fieldValueArrayRemove];
         return [FIRFieldValue fieldValueForArrayRemove:[self JSONArrayToArray:unwrapped]];
     }
+    
+    return stringValue;
 }
 
 + (NSString *)unwrap:(NSString *)stringValue ForPrefix:(NSString *)prefix {
