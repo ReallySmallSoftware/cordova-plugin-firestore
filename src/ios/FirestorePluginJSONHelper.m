@@ -183,15 +183,15 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
         return true;
     }
     
-    if ([[value substringToIndex:fieldValueIncrement.length] isEqualToString:fieldValueIncrement]) {
+    if ([value length] >= fieldValueIncrement.length && [[value substringToIndex:fieldValueIncrement.length] isEqualToString:fieldValueIncrement]) {
         return true;
     }
     
-    if ([[value substringToIndex:fieldValueArrayUnion.length] isEqualToString:fieldValueArrayUnion]) {
+    if ([value length] >= fieldValueArrayUnion.length && [[value substringToIndex:fieldValueArrayUnion.length] isEqualToString:fieldValueArrayUnion]) {
         return true;
     }
     
-    if ([[value substringToIndex:fieldValueArrayRemove.length] isEqualToString:fieldValueArrayRemove]) {
+    if ([value length] >= fieldValueArrayRemove.length &&  [[value substringToIndex:fieldValueArrayRemove.length] isEqualToString:fieldValueArrayRemove]) {
         return true;
     }
     
