@@ -4,6 +4,7 @@ package uk.co.reallysmall.cordova.plugin.firestore;
 import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -37,7 +38,8 @@ public class TransactionDocGetHandler implements ActionHandler {
 
             } catch (Exception e) {
                 FirestoreLog.e(FirestorePlugin.TAG, "Error processing transactional document get in thread", e);
-                callbackContext.error(e.getMessage());
+                String errorCode = ((FirebaseFirestoreException) e).getCode().name();
+                callbackContext.error(PluginResultHelper.createError(errorCode, e.getMessage()));
             }
 
         } catch (JSONException e) {

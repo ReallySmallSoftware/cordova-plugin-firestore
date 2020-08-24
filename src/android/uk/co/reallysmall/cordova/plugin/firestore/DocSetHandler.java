@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
 
 import org.apache.cordova.CallbackContext;
@@ -59,8 +60,8 @@ public class DocSetHandler implements ActionHandler {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         FirestoreLog.w(FirestorePlugin.TAG, "Error writing document " + docPath, e);
-                        callbackContext.error(e.getMessage());
-                    }
+                        String errorCode = ((FirebaseFirestoreException) e).getCode().name();
+                        callbackContext.error(PluginResultHelper.createError(errorCode, e.getMessage()));                    }
                 };
 
                 if (setOptions == null) {

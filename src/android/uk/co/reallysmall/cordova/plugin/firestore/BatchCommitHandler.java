@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.WriteBatch;
 
 import org.apache.cordova.CallbackContext;
@@ -35,7 +36,8 @@ public class BatchCommitHandler implements ActionHandler {
                     if (task.isSuccessful()) {
                         callbackContext.success();
                     } else {
-                        callbackContext.error(task.getException().getMessage());
+                        String errorCode = ((FirebaseFirestoreException) task.getException()).getCode().name();
+                        callbackContext.error(PluginResultHelper.createError(errorCode, task.getException().getMessage()));
                     }
                 }
             });

@@ -33,8 +33,9 @@
     FIRQuery *query = [self processQueries:queries ForQuery:collectionReference];
 
     FIRQuerySnapshotBlock snapshotBlock =^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
-        if (snapshot == nil) {
+        if (error != nil) {
             NSLog(@"Collection snapshot listener error %s", [self localError:error]);
+            CDVPluginResult *pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
             return;
         }
 
@@ -489,8 +490,9 @@
     BOOL includeMetadataChanges = [self getIncludeMetadataChanges:options];
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
-        if (snapshot == nil) {
+        if (error != nil) {
             NSLog(@"Document snapshot listener error %s", [self localError:error]);
+            CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginErrorResult:error :YES];
             return;
         }
 

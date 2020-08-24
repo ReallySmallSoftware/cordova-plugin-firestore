@@ -1,4 +1,9 @@
 # History
+## 4.1.0
+- Ensure Android errors are mapped to Javascript
+- Ensure iOS errors are mapped to Javascript
+- Fix problem with JS snapshot error handlers not being called
+
 ## 4.0.0
 - Amended typescript support
 - Updated android firebase dependencies

@@ -34,8 +34,12 @@ declare namespace Firestore {
         (documentSnapshot: DocumentSnapshot): void;
     }
 
+    export interface FirestoreError extends Error {
+        code: string;
+    }
+    
     export interface DocumentErrorCallback {
-        (error: Error): void;
+        (error: FirestoreError): void;
     }
 
     export interface SnapshotListenOptions {
@@ -112,7 +116,7 @@ declare namespace Firestore {
     }
 
     export interface QueryErrorCallback {
-        (error: Error): void;
+        (error: FirestoreError): void;
     }
 
     export interface Query {

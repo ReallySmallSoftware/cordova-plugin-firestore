@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -42,7 +43,8 @@ public class DocUpdateHandler implements ActionHandler {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        callbackContext.error(e.getMessage());
+                        String errorCode = ((FirebaseFirestoreException) e).getCode().name();
+                        callbackContext.error(PluginResultHelper.createError(errorCode, e.getMessage()));
                         FirestoreLog.w(FirestorePlugin.TAG, "Error updating document", e);
                     }
                 });

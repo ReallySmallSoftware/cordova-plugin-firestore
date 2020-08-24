@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -47,7 +48,8 @@ public class CollectionGetHandler implements ActionHandler {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         FirestoreLog.w(FirestorePlugin.TAG, "Error getting collection", e);
-                        callbackContext.error(e.getMessage());
+                        String errorCode = ((FirebaseFirestoreException) e).getCode().name();
+                        callbackContext.error(PluginResultHelper.createError(errorCode, e.getMessage()));
                     }
                 });
             } catch (Exception e) {

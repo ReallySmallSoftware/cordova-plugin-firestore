@@ -49,6 +49,7 @@ public class DocOnSnapshotHandler implements ActionHandler {
                                     @Nullable FirebaseFirestoreException e) {
                     if (e != null) {
                         FirestoreLog.w(FirestorePlugin.TAG, "Document snapshot listener error", e);
+                        callbackContext.sendPluginResult(PluginResultHelper.createPluginErrorResult(e, true));
                         return;
                     }
 

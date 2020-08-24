@@ -127,7 +127,8 @@ public class RunTransactionHandler implements ActionHandler {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         FirestoreLog.w(FirestorePlugin.TAG, "Transaction failure", e);
-                        callbackContext.error(e.getMessage());
+                        String errorCode = ((FirebaseFirestoreException) e).getCode().name();
+                        callbackContext.error(PluginResultHelper.createError(errorCode, e.getMessage()));
                     }
                 });
 

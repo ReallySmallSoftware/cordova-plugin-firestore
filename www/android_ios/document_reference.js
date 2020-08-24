@@ -47,24 +47,29 @@ DocumentReference.prototype = {
       args.push(optionsOrObserverOrOnNext);
     }
     var wrappedCallback;
+    var wrappedError;
 
     if (this._isFunction(optionsOrObserverOrOnNext)) {
       wrappedCallback = function (documentSnapshot) {
         optionsOrObserverOrOnNext(new DocumentSnapshot(documentSnapshot));
       };
+
+      if (this._isFunction(observerOrOnNextOrOnError)) {
+        wrappedError = observerOrOnNextOrOnError;
+      }
     } else if (this._isFunction(observerOrOnNextOrOnError)) {
       wrappedCallback = function (documentSnapshot) {
         observerOrOnNextOrOnError(new DocumentSnapshot(documentSnapshot));
       };
+
+      if (this._isFunction(onError)) {
+        wrappedError = onError;
+      }
     } else {
       wrappedCallback = function (documentSnapshot) { };
     }
 
-    var wrappedError;
-
-    if (this._isFunction(onError)) {
-      wrappedError = onError;
-    } else {
+    if (!wrappedError) {
       wrappedError = function () {
         throw new Error("Undefined error in docOnSnapshot");
       };

@@ -45,6 +45,7 @@ public class CollectionOnSnapshotHandler implements ActionHandler {
 
                         if (e != null) {
                             FirestoreLog.w(FirestorePlugin.TAG, "Collection snapshot listener error " + collection, e);
+                            callbackContext.sendPluginResult(PluginResultHelper.createPluginErrorResult(e, true));
                             return;
                         }
 

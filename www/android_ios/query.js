@@ -60,26 +60,31 @@ Query.prototype = Object.create({
     }
 
     var wrappedCallback;
+    var wrappedError;
 
     if (this._isFunction(optionsOrObserverOrOnNext)) {
       wrappedCallback = function (querySnapshot) {
         optionsOrObserverOrOnNext(new QuerySnapshot(querySnapshot));
       };
+
+      if (this._isFunction(observerOrOnNextOrOnError)) {
+        wrappedError = observerOrOnNextOrOnError;
+      }
     } else if (this._isFunction(observerOrOnNextOrOnError)) {
       wrappedCallback = function (querySnapshot) {
         observerOrOnNextOrOnError(new QuerySnapshot(querySnapshot));
       };
+
+      if (this._isFunction(onError)) {
+        wrappedError = onError;
+      }
     } else {
       wrappedCallback = function (querySnapshot) { };
     }
 
     var args = [this._ref.path, this._ref._queries, options, callbackId];
 
-    var wrappedError;
-
-    if (this._isFunction(onError)) {
-      wrappedError = onError;
-    } else {
+    if (!onError) {
       wrappedError = function () {
         throw new Error("Undefined error in collectionOnSnapshot");
       };
