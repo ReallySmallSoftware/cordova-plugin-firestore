@@ -11,6 +11,54 @@
 
 @implementation FirestorePluginResultHelper;
 
+id objects[] = { @"aborted", 
+@"already-exists", 
+@"cancelled", 
+@"data-loss",
+@"deadline-exceeded",
+@"failed-precondition",
+@"internal" ,
+@"invalid-argument",
+@"not-found",
+@"ok",
+@"out-of-range",
+@"permission-denied",
+@"resource-exhausted",
+@"unauthenticated",
+@"unavailable",
+@"unimplemented",
+@"unknown"};
+id keys[] = { @FIRFirestoreErrorCodeAborted,
+ @FIRFirestoreErrorCodeAlreadyExists, 
+ @FIRFirestoreErrorCodeCancelled,
+ @FIRFirestoreErrorCodeDataLoss,
+ @FIRFirestoreErrorCodeDeadlineExceeded,
+ @FIRFirestoreErrorCodeFailedPrecondition,
+ @FIRFirestoreErrorCodeInternal,
+ @FIRFirestoreErrorCodeInvalidArgument,
+ @FIRFirestoreErrorCodeNotFound,
+ @FIRFirestoreErrorCodeOK,
+ @FIRFirestoreErrorCodeOutOfRange,
+ @FIRFirestoreErrorCodePermissionDenied,
+ @FIRFirestoreErrorCodeResourceExhausted,
+ @FIRFirestoreErrorCodeUnauthenticated,
+ @FIRFirestoreErrorCodeUnavailable,
+ @FIRFirestoreErrorCodeUnimplemented,
+ @FIRFirestoreErrorCodeUnknown };
+
+NSUInteger count = sizeof(objects) / sizeof(id);
+NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
+                                                       forKeys:keys
+                                                         count:count];
+
++ (CDVPluginResult *)createPluginErrorResult:(NSError *)error :(BOOL )reusable {
+    NSDictionary *result = [FirestorePluginResultHelper createDocumentSnapshot:doc];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self.createError code:error.code message:localizedDescription]];
+    [pluginResult setKeepCallbackAsBool:reusable];
+
+    return pluginResult;
+}
+
 + (CDVPluginResult *)createDocumentPluginResult:(FIRDocumentSnapshot *)doc :(BOOL )reusable {
     NSDictionary *result = [FirestorePluginResultHelper createDocumentSnapshot:doc];
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
@@ -46,6 +94,19 @@
     [pluginResult setKeepCallbackAsBool:reusable];
 
     return pluginResult;
+}
+
++ (NSDictionary *)createError:(NSString *)code :(NSString *)message {
+
+    NSDictionary *error;
+
+    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating error result");
+
+    error = @{ @"code" : mappedErrors[code],
+               @"message" : message
+            };
+
+    return error;
 }
 
 + (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc {

@@ -33,15 +33,16 @@
     FIRQuery *query = [self processQueries:queries ForQuery:collectionReference];
 
     FIRQuerySnapshotBlock snapshotBlock =^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
+
+        CDVPluginResult *pluginResult;
+
         if (error != nil) {
             NSLog(@"Collection snapshot listener error %s", [self localError:error]);
-            CDVPluginResult *pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
-            return;
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
+        } else {
+            pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :YES];
+            os_log_debug(OS_LOG_DEFAULT, "Got collection snapshot data");
         }
-
-        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :YES];
-
-        os_log_debug(OS_LOG_DEFAULT, "Got collection snapshot data");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -229,16 +230,11 @@
         CDVPluginResult *pluginResult;
 
         if (error != nil) {
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
-                    @"code" : @(error.code),
-                    @"message" : error.description}
-            ];
-
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
             NSLog(@"Error writing document to collection %s", [self localError:error]);
 
         } else {
             pluginResult = [FirestorePluginResultHelper createDocumentReferencePluginResult:ref :NO];
-
             os_log_debug(OS_LOG_DEFAULT, "Successfully written document to collection");
         }
 
@@ -257,14 +253,16 @@
     FIRQuery *query = [self processQueries:queries ForQuery:collectionReference];
 
     [query getDocumentsWithCompletion:^(FIRQuerySnapshot * snapshot, NSError * error) {
+
+        CDVPluginResult *pluginResult;
+
         if (error != nil) {
             NSLog(@"Error getting collection %s", [self localError:error]);
-            return;
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
+        } else {
+            pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :NO];
+            os_log_debug(OS_LOG_DEFAULT, "Successfully got collection");
         }
-
-        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createQueryPluginResult:snapshot :NO];
-
-        os_log_debug(OS_LOG_DEFAULT, "Successfully got collection");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -406,16 +404,11 @@
         CDVPluginResult *pluginResult;
 
         if (error != nil) {
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
-                                                                                                          @"code" : @(error.code),
-                                                                                                          @"message" : error.description}
-                            ];
-
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
             NSLog(@"Error writing document %s", [self localError:error]);
 
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-
             os_log_debug(OS_LOG_DEFAULT, "Successfully written document");
         }
 
@@ -455,16 +448,11 @@
         CDVPluginResult *pluginResult;
 
         if (error != nil) {
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
-                                                                                                          @"code" : @(error.code),
-                                                                                                          @"message" : error.description}
-                            ];
-
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
             NSLog(@"Error updating document %s", [self localError:error]);
 
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-
             os_log_debug(OS_LOG_DEFAULT,"Successfully updated document");
         }
 
@@ -490,15 +478,17 @@
     BOOL includeMetadataChanges = [self getIncludeMetadataChanges:options];
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+
+        CDVPluginResult *pluginResult;
+
         if (error != nil) {
             NSLog(@"Document snapshot listener error %s", [self localError:error]);
-            CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginErrorResult:error :YES];
-            return;
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
+        } else {
+
+            pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
+            os_log_debug(OS_LOG_DEFAULT,"Got document snapshot data");
         }
-
-        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
-
-        os_log_debug(OS_LOG_DEFAULT,"Got document snapshot data");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -528,14 +518,16 @@
     FIRDocumentReference *documentReference = [[self.firestore collectionWithPath:collection] documentWithPath:doc];
 
     FIRDocumentSnapshotBlock snapshotBlock =^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
-        if (snapshot == nil) {
+
+        CDVPluginResult *pluginResult;
+
+        if (error != nil) {
             NSLog(@"Error getting document %s", [self localError:error]);
-            return;
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
+        } else {
+            pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
+            os_log_debug(OS_LOG_DEFAULT,"Successfully got document");
         }
-
-        CDVPluginResult *pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :YES];
-
-        os_log_debug(OS_LOG_DEFAULT,"Successfully got document");
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     };
@@ -557,7 +549,7 @@
 
         if (error != nil) {
             NSLog(@"Error deleting document %s", [self localError:error]);
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :YES];
         } else {
             os_log_debug(OS_LOG_DEFAULT, "Successfully deleted document");
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -739,7 +731,7 @@
     CDVPluginResult *pluginResult;
 
     if (*errorPointer != nil) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        pluginResult = [FirestorePluginResultHelper createPluginErrorResult:errorPointer :NO];
     } else {
         pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :NO];
     }
@@ -837,10 +829,7 @@
         CDVPluginResult *pluginResult;
 
         if (error != nil) {
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{
-                                                                                                          @"code" : @(error.code),
-                                                                                                          @"message" : error.description}
-                            ];
+            pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
             NSLog(@"Transaction failure %s", [self localError:error]);
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];

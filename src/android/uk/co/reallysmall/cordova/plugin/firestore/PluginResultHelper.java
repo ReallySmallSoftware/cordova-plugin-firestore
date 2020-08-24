@@ -46,7 +46,7 @@ public class PluginResultHelper {
 
     static PluginResult createPluginErrorResult(FirebaseFirestoreException e, boolean reusable) {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR,
-                createError(errorCodeMap.get(e.getCode()).toString(),e.getMessage()));
+                createError(e.getCode().toString(),e.getMessage()));
         pluginResult.setKeepCallback(reusable);
         return pluginResult;
     }
@@ -91,7 +91,7 @@ public class PluginResultHelper {
         FirestoreLog.d(FirestorePlugin.TAG, "Creating error result");
 
         try {
-            error.put("code", code);
+            error.put("code", errorCodeMap.get(code));
             error.put("message", message);
 
         } catch (JSONException e) {

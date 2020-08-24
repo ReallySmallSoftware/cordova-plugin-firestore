@@ -17,9 +17,11 @@
 + (CDVPluginResult *)createDocumentPluginResult:(FIRDocumentSnapshot *)doc :(BOOL )reusable;
 + (CDVPluginResult *)createQueryPluginResult:(FIRQuerySnapshot *)doc :(BOOL )reusable;
 + (CDVPluginResult *)createDocumentReferencePluginResult:(FIRDocumentReference *)doc :(BOOL )reusable;
++ (CDVPluginResult *)createPluginErrorResult:(NSError *)error :(BOOL )reusable;
 
 + (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc;
-+ (NSDictionary *)createDocumentReference:(FIRDocumentReference *)doc;
++ (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc;
++ (NSDictionary *)createError:(NSString *)code :(NSString *):message;
 
 @end
 
