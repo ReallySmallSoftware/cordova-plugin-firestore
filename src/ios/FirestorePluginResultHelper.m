@@ -7,53 +7,33 @@
 
 #import "FirestorePluginResultHelper.h"
 #import "FirestorePluginJSONHelper.h"
-#include <asl.h>
+#import <os/log.h>
 
 @implementation FirestorePluginResultHelper;
 
-id objects[] = { @"aborted", 
-@"already-exists", 
-@"cancelled", 
-@"data-loss",
-@"deadline-exceeded",
-@"failed-precondition",
-@"internal" ,
-@"invalid-argument",
-@"not-found",
-@"ok",
-@"out-of-range",
-@"permission-denied",
-@"resource-exhausted",
-@"unauthenticated",
-@"unavailable",
-@"unimplemented",
-@"unknown"};
-id keys[] = { @FIRFirestoreErrorCodeAborted,
- @FIRFirestoreErrorCodeAlreadyExists, 
- @FIRFirestoreErrorCodeCancelled,
- @FIRFirestoreErrorCodeDataLoss,
- @FIRFirestoreErrorCodeDeadlineExceeded,
- @FIRFirestoreErrorCodeFailedPrecondition,
- @FIRFirestoreErrorCodeInternal,
- @FIRFirestoreErrorCodeInvalidArgument,
- @FIRFirestoreErrorCodeNotFound,
- @FIRFirestoreErrorCodeOK,
- @FIRFirestoreErrorCodeOutOfRange,
- @FIRFirestoreErrorCodePermissionDenied,
- @FIRFirestoreErrorCodeResourceExhausted,
- @FIRFirestoreErrorCodeUnauthenticated,
- @FIRFirestoreErrorCodeUnavailable,
- @FIRFirestoreErrorCodeUnimplemented,
- @FIRFirestoreErrorCodeUnknown };
+NSDictionary *mappedErrors;
 
-NSUInteger count = sizeof(objects) / sizeof(id);
-NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
-                                                       forKeys:keys
-                                                         count:count];
-
++(void)load {
+     mappedErrors = @{  @(FIRFirestoreErrorCodeAborted) : @"aborted",\
+                        @(FIRFirestoreErrorCodeAlreadyExists): @"already-exists",\
+                        @(FIRFirestoreErrorCodeCancelled):@"cancelled",\
+                        @(FIRFirestoreErrorCodeDataLoss): @"data-loss",\
+                        @(FIRFirestoreErrorCodeDeadlineExceeded): @"deadline-exceeded",\
+                        @(FIRFirestoreErrorCodeFailedPrecondition):@"failed-precondition",\
+                        @(FIRFirestoreErrorCodeInternal):@"internal", \
+                        @(FIRFirestoreErrorCodeInvalidArgument):@"invalid-argument",\
+                        @(FIRFirestoreErrorCodeNotFound):@"not-found",\
+                        @(FIRFirestoreErrorCodeOK):@"ok",\
+                        @(FIRFirestoreErrorCodeOutOfRange):@"out-of-range",\
+                        @(FIRFirestoreErrorCodePermissionDenied):@"permission-denied",\
+                        @(FIRFirestoreErrorCodeResourceExhausted):@"resource-exhausted",\
+                        @(FIRFirestoreErrorCodeUnauthenticated):@"unauthenticated",\
+                        @(FIRFirestoreErrorCodeUnavailable):@"unavailable",\
+                        @(FIRFirestoreErrorCodeUnimplemented):@"unimplemented",\
+                        @(FIRFirestoreErrorCodeUnknown):@"unknown"};
+}
 + (CDVPluginResult *)createPluginErrorResult:(NSError *)error :(BOOL )reusable {
-    NSDictionary *result = [FirestorePluginResultHelper createDocumentSnapshot:doc];
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self.createError code:error.code message:localizedDescription]];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self createError:error.code :error.localizedDescription]];
     [pluginResult setKeepCallbackAsBool:reusable];
 
     return pluginResult;
@@ -79,7 +59,7 @@ NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
     NSDictionary *querySnapshot = @{};
     NSMutableArray *result = [[NSMutableArray alloc] init];
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating query snapshot result");
+    os_log_debug(OS_LOG_DEFAULT, "Creating query snapshot result");
 
     if (query.documents != nil) {
         for (FIRQueryDocumentSnapshot *doc in query.documents) {
@@ -96,13 +76,13 @@ NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
     return pluginResult;
 }
 
-+ (NSDictionary *)createError:(NSString *)code :(NSString *)message {
++ (NSDictionary *)createError:(NSInteger )code :(NSString *)message {
 
     NSDictionary *error;
+    
+    os_log_debug(OS_LOG_DEFAULT, "Creating error result");
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating error result");
-
-    error = @{ @"code" : mappedErrors[code],
+    error = @{ @"code" : [mappedErrors objectForKey:@(code)],
                @"message" : message
             };
 
@@ -113,7 +93,7 @@ NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
 
     NSDictionary *documentSnapshot;
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating document snapshot result");
+    os_log_debug(OS_LOG_DEFAULT, "Creating document snapshot result");
 
     if (doc.exists) {
         documentSnapshot = @{ @"id" : doc.documentID,
@@ -135,7 +115,7 @@ NSDictionary *mappedErrors = [NSDictionary dictionaryWithObjects:objects
 
     NSDictionary *documentReference;
 
-    asl_log(NULL, NULL, ASL_LEVEL_DEBUG, "Creating document reference result");
+    os_log_debug(OS_LOG_DEFAULT, "Creating document reference result");
 
     documentReference = @{ @"id" : doc.documentID};
 

@@ -729,9 +729,10 @@
     FIRDocumentSnapshot *snapshot = [transaction getDocument:documentReference error:errorPointer];
 
     CDVPluginResult *pluginResult;
-
+    
     if (*errorPointer != nil) {
-        pluginResult = [FirestorePluginResultHelper createPluginErrorResult:errorPointer :NO];
+        NSError *error = *errorPointer;
+        pluginResult = [FirestorePluginResultHelper createPluginErrorResult:error :NO];
     } else {
         pluginResult = [FirestorePluginResultHelper createDocumentPluginResult:snapshot :NO];
     }

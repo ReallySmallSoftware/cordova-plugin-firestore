@@ -20,8 +20,7 @@
 + (CDVPluginResult *)createPluginErrorResult:(NSError *)error :(BOOL )reusable;
 
 + (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc;
-+ (NSDictionary *)createDocumentSnapshot:(FIRDocumentSnapshot *)doc;
-+ (NSDictionary *)createError:(NSString *)code :(NSString *):message;
++ (NSDictionary *)createError:(NSInteger)code :(NSString *)message;
 
 @end
 
