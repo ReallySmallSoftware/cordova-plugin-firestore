@@ -84,7 +84,7 @@ Query.prototype = Object.create({
 
     var args = [this._ref.path, this._ref._queries, options, callbackId];
 
-    if (!onError) {
+    if (!wrappedError) {
       wrappedError = function () {
         throw new Error("Undefined error in collectionOnSnapshot");
       };

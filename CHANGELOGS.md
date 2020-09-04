@@ -1,4 +1,7 @@
 # History
+## 4.1.1
+- Fixed Javascript onSnapshot error handling
+
 ## 4.1.0
 - Ensure Android errors are mapped to Javascript
 - Ensure iOS errors are mapped to Javascript
