@@ -29,7 +29,7 @@ public class JSONDateWrapper extends Date {
     public static Date unwrapDate(Object value) {
         String stringValue = (String) value;
         int prefixLength = datePrefix.length();
-        String timestamp = stringValue.substring(prefixLength + 1);
+        String timestamp = stringValue.substring(prefixLength);
 
         return new Date(Long.parseLong(timestamp));
     }
