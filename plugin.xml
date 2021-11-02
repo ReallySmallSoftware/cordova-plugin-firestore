@@ -42,7 +42,12 @@
       </feature>
     </config-file>
 
-    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.3.1"/>
+    <config-file target="config.xml" parent="/*">
+      <preference name="GradlePluginGoogleServicesEnabled" value="true" />
+      <preference name="GradlePluginGoogleServicesVersion" value="4.2.0" />
+    </config-file>
+    
+    <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="22.0.0"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
     <framework src="com.google.code.gson:gson:2.8.2"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>
