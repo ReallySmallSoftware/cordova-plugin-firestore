@@ -49,7 +49,7 @@
     
     <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="22.0.0"/>
     <framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION"/>
-    <framework src="com.google.code.gson:gson:2.8.2"/>
+    <framework src="com.google.code.gson:gson:2.9.0"/>
     <framework src="firestore.gradle" custom="true" type="gradleReference"/>
 
     <source-file src="src/android/uk/co/reallysmall/cordova/plugin/firestore/ActionHandler.java" target-dir="src/uk/co/reallysmall/cordova/plugin/firestore"/>
