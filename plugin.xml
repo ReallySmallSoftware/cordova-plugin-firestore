@@ -44,7 +44,7 @@
 
     <config-file target="config.xml" parent="/*">
       <preference name="GradlePluginGoogleServicesEnabled" value="true" />
-      <preference name="GradlePluginGoogleServicesVersion" value="4.2.0" />
+      <preference name="GradlePluginGoogleServicesVersion" value="4.3.14" />
     </config-file>
     
     <preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="22.0.0"/>
