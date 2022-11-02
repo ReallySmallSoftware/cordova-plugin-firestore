@@ -1,10 +1,32 @@
 buildscript {
-	repositories {
-		maven { url 'https://maven.google.com' }
-		mavenLocal()
-	}
-	dependencies {
-		classpath 'com.android.tools.build:gradle:7.2.1'
-		classpath 'com.google.gms:google-services:4.3.10'
-	}
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.google.gms:google-services:4.3.10'
+    }
 }
+repositories {
+    mavenCentral()
+    maven {
+      url "https://maven.google.com"
+    }
+}
+dependencies {
+    implementation "com.google.firebase:firebase-core:18.0.0"
+    implementation "androidx.appcompat:appcompat:1.3.1"
+}
+
+cdvPluginPostBuildExtras.add({
+    afterEvaluate {
+        rootProject.subprojects {
+            if (name == "app") {
+                if (!plugins.hasPlugin('com.google.gms.google-services')) {
+                    apply plugin: com.google.gms.googleservices.GoogleServicesPlugin
+                }
+            }
+        }
+    }
+})
