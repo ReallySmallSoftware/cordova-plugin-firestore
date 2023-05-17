@@ -139,7 +139,6 @@ public class InitialiseHandler implements ActionHandler {
 
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(persist)
-                    .setTimestampsInSnapshotsEnabled(timestampsInSnapshots)
                     .build();
             firestorePlugin.getDatabase().setFirestoreSettings(settings);
 
