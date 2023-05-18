@@ -229,6 +229,13 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
 }
 
 + (NSArray *)JSONArrayToArray:(NSString *)array {
-    
+    NSData *data = [array dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    NSArray *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    if (error != nil) {
+        NSLog(@"Error parsing JSON string: %@", error);
+        return nil;
+    }
+    return result;
 }
 @end
