@@ -225,7 +225,8 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
 }
 
 + (NSString *)unwrap:(NSString *)stringValue ForPrefix:(NSString *)prefix {
-    return [stringValue substringFromIndex:prefix.length];
+    // +1 to remove ":" (e.g stringValue "__INCREMENT:{value}")
+    return [stringValue substringFromIndex:prefix.length+1];
 }
 
 + (NSArray *)JSONArrayToArray:(NSString *)array {
