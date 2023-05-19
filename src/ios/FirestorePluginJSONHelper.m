@@ -225,10 +225,18 @@ static NSString *fieldValueArrayUnion = @"__ARRAYUNION";
 }
 
 + (NSString *)unwrap:(NSString *)stringValue ForPrefix:(NSString *)prefix {
-    return [stringValue substringFromIndex:prefix.length];
+    // +1 to remove ":" (e.g stringValue "__INCREMENT:{value}")
+    return [stringValue substringFromIndex:prefix.length+1];
 }
 
 + (NSArray *)JSONArrayToArray:(NSString *)array {
-    
+    NSData *data = [array dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *error;
+    NSArray *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    if (error != nil) {
+        NSLog(@"Error parsing JSON string: %@", error);
+        return nil;
+    }
+    return result;
 }
 @end
