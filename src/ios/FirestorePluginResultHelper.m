@@ -56,9 +56,9 @@ NSDictionary *mappedErrors;
 }
 
 + (CDVPluginResult *)createQueryPluginResult:(FIRQuerySnapshot *)query :(BOOL )reusable {
+    NSDictionary *querySnapshot = @{};
     NSMutableArray *result = [[NSMutableArray alloc] init];
-    NSMutableArray *changes = [[NSMutableArray alloc] init];
-  
+
     os_log_debug(OS_LOG_DEFAULT, "Creating query snapshot result");
 
     if (query.documents != nil) {
@@ -68,21 +68,8 @@ NSDictionary *mappedErrors;
         }
     }
 
-    if (query.documentChanges != nil) {
-        for (FIRDocumentChange *diff in query.documentChanges) {
-            NSDictionary *change = @{
-                @"type": [self mapDocumentChangeType:diff.type],
-                @"doc": [FirestorePluginResultHelper createDocumentSnapshot:diff.document]
-            };
-            [changes addObject:change];
-        }
-    }
-
-    NSDictionary *querySnapshot = @{
-        @"docs" : result,
-        @"docChanges" : changes
-    };
-
+    querySnapshot = @{ @"docs" : result};
+    
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:querySnapshot];
     [pluginResult setKeepCallbackAsBool:reusable];
 
