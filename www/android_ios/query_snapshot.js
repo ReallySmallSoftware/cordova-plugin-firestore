@@ -10,15 +10,18 @@ QuerySnapshot.prototype = {
     for (var i = 0; i < keys.length; i++) {
       callback(new QueryDocumentSnapshot(this._data.docs[i]));
     }
+  },
+  docChanges: function () {
+    return this._data.docChanges.map(function(change) {
+      return {
+        type: change.type,
+        doc: new QueryDocumentSnapshot(change.doc)
+      };
+    });
   }
 };
 
 Object.defineProperties(QuerySnapshot.prototype, {
-  docChanges: {
-    get: function () {
-      throw "QuerySnapshot.docChanges: Not supported";
-    }
-  },
   docs: {
     get: function () {
       return this._data.docs.map(function(doc) {

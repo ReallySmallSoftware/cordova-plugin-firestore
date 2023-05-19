@@ -66,6 +66,7 @@ public class PluginResultHelper {
     static PluginResult createPluginResult(QuerySnapshot value, boolean reusable) {
         JSONObject querySnapshot = new JSONObject();
         JSONArray array = new JSONArray();
+        JSONArray changesArray = new JSONArray();
 
         FirestoreLog.d(FirestorePlugin.TAG, "Creating query snapshot result");
 
@@ -74,8 +75,21 @@ public class PluginResultHelper {
             array.put(document);
         }
 
+        for (DocumentChange change : value.getDocumentChanges()) {
+            JSONObject changeObj = new JSONObject();
+            try {
+                changeObj.put("type", change.getType().toString());
+                changeObj.put("doc", createDocumentSnapshot(change.getDocument()));
+            } catch (JSONException e) {
+                FirestoreLog.e(FirestorePlugin.TAG, "Error creating document change result", e);
+                throw new RuntimeException(e);
+            }
+            changesArray.put(changeObj);
+        }
+
         try {
             querySnapshot.put("docs", array);
+            querySnapshot.put("docChanges", changesArray);  // add this line
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

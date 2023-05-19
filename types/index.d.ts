@@ -104,6 +104,7 @@ declare namespace Firestore {
 
     export interface QuerySnapshot {
         forEach(callback: QuerySnapshotCallback): void;
+        docChanges(): any[];
         docs: QueryDocumentSnapshot[];
         empty: boolean;
         metadata: any;
